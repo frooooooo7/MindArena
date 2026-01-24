@@ -2,29 +2,12 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { registerSchema, type RegisterFormData } from "@mindarena/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Eye, EyeOff, User, Loader2 } from "lucide-react";
 import { useState } from "react";
-
-const registerSchema = z
-    .object({
-        name: z.string().min(2, "Name must be at least 2 characters"),
-        email: z.string().email("Please enter a valid email address"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
-        confirmPassword: z.string(),
-        terms: z.boolean().refine((val) => val === true, {
-            message: "You must accept the terms and conditions",
-        }),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords don't match",
-        path: ["confirmPassword"],
-    });
-
-type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
     const [showPassword, setShowPassword] = useState(false);
