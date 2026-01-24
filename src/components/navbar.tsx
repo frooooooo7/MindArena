@@ -48,8 +48,16 @@ export function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
+            <Link href="/auth">
+              <Button
+                size="sm"
+                className="hidden sm:flex h-9 px-4 font-medium bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all"
+              >
+                Sign In
+              </Button>
+            </Link>
             <ModeToggle />
-            
+
             {/* Mobile menu button */}
             <Button
               variant="ghost"
