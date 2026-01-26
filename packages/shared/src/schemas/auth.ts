@@ -31,3 +31,19 @@ export const registerSchema = z
     });
 
 export type RegisterFormData = z.infer<typeof registerSchema>;
+
+// ============================================
+// API RESPONSE TYPES
+// ============================================
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    createdAt: Date;
+}
+
+export interface AuthResponse {
+    user: User;
+    token: string;
+}
