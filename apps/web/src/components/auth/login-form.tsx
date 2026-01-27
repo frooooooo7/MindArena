@@ -8,9 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
 
 export function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     const {
         register,
@@ -21,14 +25,24 @@ export function LoginForm() {
     });
 
     const onSubmit = async (data: LoginFormData) => {
-        // Simulate API call
-        console.log("Login data:", data);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        alert("Login submitted! (Demo mode)");
+        try {
+            setError(null);
+            await authService.login(data);
+            router.push("/");
+        } catch (err: any) {
+            console.error("Login failed", err);
+            setError(err.response?.data?.error || "Invalid email or password");
+        }
     };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
+                    {error}
+                </div>
+            )}
+
             {/* Email Field */}
             <div className="space-y-2">
                 <Label htmlFor="login-email" className="text-sm font-medium">

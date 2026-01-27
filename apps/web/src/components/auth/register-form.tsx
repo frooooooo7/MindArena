@@ -8,10 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Eye, EyeOff, User, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
 
 export function RegisterForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     const {
         register,
@@ -25,14 +29,24 @@ export function RegisterForm() {
     });
 
     const onSubmit = async (data: RegisterFormData) => {
-        // Simulate API call
-        console.log("Register data:", data);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        alert("Registration submitted! (Demo mode)");
+        try {
+            setError(null);
+            await authService.register(data);
+            router.push("/");
+        } catch (err: any) {
+            console.error("Registration failed", err);
+            setError(err.response?.data?.error || "Registration failed. Please try again.");
+        }
     };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
+                    {error}
+                </div>
+            )}
+
             {/* Name Field */}
             <div className="space-y-2">
                 <Label htmlFor="register-name" className="text-sm font-medium">
