@@ -1,13 +1,26 @@
 "use client";
 
+"use client";
+
+import { useState } from "react";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
 import { ArenaHeader } from "@/components/arena/arena-header";
 import { ArenaModes } from "@/components/arena/arena-modes";
 import { LiveFeed } from "@/components/arena/live-feed";
+import { MatchmakingOverlay } from "@/components/arena/matchmaking-overlay";
+import { useArena } from "@/hooks/use-arena";
 import { ShieldAlert, Info } from "lucide-react";
 
 export default function ArenaPage() {
+  const [selectedGame, setSelectedGame] = useState("");
+  const { isSearching, match, joinQueue, leaveQueue } = useArena();
+
+  const handleJoinQueue = (gameType: string) => {
+    setSelectedGame(gameType);
+    joinQueue(gameType);
+  };
+
   return (
     <div className="relative min-h-screen bg-[#050505]">
       {/* Darker backgrounds for Arena */}
@@ -26,7 +39,7 @@ export default function ArenaPage() {
                   <h2 className="text-2xl font-bold tracking-tight mb-2">Available Arenas</h2>
                   <p className="text-muted-foreground text-sm">Select your battlefield and start competing.</p>
                </div>
-               <ArenaModes />
+               <ArenaModes onJoin={handleJoinQueue} />
 
                <div className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/10 flex items-start gap-4">
                   <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
@@ -68,6 +81,12 @@ export default function ArenaPage() {
 
         </div>
       </main>
+
+      <MatchmakingOverlay 
+        isOpen={isSearching || !!match} 
+        onClose={leaveQueue} 
+        gameType={selectedGame}
+      />
     </div>
   );
 }

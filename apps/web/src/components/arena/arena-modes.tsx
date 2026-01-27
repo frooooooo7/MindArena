@@ -35,13 +35,17 @@ const modes = [
 
 import { Zap } from "lucide-react";
 
-export function ArenaModes() {
+interface ArenaModesProps {
+  onJoin: (gameType: string) => void;
+}
+
+export function ArenaModes({ onJoin }: ArenaModesProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {modes.map((mode, i) => (
-        <div key={i} className="group relative p-8 rounded-[2rem] border border-border/40 bg-card/30 backdrop-blur-sm overflow-hidden hover:border-violet-500/40 transition-all flex flex-col h-full shadow-lg">
-          {/* Color splash */}
-          <div className={`absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-32 w-32 bg-gradient-to-br ${mode.color} opacity-10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700`} />
+        <div key={i} className="group relative p-8 rounded-[2rem] border border-border/40 bg-card/50 overflow-hidden hover:border-violet-500/40 transition-colors duration-200 flex flex-col h-full shadow-lg">
+          {/* Color splash - simplified */}
+          <div className={`absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-32 w-32 bg-gradient-to-br ${mode.color} opacity-10 rounded-full pointer-events-none`} />
           
           <div className="relative mb-6">
             <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${mode.color} text-white shadow-lg`}>
@@ -67,7 +71,10 @@ export function ArenaModes() {
                 <Globe className="h-3 w-3" />
                 {mode.participants}
              </div>
-             <Button className="w-full group/btn relative overflow-hidden h-12 rounded-xl bg-violet-600/10 text-violet-400 hover:bg-violet-600 hover:text-white border border-violet-500/20 hover:border-violet-500 transition-all duration-300 shadow-sm shadow-violet-500/5">
+             <Button 
+                onClick={() => onJoin(mode.title)}
+                className="w-full group/btn relative overflow-hidden h-12 rounded-xl bg-violet-600/10 text-violet-400 hover:bg-violet-600 hover:text-white border border-violet-500/20 hover:border-violet-500 transition-colors duration-200 shadow-sm"
+             >
                 <span className="relative z-10 flex items-center gap-2 font-bold uppercase tracking-wider text-xs">
                    Enter Arena
                    <Play className="h-3 w-3 fill-current group-hover/btn:translate-x-1 transition-transform" />

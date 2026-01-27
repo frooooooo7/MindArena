@@ -70,15 +70,15 @@ export default function AccountPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <AccountSettings user={user!} />
                                 {/* Quick Actions Placeholder */}
-                                <div className="p-6 rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm">
+                                <div className="p-6 rounded-2xl border border-border/40 bg-card/60">
                                     <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <button className="flex flex-col items-center justify-center p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors border border-border/40 group">
-                                            <Trophy className="h-6 w-6 text-violet-500 mb-2 group-hover:scale-110 transition-transform" />
+                                        <button className="flex flex-col items-center justify-center p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors duration-200 border border-border/40">
+                                            <Trophy className="h-6 w-6 text-violet-500 mb-2" />
                                             <span className="text-xs font-medium">Daily Challenge</span>
                                         </button>
-                                        <button className="flex flex-col items-center justify-center p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors border border-border/40 group">
-                                            <BarChart3 className="h-6 w-6 text-indigo-500 mb-2 group-hover:scale-110 transition-transform" />
+                                        <button className="flex flex-col items-center justify-center p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors duration-200 border border-border/40">
+                                            <BarChart3 className="h-6 w-6 text-indigo-500 mb-2" />
                                             <span className="text-xs font-medium">View Global Ranking</span>
                                         </button>
                                     </div>
@@ -107,7 +107,7 @@ export default function AccountPage() {
                         </TabsContent>
 
                         <TabsContent value="security">
-                            <div className="max-w-xl p-6 rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm">
+                            <div className="max-w-xl p-6 rounded-2xl border border-border/40 bg-card/60">
                                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                     <Shield className="h-5 w-5 text-violet-500" />
                                     Security Settings

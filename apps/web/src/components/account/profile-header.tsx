@@ -9,9 +9,9 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ user }: ProfileHeaderProps) {
     return (
-        <div className="relative p-6 md:p-8 rounded-3xl border border-border/40 bg-card/50 backdrop-blur-md overflow-hidden group">
+        <div className="relative p-6 md:p-8 rounded-3xl border border-border/40 bg-card/60 overflow-hidden">
             {/* Background Accent */}
-            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 h-64 w-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 h-64 w-64 bg-violet-600/10 rounded-full pointer-events-none" />
             
             <div className="flex flex-col md:flex-row items-center md:items-end gap-6 relative">
                 {/* Avatar */}

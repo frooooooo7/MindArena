@@ -43,7 +43,7 @@ export function StatsCards() {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat, i) => (
-                <div key={i} className="p-6 rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm group hover:border-border transition-colors">
+            <div key={i} className="p-6 rounded-2xl border border-border/40 bg-card/60 hover:border-border transition-colors duration-200">
                     <div className="flex items-center justify-between mb-4">
                         <div className={`p-2 rounded-xl ${stat.bg} ${stat.color}`}>
                             <stat.icon className="h-5 w-5" />

@@ -5,8 +5,8 @@ import { Target, TrendingUp, Users } from "lucide-react";
 export function RankCard() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="p-6 rounded-3xl border border-border/40 bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-2xl shadow-violet-500/20 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-32 w-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+      <div className="p-6 rounded-3xl border border-border/40 bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-2xl shadow-violet-500/20 relative overflow-hidden">
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-32 w-32 bg-white/10 rounded-full pointer-events-none" />
         
         <div className="relative flex items-center justify-between mb-6">
           <div className="p-2 rounded-xl bg-white/20">
@@ -24,7 +24,7 @@ export function RankCard() {
         </div>
       </div>
 
-      <div className="p-6 rounded-3xl border border-border/40 bg-card/30 backdrop-blur-md shadow-xl group hover:border-violet-500/40 transition-colors">
+      <div className="p-6 rounded-3xl border border-border/40 bg-card/60 shadow-xl hover:border-violet-500/40 transition-colors duration-200">
         <div className="flex items-center justify-between mb-6">
           <div className="p-2 rounded-xl bg-violet-600/10 text-violet-600">
             <Users className="h-6 w-6" />
@@ -38,7 +38,7 @@ export function RankCard() {
         </div>
       </div>
 
-      <div className="p-6 rounded-3xl border border-border/40 bg-card/30 backdrop-blur-md shadow-xl group hover:border-emerald-500/40 transition-colors">
+      <div className="p-6 rounded-3xl border border-border/40 bg-card/60 shadow-xl hover:border-emerald-500/40 transition-colors duration-200">
         <div className="flex items-center justify-between mb-6">
           <div className="p-2 rounded-xl bg-emerald-600/10 text-emerald-600">
             <TrendingUp className="h-6 w-6" />

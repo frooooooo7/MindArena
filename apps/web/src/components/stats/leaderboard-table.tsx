@@ -14,7 +14,7 @@ const leaderboardData = [
 
 export function LeaderboardTable() {
   return (
-    <div className="w-full overflow-hidden rounded-3xl border border-border/40 bg-card/30 backdrop-blur-md shadow-2xl">
+    <div className="w-full overflow-hidden rounded-3xl border border-border/40 bg-card/60 shadow-2xl">
       <div className="p-6 border-b border-border/40 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Trophy className="h-6 w-6 text-amber-500" />

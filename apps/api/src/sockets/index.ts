@@ -1,5 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
+import { socketAuthMiddleware } from "./middleware/auth.middleware";
+import { registerArenaHandlers } from "./handlers/arena.handler";
 
 export class SocketManager {
     private io: Server;
@@ -7,37 +9,52 @@ export class SocketManager {
     constructor(server: HttpServer) {
         this.io = new Server(server, {
             cors: {
-                origin: true, // In production, replace with specific frontend URL
+                origin: process.env.NODE_ENV === "production" 
+                    ? process.env.FRONTEND_URL 
+                    : true,
                 credentials: true
-            }
+            },
+            // Reconnection settings
+            pingTimeout: 60000,
+            pingInterval: 25000,
         });
 
         this.init();
     }
 
     private init() {
-        console.log("Initializing Socket.io...");
+        // Apply authentication middleware
+        this.io.use(socketAuthMiddleware);
+
+        console.log("[SOCKET] Server initialized and waiting for connections...");
 
         this.io.on("connection", (socket: Socket) => {
-            console.log(`User connected: ${socket.id}`);
+            const user = socket.data.user;
+            console.log(`[SOCKET] User connected: ${user?.name || socket.id}`);
 
-            socket.on("arena:join-queue", (data) => {
-                console.log(`User ${socket.id} joined arena queue for ${data.gameType}`);
-                // Matchmaking logic will go here
-                
-                // For now, simulate matching after 3 seconds
-                setTimeout(() => {
-                    socket.emit("arena:match-found", {
-                        opponent: { name: "ShadowPlayer", rank: 1200 },
-                        room: `room-${socket.id}`,
-                        gameType: data.gameType
-                    });
-                }, 3000);
-            });
+            // Register all handlers
+            registerArenaHandlers(socket);
 
-            socket.on("disconnect", () => {
-                console.log(`User disconnected: ${socket.id}`);
+            // Future handlers can be added here:
+            // registerGameHandlers(socket);
+            // registerChatHandlers(socket);
+
+            socket.on("disconnect", (reason) => {
+                console.log(`[SOCKET] User disconnected: ${user?.name || socket.id} (${reason})`);
             });
         });
+    }
+
+    // Utility methods for broadcasting
+    public getIO(): Server {
+        return this.io;
+    }
+
+    public emitToRoom(room: string, event: string, data: any) {
+        this.io.to(room).emit(event, data);
+    }
+
+    public emitToAll(event: string, data: any) {
+        this.io.emit(event, data);
     }
 }

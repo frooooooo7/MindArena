@@ -28,8 +28,11 @@ app.use("/auth", authRoutes);
 app.use(errorHandler);
 
 // Initialize Sockets
+console.log("Attempting to initialize SocketManager...");
 new SocketManager(httpServer);
+console.log("SocketManager initialized.");
 
+console.log(`Starting server on port ${env.PORT}...`);
 httpServer.listen(env.PORT, () => {
     console.log(`API running at http://localhost:${env.PORT}`);
 });

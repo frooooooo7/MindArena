@@ -25,7 +25,7 @@ export function AccountSettings({ user }: AccountSettingsProps) {
     };
 
     return (
-        <div className="p-6 rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm h-fit">
+        <div className="p-6 rounded-2xl border border-border/40 bg-card/60 h-fit">
             <div className="flex items-center gap-2 mb-6">
                 <Settings className="h-5 w-5 text-violet-500" />
                 <h3 className="text-xl font-bold">Profile Info</h3>

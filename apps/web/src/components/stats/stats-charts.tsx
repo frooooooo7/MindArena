@@ -12,7 +12,7 @@ export function StatsCharts() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Activity Chart Placeholder */}
-      <div className="p-6 rounded-3xl border border-border/40 bg-card/30 backdrop-blur-md shadow-xl">
+      <div className="p-6 rounded-3xl border border-border/40 bg-card/60 shadow-xl">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-indigo-500" />
@@ -28,7 +28,7 @@ export function StatsCharts() {
           {[40, 70, 45, 90, 65, 80, 55, 100, 75, 85].map((height, i) => (
             <div key={i} className="flex-1 group relative">
               <div 
-                className="w-full bg-gradient-to-t from-violet-600/20 to-indigo-600/60 rounded-t-lg transition-all duration-500 group-hover:to-indigo-500 cursor-pointer"
+                className="w-full bg-gradient-to-t from-violet-600/20 to-indigo-600/60 rounded-t-lg hover:to-indigo-500 cursor-pointer transition-colors duration-200"
                 style={{ height: `${height}%` }}
               >
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-indigo-600 text-white text-[10px] font-bold py-1 px-2 rounded shadow-lg whitespace-nowrap">
@@ -45,7 +45,7 @@ export function StatsCharts() {
       </div>
 
       {/* Game Mastery Bars */}
-      <div className="p-6 rounded-3xl border border-border/40 bg-card/30 backdrop-blur-md shadow-xl">
+      <div className="p-6 rounded-3xl border border-border/40 bg-card/60 shadow-xl">
         <div className="mb-8">
           <h3 className="font-bold mb-1">Game Mastery</h3>
           <p className="text-xs text-muted-foreground">Progress towards elite level in each domain</p>

@@ -11,7 +11,7 @@ const matches = [
 
 export function LiveFeed() {
   return (
-    <div className="p-6 md:p-8 rounded-[2rem] border border-border/40 bg-card/20 backdrop-blur-md">
+    <div className="p-6 md:p-8 rounded-[2rem] border border-border/40 bg-card/40">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <Activity className="h-5 w-5 text-emerald-500" />
@@ -28,7 +28,7 @@ export function LiveFeed() {
 
       <div className="space-y-4">
         {matches.map((match) => (
-          <div key={match.id} className="group p-4 rounded-2xl bg-secondary/10 border border-border/20 hover:border-violet-500/30 transition-all flex flex-col md:flex-row items-center justify-between gap-4">
+          <div key={match.id} className="group p-4 rounded-2xl bg-secondary/10 border border-border/20 hover:border-violet-500/30 transition-colors duration-200 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4 flex-1">
                <div className="flex -space-x-3">
                   <div className="h-10 w-10 rounded-full bg-violet-600 border-2 border-background flex items-center justify-center text-xs font-bold text-white shadow-lg">
@@ -59,7 +59,7 @@ export function LiveFeed() {
                   </p>
                   <p className="text-[10px] font-bold text-muted-foreground/60 uppercase">{match.status}</p>
                </div>
-               <button className="p-2 rounded-xl bg-violet-600 text-white shadow-lg shadow-violet-500/20 hover:scale-105 transition-transform">
+               <button className="p-2 rounded-xl bg-violet-600 text-white shadow-lg hover:brightness-110 transition-all duration-200">
                   <Activity className="h-4 w-4" />
                </button>
             </div>
