@@ -42,7 +42,7 @@ export default function GamesPage() {
       <Navbar />
 
       <main className="container relative w-full mx-auto px-4 md:px-8 py-12">
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* Title */}
           <div className="text-center max-w-2xl">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
@@ -55,7 +55,7 @@ export default function GamesPage() {
           </div>
 
           {/* Games Grid */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full max-w-4xl mt-8">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full max-w-4xl mt-8 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 fill-mode-both">
             {games.map((game) => (
               <Card
                 key={game.id}
