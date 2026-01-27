@@ -1,42 +1,23 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, type LoginFormData } from "@mindarena/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { authService } from "@/services/auth.service";
+import { useLogin } from "@/hooks/auth/use-login";
 
 export function LoginForm() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-    } = useForm<LoginFormData>({
-        resolver: zodResolver(loginSchema),
-    });
-
-    const onSubmit = async (data: LoginFormData) => {
-        try {
-            setError(null);
-            await authService.login(data);
-            router.push("/");
-        } catch (err: any) {
-            console.error("Login failed", err);
-            setError(err.response?.data?.error || "Invalid email or password");
-        }
-    };
+    const { 
+        form: { register, formState: { errors } },
+        error,
+        showPassword,
+        togglePassword,
+        isSubmitting,
+        onSubmit 
+    } = useLogin();
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4">
             {error && (
                 <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
                     {error}
@@ -87,7 +68,7 @@ export function LoginForm() {
                     />
                     <button
                         type="button"
-                        onClick={() => setShowPassword(!showPassword)}
+                        onClick={togglePassword}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         {showPassword ? (
