@@ -37,7 +37,7 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
             gameType,
             joinedAt: new Date(),
         });
-
+        // Check if already in queue, if so, emit queue status
         if (!added) {
             // Already in queue
             const position = queueService.getPlayerPosition(gameType, odId);
