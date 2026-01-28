@@ -2,7 +2,7 @@
 
 import { useArena } from "@/hooks/use-arena";
 import { X, Swords, Shield, Target } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { useRouter } from "next/navigation";
 
 interface MatchmakingOverlayProps {
@@ -29,107 +29,147 @@ export function MatchmakingOverlay({ isOpen, onClose, gameType = "Sequence" }: M
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/90 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="relative w-full max-w-lg p-8 rounded-[2.5rem] border border-violet-500/20 bg-card/80 shadow-2xl overflow-hidden">
-                {/* Background glow */}
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-64 w-64 bg-violet-600/15 rounded-full pointer-events-none" />
-                
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
+            <div className="relative w-full max-w-lg p-8 rounded-3xl border border-violet-500/20 bg-zinc-900/95 shadow-2xl">
                 <button 
                     onClick={onClose}
-                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-secondary/50 text-muted-foreground transition-colors z-10"
+                    className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/10 text-zinc-400 transition-colors z-10"
                 >
                     <X className="h-5 w-5" />
                 </button>
 
                 {!match ? (
-                    <div className="relative flex flex-col items-center py-8">
-                        {/* Radar Animation */}
-                        <div className="relative h-48 w-48 mb-10">
-                            <div className="absolute inset-0 rounded-full border border-violet-500/20" />
-                            <div className="absolute inset-4 rounded-full border border-violet-500/10" />
-                            <div className="absolute inset-12 rounded-full border border-violet-500/5" />
-                            
-                            {/* Scanning line */}
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-600/0 via-violet-600/20 to-violet-600/0 animate-[spin_3s_linear_infinite]" />
-                            
-                            {/* Central brain icon */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <Swords className="h-10 w-10 text-violet-500 animate-pulse" />
-                            </div>
-
-                            {/* Ping dots */}
-                            <div className="absolute top-10 left-10 h-2 w-2 bg-violet-400 rounded-full animate-ping" />
-                            <div className="absolute bottom-12 right-6 h-2 w-2 bg-indigo-400 rounded-full animate-ping [animation-delay:1s]" />
-                        </div>
-
-                        <div className="text-center space-y-3">
-                            <h2 className="text-2xl font-bold tracking-tight">Searching for Opponent</h2>
-                            <p className="text-sm text-muted-foreground uppercase tracking-widest font-bold">
-                                {gameType} Arena • {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, '0')}
-                            </p>
-                            <div className="flex items-center justify-center gap-4 pt-4">
-                                <span className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 bg-violet-500/10 px-3 py-1.5 rounded-full border border-violet-500/20">
-                                    <Target className="h-3 w-3" />
-                                    Finding Tier: Quantum
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    <SearchingState gameType={gameType} seconds={seconds} />
                 ) : (
-                    <div className="relative py-8 animate-in zoom-in-95 duration-500">
-                        {/* Header */}
-                        <div className="text-center mb-8">
-                            <div className="inline-flex p-3 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 mb-4 animate-bounce">
-                                <Shield className="h-8 w-8" />
-                            </div>
-                            <h2 className="text-3xl font-black italic uppercase tracking-tighter">Match Found!</h2>
-                        </div>
-
-                        {/* Players Grid */}
-                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 mb-8 px-4">
-                            {/* You */}
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-xl shadow-violet-500/30 border-2 border-violet-400/30">
-                                    <span className="text-2xl font-black text-white">YOU</span>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-sm font-bold">You</p>
-                                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Master</p>
-                                </div>
-                            </div>
-
-                            {/* VS Divider */}
-                            <div className="flex flex-col items-center justify-center">
-                                <div className="h-12 w-12 rounded-full bg-secondary/50 border border-border/40 flex items-center justify-center">
-                                    <Swords className="h-5 w-5 text-violet-500" />
-                                </div>
-                                <span className="text-xs font-black text-muted-foreground mt-2 uppercase tracking-widest">VS</span>
-                            </div>
-
-                            {/* Opponent */}
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-xl border-2 border-indigo-500/30">
-                                    <span className="text-2xl font-black text-indigo-400">
-                                        {match.opponent.avatar || match.opponent.name[0].toUpperCase()}
-                                    </span>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-sm font-bold text-indigo-400">{match.opponent.name}</p>
-                                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Rank #{match.opponent.rank}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Enter Combat Button */}
-                        <button 
-                            onClick={() => router.push("/arena/1v1")}
-                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-black uppercase tracking-widest shadow-xl shadow-violet-500/25 hover:scale-[1.02] transition-transform duration-200"
-                        >
-                            Enter Combat
-                        </button>
-                    </div>
+                    <MatchFoundState match={match} onEnterCombat={() => router.push("/arena/1v1")} />
                 )}
             </div>
         </div>
     );
 }
+
+// ==========================================
+// SEARCHING STATE
+// ==========================================
+
+const SearchingState = memo(function SearchingState({ 
+    gameType, 
+    seconds 
+}: { 
+    gameType: string; 
+    seconds: number;
+}) {
+    return (
+        <div className="relative flex flex-col items-center py-8">
+            {/* Simple Radar Animation - CSS only, no JS */}
+            <div className="relative h-40 w-40 mb-8">
+                <div className="absolute inset-0 rounded-full border border-violet-500/30" />
+                <div className="absolute inset-6 rounded-full border border-violet-500/20" />
+                <div className="absolute inset-12 rounded-full border border-violet-500/10" />
+                
+                {/* Scanning line - transform instead of background animation */}
+                <div 
+                    className="absolute inset-0 rounded-full overflow-hidden"
+                    style={{ transform: 'translateZ(0)' }} // Force GPU
+                >
+                    <div 
+                        className="absolute inset-0 bg-gradient-conic from-violet-500/30 via-transparent to-transparent animate-spin"
+                        style={{ animationDuration: '3s' }}
+                    />
+                </div>
+                
+                {/* Central icon */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Swords className="h-8 w-8 text-violet-400" />
+                </div>
+            </div>
+
+            <div className="text-center space-y-2">
+                <h2 className="text-xl font-bold">Searching for Opponent</h2>
+                <p className="text-sm text-zinc-500 uppercase tracking-widest font-medium">
+                    {gameType} Arena • {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, '0')}
+                </p>
+                <div className="flex items-center justify-center gap-4 pt-3">
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-violet-400 bg-violet-500/10 px-3 py-1.5 rounded-full">
+                        <Target className="h-3 w-3" />
+                        Finding Match...
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+// ==========================================
+// MATCH FOUND STATE
+// ==========================================
+
+interface MatchFoundStateProps {
+    match: {
+        opponent: {
+            name: string;
+            avatar?: string;
+            rank: number;
+        };
+    };
+    onEnterCombat: () => void;
+}
+
+const MatchFoundState = memo(function MatchFoundState({ match, onEnterCombat }: MatchFoundStateProps) {
+    return (
+        <div className="relative py-6">
+            {/* Header - simple pulse, no bounce */}
+            <div className="text-center mb-6">
+                <div className="inline-flex p-3 rounded-xl bg-emerald-500/15 text-emerald-400 mb-3">
+                    <Shield className="h-7 w-7" />
+                </div>
+                <h2 className="text-2xl font-black uppercase tracking-tight">Match Found!</h2>
+            </div>
+
+            {/* Players Grid - optimized, no shadows */}
+            <div className="grid grid-cols-3 items-center gap-3 mb-6 px-2">
+                {/* You */}
+                <div className="flex flex-col items-center gap-2">
+                    <div className="h-20 w-20 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
+                        <span className="text-xl font-black text-white">YOU</span>
+                    </div>
+                    <div className="text-center">
+                        <p className="text-sm font-bold">You</p>
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Ready</p>
+                    </div>
+                </div>
+
+                {/* VS Divider */}
+                <div className="flex flex-col items-center justify-center">
+                    <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center">
+                        <Swords className="h-4 w-4 text-violet-400" />
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-600 mt-1 uppercase">VS</span>
+                </div>
+
+                {/* Opponent */}
+                <div className="flex flex-col items-center gap-2">
+                    <div className="h-20 w-20 rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 flex items-center justify-center border border-indigo-500/30">
+                        <span className="text-xl font-black text-indigo-400">
+                            {match.opponent.avatar || match.opponent.name[0].toUpperCase()}
+                        </span>
+                    </div>
+                    <div className="text-center">
+                        <p className="text-sm font-bold text-indigo-400">{match.opponent.name}</p>
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                            Rank #{match.opponent.rank}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Enter Combat Button - simple, no heavy shadows */}
+            <button 
+                onClick={onEnterCombat}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold uppercase tracking-wider hover:brightness-110 transition-all duration-150 active:scale-[0.98]"
+            >
+                Enter Combat
+            </button>
+        </div>
+    );
+});
