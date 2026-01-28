@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
 import { socketAuthMiddleware } from "./middleware/auth.middleware";
 import { registerArenaHandlers } from "./handlers/arena.handler";
+import { registerGameHandlers } from "./handlers/game.handler";
 
 export class SocketManager {
     private io: Server;
@@ -32,12 +33,9 @@ export class SocketManager {
             const user = socket.data.user;
             console.log(`[SOCKET] User connected: ${user?.name || socket.id}`);
 
-            // Register all handlers
-            registerArenaHandlers(socket);
-
-            // Future handlers can be added here:
-            // registerGameHandlers(socket);
-            // registerChatHandlers(socket);
+            // Register all handlers (pass io for room broadcasting)
+            registerArenaHandlers(socket, this.io);
+            registerGameHandlers(socket, this.io);
 
             socket.on("disconnect", (reason) => {
                 console.log(`[SOCKET] User disconnected: ${user?.name || socket.id} (${reason})`);

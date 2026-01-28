@@ -3,6 +3,7 @@
 import { useArena } from "@/hooks/use-arena";
 import { X, Swords, Shield, Target } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface MatchmakingOverlayProps {
     isOpen: boolean;
@@ -13,6 +14,7 @@ interface MatchmakingOverlayProps {
 export function MatchmakingOverlay({ isOpen, onClose, gameType = "Sequence" }: MatchmakingOverlayProps) {
     const { isSearching, match } = useArena();
     const [seconds, setSeconds] = useState(0);
+    const router = useRouter();
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -119,7 +121,10 @@ export function MatchmakingOverlay({ isOpen, onClose, gameType = "Sequence" }: M
                         </div>
 
                         {/* Enter Combat Button */}
-                        <button className="w-full py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-black uppercase tracking-widest shadow-xl shadow-violet-500/25 hover:scale-[1.02] transition-transform duration-200">
+                        <button 
+                            onClick={() => router.push("/arena/1v1")}
+                            className="w-full py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-black uppercase tracking-widest shadow-xl shadow-violet-500/25 hover:scale-[1.02] transition-transform duration-200"
+                        >
                             Enter Combat
                         </button>
                     </div>

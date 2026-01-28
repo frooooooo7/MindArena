@@ -1,69 +1,105 @@
-import { Socket } from "socket.io";
+import { Socket, Server } from "socket.io";
 import { JoinQueuePayload, ARENA_EVENTS } from "@mindarena/shared";
+import * as queueService from "../../services/queue.service";
+import * as rateLimiter from "../../services/rate-limiter.service";
+import * as matchmaking from "../../services/matchmaking.service";
 
-// Simple in-memory queue for now (replace with Redis in production)
-const matchmakingQueue: Map<string, { socketId: string; gameType: string; joinedAt: Date }> = new Map();
+/**
+ * Arena Handler
+ * Handles socket events for matchmaking queue
+ */
+export function registerArenaHandlers(socket: Socket, io: Server) {
+    const user = socket.data.user;
+    const odId = user?.id || socket.id;
+    const userName = user?.name || `Player_${socket.id.slice(0, 4)}`;
 
-export function registerArenaHandlers(socket: Socket) {
-    const userId = socket.data.user?.id || socket.id;
+    // Start queue cleanup timer
+    queueService.startCleanup(io);
 
+    // ==========================================
+    // JOIN QUEUE
+    // ==========================================
     socket.on(ARENA_EVENTS.JOIN_QUEUE, (data: JoinQueuePayload) => {
-        console.log(`[ARENA] User ${userId} joined queue for: ${data.gameType}`);
+        // Rate limiting
+        if (!rateLimiter.checkRateLimit(odId)) {
+            emitRateLimited(socket);
+            return;
+        }
+
+        const { gameType } = data;
+        console.log(`[ARENA] ${userName} joining ${gameType} queue`);
         
-        // Add to queue
-        matchmakingQueue.set(userId, {
+        // Try to add to queue
+        const added = queueService.addPlayer({
+            odId,
+            name: userName,
             socketId: socket.id,
-            gameType: data.gameType,
-            joinedAt: new Date()
+            gameType,
+            joinedAt: new Date(),
         });
+
+        if (!added) {
+            // Already in queue
+            const position = queueService.getPlayerPosition(gameType, odId);
+            emitQueueStatus(socket, position, "already in queue");
+            return;
+        }
 
         // Emit queue status
-        socket.emit(ARENA_EVENTS.QUEUE_STATUS, {
-            position: matchmakingQueue.size,
-            estimatedWait: "~30s"
-        });
+        const queueSize = queueService.getQueueSize(gameType);
+        emitQueueStatus(socket, queueSize, queueSize >= 2 ? "~5s" : "waiting for opponent");
 
-        // Simulate matchmaking (3 seconds delay)
-        // In production, this would be a proper matchmaking algorithm
-        setTimeout(() => {
-            // Check if user is still in queue
-            if (!matchmakingQueue.has(userId)) {
-                console.log(`[ARENA] User ${userId} left queue before match was found`);
-                return;
-            }
-
-            socket.emit(ARENA_EVENTS.MATCH_FOUND, {
-                opponent: { 
-                    name: "ShadowPlayer", 
-                    rank: 1200,
-                    avatar: "S"
-                },
-                room: `room-${socket.id}-${Date.now()}`,
-                gameType: data.gameType
-            });
-
-            // Remove from queue after match found
-            matchmakingQueue.delete(userId);
-        }, 3000);
+        // Try to match players
+        matchmaking.attemptMatch(gameType, io);
     });
 
+    // ==========================================
+    // LEAVE QUEUE
+    // ==========================================
     socket.on(ARENA_EVENTS.LEAVE_QUEUE, () => {
-        console.log(`[ARENA] User ${userId} left the queue`);
-        matchmakingQueue.delete(userId);
+        if (!rateLimiter.checkRateLimit(odId)) return;
+        
+        console.log(`[ARENA] ${userName} left queue`);
+        queueService.removePlayer(odId);
     });
 
-    // Cleanup on disconnect
+    // ==========================================
+    // DISCONNECT
+    // ==========================================
     socket.on("disconnect", () => {
-        console.log(`[ARENA] User ${userId} disconnected, removing from queue`);
-        matchmakingQueue.delete(userId);
+        console.log(`[ARENA] ${userName} disconnected`);
+        queueService.removePlayer(odId);
     });
 }
 
-// Export for potential use in other parts of the app
-export function getQueueSize(): number {
-    return matchmakingQueue.size;
+// ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+
+function emitQueueStatus(socket: Socket, position: number, estimatedWait: string): void {
+    socket.emit(ARENA_EVENTS.QUEUE_STATUS, { position, estimatedWait });
 }
 
-export function isUserInQueue(userId: string): boolean {
-    return matchmakingQueue.has(userId);
+function emitRateLimited(socket: Socket): void {
+    socket.emit(ARENA_EVENTS.QUEUE_STATUS, {
+        position: 0,
+        estimatedWait: "rate_limited",
+        error: "Too many requests. Please wait a moment."
+    });
+}
+
+// ==========================================
+// EXPORTS FOR MONITORING
+// ==========================================
+
+export function getQueueSize(gameType?: string): number {
+    return queueService.getQueueSize(gameType);
+}
+
+export function getQueueStats() {
+    return {
+        queues: queueService.getQueueStats(),
+        totalPlayers: queueService.getQueueSize(),
+        rateLimitedUsers: rateLimiter.getRateLimitedCount()
+    };
 }
