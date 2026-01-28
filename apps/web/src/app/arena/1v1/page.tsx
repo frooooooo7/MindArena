@@ -9,7 +9,8 @@ import {
     GameResultModal, 
     WaitingState, 
     CountdownState,
-    GameHeader 
+    GameHeader,
+    GameStatusMessage
 } from "@/components/arena/game";
 
 export default function Arena1v1Page() {
@@ -99,31 +100,4 @@ export default function Arena1v1Page() {
             </main>
         </div>
     );
-}
-
-// Small helper component for status message
-function GameStatusMessage({ 
-    showingSequence, 
-    isPlaying 
-}: { 
-    showingSequence: boolean; 
-    isPlaying: boolean;
-}) {
-    if (showingSequence) {
-        return (
-            <p className="mt-4 text-sm font-semibold text-violet-500 animate-pulse">
-                Watch the sequence...
-            </p>
-        );
-    }
-
-    if (isPlaying) {
-        return (
-            <p className="mt-4 text-sm font-semibold text-muted-foreground">
-                Your turn! Repeat the sequence.
-            </p>
-        );
-    }
-
-    return null;
 }

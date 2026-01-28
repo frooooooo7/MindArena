@@ -102,6 +102,7 @@ export const GAME_EVENTS = {
     LEVEL_COMPLETE: "game:level-complete",
     FAIL: "game:fail",
     END: "game:end",
+    ERROR: "game:error",
 } as const;
 
 export type GameEventName = typeof GAME_EVENTS[keyof typeof GAME_EVENTS];

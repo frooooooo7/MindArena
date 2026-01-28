@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { socket } from "@/lib/socket";
 import { useArenaStore } from "@/store/arena.store";
 import { 
@@ -51,6 +51,19 @@ export function useArenaGame(): UseArenaGameReturn {
     const [gameResult, setGameResult] = useState<GameEndPayload | null>(null);
     const [isWinner, setIsWinner] = useState<boolean | null>(null);
 
+    // Ref for countdown timer cleanup
+    const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Cleanup countdown timer on unmount
+    useEffect(() => {
+        return () => {
+            if (countdownTimerRef.current) {
+                clearInterval(countdownTimerRef.current);
+                countdownTimerRef.current = null;
+            }
+        };
+    }, []);
+
     useEffect(() => {
         if (!roomId) return;
 
@@ -60,13 +73,21 @@ export function useArenaGame(): UseArenaGameReturn {
             setGameStatus("countdown");
             setCountdown(data.seconds);
             
-            // Countdown logic
+            // Clear any existing timer
+            if (countdownTimerRef.current) {
+                clearInterval(countdownTimerRef.current);
+            }
+            
+            // Countdown logic with proper cleanup
             let remaining = data.seconds;
-            const timer = setInterval(() => {
+            countdownTimerRef.current = setInterval(() => {
                 remaining--;
                 setCountdown(remaining);
                 if (remaining <= 0) {
-                    clearInterval(timer);
+                    if (countdownTimerRef.current) {
+                        clearInterval(countdownTimerRef.current);
+                        countdownTimerRef.current = null;
+                    }
                 }
             }, 1000);
         };
@@ -74,6 +95,11 @@ export function useArenaGame(): UseArenaGameReturn {
         // Game start event
         const handleGameStart = (data: GameStartPayload) => {
             console.log("[ArenaGame] Game started:", data);
+            // Clear countdown timer if still running
+            if (countdownTimerRef.current) {
+                clearInterval(countdownTimerRef.current);
+                countdownTimerRef.current = null;
+            }
             setGameStatus("playing");
             setLevel(data.level);
             setSequence(data.sequence);
@@ -113,10 +139,6 @@ export function useArenaGame(): UseArenaGameReturn {
             setGameResult(data);
             
             // Determine if current user is winner
-            // Compare with auth store or match data
-            const myId = socket.id;
-            // Since we don't have direct access to user ID here, 
-            // we check if loserName matches opponent name
             const opponentName = match?.opponent?.name;
             setIsWinner(data.loserName === opponentName);
         };
@@ -129,6 +151,12 @@ export function useArenaGame(): UseArenaGameReturn {
         socket.on(GAME_EVENTS.END, handleGameEnd);
 
         return () => {
+            // Cleanup countdown timer
+            if (countdownTimerRef.current) {
+                clearInterval(countdownTimerRef.current);
+                countdownTimerRef.current = null;
+            }
+            
             socket.off(GAME_EVENTS.COUNTDOWN, handleCountdown);
             socket.off(GAME_EVENTS.START, handleGameStart);
             socket.off(GAME_EVENTS.MOVE_RESULT, handleMoveResult);

@@ -28,8 +28,9 @@ export function useSequenceGame1v1() {
     const [activeCell, setActiveCell] = useState<number | null>(null);
     const [playerIndex, setPlayerIndex] = useState(0);
     
-    // Refs for cleanup
+    // Refs for animation control
     const animationRef = useRef<boolean>(false);
+    const lastSequenceRef = useRef<string>("");
 
     // Redirect if no match
     useEffect(() => {
@@ -46,17 +47,17 @@ export function useSequenceGame1v1() {
         }
     }, [match, gameStatus, sendReady]);
 
-    // Show sequence animation
-    const showSequenceAnimation = useCallback(async () => {
-        if (animationRef.current) return; // Prevent double animation
+    // Show sequence animation - memoized without sequence in deps
+    const showSequenceAnimation = useCallback(async (seq: number[]) => {
+        if (animationRef.current) return;
         animationRef.current = true;
         
         setShowingSequence(true);
         setPlayerIndex(0);
 
-        for (let i = 0; i < sequence.length; i++) {
+        for (let i = 0; i < seq.length; i++) {
             await new Promise(resolve => setTimeout(resolve, 600));
-            setActiveCell(sequence[i]);
+            setActiveCell(seq[i]);
             await new Promise(resolve => setTimeout(resolve, 400));
             setActiveCell(null);
         }
@@ -64,12 +65,17 @@ export function useSequenceGame1v1() {
         await new Promise(resolve => setTimeout(resolve, 300));
         setShowingSequence(false);
         animationRef.current = false;
-    }, [sequence]);
+    }, []);
 
     // Trigger sequence animation when game starts or level changes
     useEffect(() => {
         if (gameStatus === "playing" && sequence.length > 0) {
-            showSequenceAnimation();
+            // Compare sequence to prevent duplicate animations
+            const sequenceKey = sequence.join(",");
+            if (sequenceKey !== lastSequenceRef.current) {
+                lastSequenceRef.current = sequenceKey;
+                showSequenceAnimation(sequence);
+            }
         }
     }, [gameStatus, sequence, level, showSequenceAnimation]);
 

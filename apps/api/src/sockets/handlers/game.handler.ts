@@ -10,6 +10,14 @@ export function registerGameHandlers(socket: Socket, io: Server) {
     // Player signals ready to start
     socket.on(GAME_EVENTS.READY, (data: { roomId: string }) => {
         const { roomId } = data;
+        
+        // Validate that player belongs to this room
+        if (!validatePlayerInRoom(roomId, userId)) {
+            console.log(`[GAME] Invalid ready: ${user?.name} not in room ${roomId}`);
+            socket.emit(GAME_EVENTS.ERROR, { message: "You are not in this game room" });
+            return;
+        }
+        
         console.log(`[GAME] Player ${user?.name} ready in room ${roomId}`);
 
         const allReady = roomService.setPlayerReady(roomId, userId);
@@ -22,6 +30,13 @@ export function registerGameHandlers(socket: Socket, io: Server) {
     // Player makes a move
     socket.on(GAME_EVENTS.MOVE, (data: GameMovePayload & { roomId: string }) => {
         const { roomId, cellIndex } = data;
+        
+        // Validate that player belongs to this room
+        if (!validatePlayerInRoom(roomId, userId)) {
+            console.log(`[GAME] Invalid move: ${user?.name} not in room ${roomId}`);
+            return;
+        }
+        
         handlePlayerMove(socket, io, roomId, userId, cellIndex);
     });
 
@@ -29,6 +44,17 @@ export function registerGameHandlers(socket: Socket, io: Server) {
     socket.on("disconnect", () => {
         handlePlayerDisconnect(socket, io, userId, user?.name);
     });
+}
+
+// ==========================================
+// VALIDATION
+// ==========================================
+
+function validatePlayerInRoom(roomId: string, playerId: string): boolean {
+    const room = roomService.getRoom(roomId);
+    if (!room) return false;
+    
+    return room.players.some(p => p.id === playerId);
 }
 
 // ==========================================

@@ -1,8 +1,8 @@
 import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
 import { socketAuthMiddleware } from "./middleware/auth.middleware";
-import { registerArenaHandlers } from "./handlers/arena.handler";
-import { registerGameHandlers } from "./handlers/game.handler";
+import { registerArenaHandlers, registerGameHandlers } from "./handlers";
+
 
 export class SocketManager {
     private io: Server;
