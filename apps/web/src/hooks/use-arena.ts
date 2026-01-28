@@ -11,6 +11,7 @@ export function useArena() {
     const { accessToken, isAuthenticated } = useAuthStore();
     const { isSearching, match, setSearching, setMatch, resetArena } = useArenaStore();
     const [connectionError, setConnectionError] = useState<ConnectionError>(null);
+    const [matchCancelled, setMatchCancelled] = useState(false);
 
     useEffect(() => {
         if (isAuthenticated && accessToken && !socket.connected) {
@@ -21,7 +22,13 @@ export function useArena() {
         const handleMatchFound = (data: ArenaMatch) => {
             console.log("[useArena] Match found:", data);
             setConnectionError(null);
+            setMatchCancelled(false);
             setMatch(data);
+        };
+
+        const handleMatchCancelled = (data: { reason: string }) => {
+            console.log("[useArena] Match cancelled:", data.reason);
+            setMatchCancelled(true);
         };
 
         const handleQueueStatus = (data: { position: number; estimatedWait: string; error?: string }) => {
@@ -60,6 +67,7 @@ export function useArena() {
         socket.on("disconnect", handleDisconnect);
         socket.on("connect_error", handleError);
         socket.on(ARENA_EVENTS.MATCH_FOUND, handleMatchFound);
+        socket.on(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
         socket.on(ARENA_EVENTS.QUEUE_STATUS, handleQueueStatus);
 
         return () => {
@@ -67,6 +75,7 @@ export function useArena() {
             socket.off("disconnect", handleDisconnect);
             socket.off("connect_error", handleError);
             socket.off(ARENA_EVENTS.MATCH_FOUND, handleMatchFound);
+            socket.off(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
             socket.off(ARENA_EVENTS.QUEUE_STATUS, handleQueueStatus);
         };
     }, [isAuthenticated, accessToken, setMatch, isSearching, resetArena]);
@@ -80,6 +89,7 @@ export function useArena() {
         
         console.log(`[useArena] Joining queue for: ${gameType}`);
         setConnectionError(null);
+        setMatchCancelled(false);
         setSearching(true, gameType);
         socket.emit(ARENA_EVENTS.JOIN_QUEUE, { gameType });
         return { success: true };
@@ -92,6 +102,7 @@ export function useArena() {
             socket.emit(ARENA_EVENTS.LEAVE_QUEUE);
         }
         resetArena();
+        setMatchCancelled(false);
     }, [resetArena]);
 
     return {
@@ -100,6 +111,8 @@ export function useArena() {
         joinQueue,
         leaveQueue,
         connectionError,
+        matchCancelled,
         isConnected: socket.connected,
     };
 }
+

@@ -2,6 +2,9 @@ import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
 import { socketAuthMiddleware } from "./middleware/auth.middleware";
 import { registerArenaHandlers, registerGameHandlers } from "./handlers";
+import * as roomService from "../services/room.service";
+import * as queueService from "../services/queue.service";
+
 
 
 export class SocketManager {
@@ -24,7 +27,12 @@ export class SocketManager {
     }
 
     private init() {
+        // Start background services
+        roomService.startRoomCleanup(this.io);
+        queueService.startCleanup(this.io);
+
         // Apply authentication middleware
+
         this.io.use(socketAuthMiddleware);
 
         console.log("[SOCKET] Server initialized and waiting for connections...");

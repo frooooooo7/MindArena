@@ -3,6 +3,8 @@ import { JoinQueuePayload, ARENA_EVENTS } from "@mindarena/shared";
 import * as queueService from "../../services/queue.service";
 import * as rateLimiter from "../../services/rate-limiter.service";
 import * as matchmaking from "../../services/matchmaking.service";
+import * as roomService from "../../services/room.service";
+
 
 /**
  * Arena Handler
@@ -13,10 +15,8 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
     const odId = user?.id || socket.id;
     const userName = user?.name || `Player_${socket.id.slice(0, 4)}`;
 
-    // Start queue cleanup timer
-    queueService.startCleanup(io);
-
     // ==========================================
+
     // JOIN QUEUE
     // ==========================================
     socket.on(ARENA_EVENTS.JOIN_QUEUE, (data: JoinQueuePayload) => {
@@ -60,17 +60,43 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
         if (!rateLimiter.checkRateLimit(odId)) return;
         
         console.log(`[ARENA] ${userName} left queue`);
-        queueService.removePlayer(odId);
+        handlePlayerLeaving(socket, io, odId);
     });
 
     // ==========================================
-    // DISCONNECT
+    // DISCONNECTING
     // ==========================================
-    socket.on("disconnect", () => {
-        console.log(`[ARENA] ${userName} disconnected`);
-        queueService.removePlayer(odId);
+    socket.on("disconnecting", () => {
+        console.log(`[ARENA] ${userName} disconnecting from arena`);
+        handlePlayerLeaving(socket, io, odId);
     });
 }
+
+
+/**
+ * Handle player leaving queue or disconnecting
+ */
+function handlePlayerLeaving(socket: Socket, io: Server, odId: string) {
+    // 1. Remove from matchmaking queue
+    queueService.removePlayer(odId);
+
+    // 2. Check if player was in a waiting room
+    const rooms = Array.from(socket.rooms);
+    rooms.forEach(roomId => {
+        if (roomId.startsWith("game-")) {
+            const room = roomService.getRoom(roomId);
+            if (room && room.status === "waiting") {
+                console.log(`[ARENA] Notifying opponent in room ${roomId} that match was cancelled`);
+                io.to(roomId).emit(ARENA_EVENTS.MATCH_CANCELLED, {
+                    reason: "opponent_left"
+                });
+                // Remove the room as it's no longer valid
+                roomService.removeRoom(roomId);
+            }
+        }
+    });
+}
+
 
 // ==========================================
 // HELPER FUNCTIONS

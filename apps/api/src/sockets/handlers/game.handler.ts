@@ -24,8 +24,18 @@ export function registerGameHandlers(socket: Socket, io: Server) {
         
         if (allReady) {
             startGameCountdown(io, roomId);
+        } else {
+            // Notify opponent that this player is ready
+            const opponent = roomService.getOpponent(roomId, userId);
+            if (opponent) {
+                io.to(opponent.socketId).emit(GAME_EVENTS.ERROR, { 
+                    message: "Opponent is ready! Waiting for you...",
+                    type: "info"
+                });
+            }
         }
     });
+
 
     // Player makes a move
     socket.on(GAME_EVENTS.MOVE, (data: GameMovePayload & { roomId: string }) => {
@@ -41,10 +51,11 @@ export function registerGameHandlers(socket: Socket, io: Server) {
     });
 
     // Handle disconnect during game
-    socket.on("disconnect", () => {
+    socket.on("disconnecting", () => {
         handlePlayerDisconnect(socket, io, userId, user?.name);
     });
 }
+
 
 // ==========================================
 // VALIDATION

@@ -3,11 +3,13 @@ import { socket } from "@/lib/socket";
 import { useArenaStore } from "@/store/arena.store";
 import { 
     GAME_EVENTS, 
+    ARENA_EVENTS,
     GameStartPayload, 
     GameEndPayload, 
     LevelCompletePayload,
     OpponentProgressPayload 
 } from "@mindarena/shared";
+
 
 interface UseArenaGameReturn {
     // Game state
@@ -25,6 +27,7 @@ interface UseArenaGameReturn {
     // Result
     isWinner: boolean | null;
     gameResult: GameEndPayload | null;
+    matchCancelled: boolean;
     
     // Actions
     sendReady: () => void;
@@ -42,6 +45,8 @@ export function useArenaGame(): UseArenaGameReturn {
     const [sequence, setSequence] = useState<number[]>([]);
     const [gridSize, setGridSize] = useState(3);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [matchCancelled, setMatchCancelled] = useState(false);
+
     
     // Opponent state
     const [opponentProgress, setOpponentProgress] = useState(0);
@@ -122,6 +127,12 @@ export function useArenaGame(): UseArenaGameReturn {
             setOpponentLevel(data.currentLevel);
         };
 
+        // Match cancelled event
+        const handleMatchCancelled = (data: { reason: string }) => {
+            console.log("[ArenaGame] Match cancelled:", data.reason);
+            setMatchCancelled(true);
+        };
+
         // Level complete event
         const handleLevelComplete = (data: LevelCompletePayload) => {
             console.log("[ArenaGame] Level complete:", data);
@@ -147,6 +158,7 @@ export function useArenaGame(): UseArenaGameReturn {
         socket.on(GAME_EVENTS.START, handleGameStart);
         socket.on(GAME_EVENTS.MOVE_RESULT, handleMoveResult);
         socket.on(GAME_EVENTS.OPPONENT_PROGRESS, handleOpponentProgress);
+        socket.on(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
         socket.on(GAME_EVENTS.LEVEL_COMPLETE, handleLevelComplete);
         socket.on(GAME_EVENTS.END, handleGameEnd);
 
@@ -161,6 +173,7 @@ export function useArenaGame(): UseArenaGameReturn {
             socket.off(GAME_EVENTS.START, handleGameStart);
             socket.off(GAME_EVENTS.MOVE_RESULT, handleMoveResult);
             socket.off(GAME_EVENTS.OPPONENT_PROGRESS, handleOpponentProgress);
+            socket.off(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
             socket.off(GAME_EVENTS.LEVEL_COMPLETE, handleLevelComplete);
             socket.off(GAME_EVENTS.END, handleGameEnd);
         };
@@ -189,7 +202,9 @@ export function useArenaGame(): UseArenaGameReturn {
         opponentLevel,
         isWinner,
         gameResult,
+        matchCancelled,
         sendReady,
         sendMove,
     };
 }
+

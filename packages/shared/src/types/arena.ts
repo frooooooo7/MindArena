@@ -27,6 +27,7 @@ export const ARENA_EVENTS = {
     LEAVE_QUEUE: "arena:leave-queue",
     MATCH_FOUND: "arena:match-found",
     QUEUE_STATUS: "arena:queue-status",
+    MATCH_CANCELLED: "arena:match-cancelled",
 } as const;
 
 export type ArenaEventName = typeof ARENA_EVENTS[keyof typeof ARENA_EVENTS];

@@ -1,11 +1,14 @@
+import { Server } from "socket.io";
 import { GameRoom, GamePlayer } from "@mindarena/shared";
+import { ARENA_EVENTS } from "@mindarena/shared";
 
 // In-memory storage for active game rooms
 const gameRooms: Map<string, GameRoom> = new Map();
 
 // Config for room cleanup
-const WAITING_ROOM_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
-const CLEANUP_INTERVAL_MS = 30 * 1000; // 30 seconds
+const WAITING_ROOM_TIMEOUT_MS = 15 * 1000; // 15 seconds for confirmation
+const CLEANUP_INTERVAL_MS = 10 * 1000; // 10 seconds check
+const FINISHED_ROOM_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 // Cleanup timer
 let cleanupInterval: NodeJS.Timeout | null = null;
@@ -13,7 +16,7 @@ let cleanupInterval: NodeJS.Timeout | null = null;
 /**
  * Start cleanup timer for stale rooms
  */
-export function startRoomCleanup(): void {
+export function startRoomCleanup(io: Server): void {
     if (cleanupInterval) return;
     
     cleanupInterval = setInterval(() => {
@@ -21,23 +24,25 @@ export function startRoomCleanup(): void {
         let removed = 0;
         
         gameRooms.forEach((room, roomId) => {
-            // Remove waiting rooms that have been waiting too long
-            if (room.status === "waiting") {
-                const waitTime = now.getTime() - room.createdAt.getTime();
-                if (waitTime > WAITING_ROOM_TIMEOUT_MS) {
-                    gameRooms.delete(roomId);
-                    removed++;
-                    console.log(`[ROOM] Cleanup: removed stale waiting room ${roomId}`);
-                }
+            const age = now.getTime() - room.createdAt.getTime();
+
+            // 1. Remove waiting rooms that weren't confirmed in time
+            if (room.status === "waiting" && age > WAITING_ROOM_TIMEOUT_MS) {
+                console.log(`[ROOM] Match confirmation timed out for ${roomId}`);
+                
+                // Notify any connected players
+                io.to(roomId).emit(ARENA_EVENTS.MATCH_CANCELLED, {
+                    reason: "confirmation_timeout"
+                });
+                
+                gameRooms.delete(roomId);
+                removed++;
             }
             
-            // Remove finished rooms after 5 minutes
-            if (room.status === "finished") {
-                const waitTime = now.getTime() - room.createdAt.getTime();
-                if (waitTime > 5 * 60 * 1000) {
-                    gameRooms.delete(roomId);
-                    removed++;
-                }
+            // 2. Remove finished rooms after timeout
+            if (room.status === "finished" && age > FINISHED_ROOM_TIMEOUT_MS) {
+                gameRooms.delete(roomId);
+                removed++;
             }
         });
         
@@ -46,8 +51,9 @@ export function startRoomCleanup(): void {
         }
     }, CLEANUP_INTERVAL_MS);
     
-    console.log("[ROOM] Cleanup timer started");
+    console.log("[ROOM] Cleanup timer started with 10s interval");
 }
+
 
 /**
  * Create a new game room for two matched players
@@ -59,10 +65,8 @@ export function createRoom(
     player2: { id: string; name: string; socketId: string },
     initialGameData: { sequence: number[]; gridSize: number }
 ): GameRoom {
-    // Start cleanup if not already running
-    startRoomCleanup();
-    
     const room: GameRoom = {
+
         id: roomId,
         gameType,
         players: [
