@@ -26,6 +26,7 @@ export function useSequenceGame1v1() {
     // Local UI state
     const [showingSequence, setShowingSequence] = useState(false);
     const [activeCell, setActiveCell] = useState<number | null>(null);
+    const [clickedCell, setClickedCell] = useState<number | null>(null);
     const [playerIndex, setPlayerIndex] = useState(0);
     
     // Refs for animation control
@@ -83,6 +84,10 @@ export function useSequenceGame1v1() {
     const handleCellClick = useCallback((cellIndex: number) => {
         if (showingSequence || gameStatus !== "playing") return;
 
+        // Set clicked cell for visual feedback
+        setClickedCell(cellIndex);
+        setTimeout(() => setClickedCell(null), 150);
+
         // Update local state for immediate feedback
         if (sequence[playerIndex] === cellIndex) {
             setPlayerIndex(prev => prev + 1);
@@ -114,6 +119,7 @@ export function useSequenceGame1v1() {
         // Local UI state
         showingSequence,
         activeCell,
+        clickedCell,
         playerIndex,
         
         // Actions

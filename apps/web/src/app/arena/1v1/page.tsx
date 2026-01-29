@@ -3,9 +3,9 @@
 import { useSequenceGame1v1 } from "@/hooks/use-sequence-game-1v1";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
+import { GameGrid } from "@/components/games/sequence-memory";
 import { 
     PlayerCard, 
-    GameGrid, 
     GameResultModal, 
     WaitingState, 
     CountdownState,
@@ -32,6 +32,7 @@ export default function Arena1v1Page() {
         // Local UI state
         showingSequence,
         activeCell,
+        clickedCell,
         playerIndex,
         // Actions
         handleCellClick,
@@ -97,6 +98,7 @@ export default function Arena1v1Page() {
                             <GameGrid
                                 gridSize={gridSize}
                                 activeCell={activeCell}
+                                clickedCell={clickedCell}
                                 disabled={showingSequence || gameStatus !== "playing"}
                                 onCellClick={handleCellClick}
                             />
