@@ -11,6 +11,7 @@ import {
   CountdownState,
   GameHeader,
   LevelCompleteOverlay,
+  RoundTimer,
 } from "@/components/arena/game";
 import { X, Eye, MousePointerClick } from "lucide-react";
 
@@ -28,6 +29,7 @@ export default function ArenaChimpPage() {
     completedCount,
     opponentProgress,
     waitingForOpponent,
+    timeLeft,
     isWinner,
     gameResult,
     matchCancelled,
@@ -153,6 +155,12 @@ export default function ArenaChimpPage() {
           />
         )}
       </main>
+
+      {/* Round Timer - fixed at bottom */}
+      {isGameActive &&
+        !matchCancelled &&
+        !waitingForOpponent &&
+        gameStatus !== "finished" && <RoundTimer timeLeft={timeLeft} />}
     </div>
   );
 }

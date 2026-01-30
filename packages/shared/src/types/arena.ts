@@ -139,6 +139,18 @@ export interface ChimpPlayerCompletePayload {
   waitingForOpponent: boolean;
 }
 
+// ============================================
+// SHARED GAME TIMER
+// ============================================
+
+export interface RoundTimerPayload {
+  timeLeft: number;
+  totalTime: number;
+}
+
+// Round time limit in seconds
+export const ROUND_TIME_LIMIT = 10;
+
 // Game Socket Events
 export const GAME_EVENTS = {
   READY: "game:ready",
@@ -151,6 +163,8 @@ export const GAME_EVENTS = {
   FAIL: "game:fail",
   END: "game:end",
   ERROR: "game:error",
+  ROUND_TIMER: "game:round-timer",
+  TIMEOUT: "game:timeout",
   // Chimp Memory specific events
   CHIMP_START: "game:chimp-start",
   CHIMP_MOVE: "game:chimp-move",

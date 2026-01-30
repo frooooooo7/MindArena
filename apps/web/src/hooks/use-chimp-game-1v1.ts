@@ -12,7 +12,9 @@ import {
   ChimpLevelCompletePayload,
   ChimpOpponentProgressPayload,
   ChimpPlayerCompletePayload,
+  RoundTimerPayload,
   GameEndPayload,
+  ROUND_TIME_LIMIT,
 } from "@mindarena/shared";
 
 const MEMORIZE_TIME = 2000; // ms to show numbers before hiding
@@ -69,6 +71,7 @@ export function useChimpGame1v1() {
   const [matchCancelled, setMatchCancelled] = useState(false);
   const [gameResult, setGameResult] = useState<GameEndPayload | null>(null);
   const [isWinner, setIsWinner] = useState<boolean | null>(null);
+  const [timeLeft, setTimeLeft] = useState(ROUND_TIME_LIMIT);
 
   // Refs for cleanup and mounted state tracking
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -240,7 +243,13 @@ export function useChimpGame1v1() {
     const handleLevelComplete = (data: ChimpLevelCompletePayload) => {
       console.log("[ChimpGame] Level complete:", data);
       setOpponent((prev) => ({ ...prev, progress: 0 }));
+      setTimeLeft(ROUND_TIME_LIMIT); // Reset timer
       startMemorizePhase(data.newCells, data.newLevel, data.newNumbersCount);
+    };
+
+    // Round timer event
+    const handleRoundTimer = (data: RoundTimerPayload) => {
+      setTimeLeft(data.timeLeft);
     };
 
     // Game end event
@@ -272,6 +281,7 @@ export function useChimpGame1v1() {
     socket.on(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
     socket.on(GAME_EVENTS.CHIMP_PLAYER_COMPLETE, handlePlayerComplete);
     socket.on(GAME_EVENTS.CHIMP_LEVEL_COMPLETE, handleLevelComplete);
+    socket.on(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
     socket.on(GAME_EVENTS.END, handleGameEnd);
 
     return () => {
@@ -283,6 +293,7 @@ export function useChimpGame1v1() {
       socket.off(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
       socket.off(GAME_EVENTS.CHIMP_PLAYER_COMPLETE, handlePlayerComplete);
       socket.off(GAME_EVENTS.CHIMP_LEVEL_COMPLETE, handleLevelComplete);
+      socket.off(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
       socket.off(GAME_EVENTS.END, handleGameEnd);
     };
   }, [
@@ -334,6 +345,7 @@ export function useChimpGame1v1() {
     opponentProgress: opponent.progress,
     opponentLevel: opponent.level,
     waitingForOpponent: gameState.status === "levelComplete",
+    timeLeft,
     isWinner,
     gameResult,
     matchCancelled,

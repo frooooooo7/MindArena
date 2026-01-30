@@ -12,6 +12,7 @@ import {
   GameHeader,
   GameStatusMessage,
   LevelCompleteOverlay,
+  RoundTimer,
 } from "@/components/arena/game";
 import { X } from "lucide-react";
 
@@ -27,6 +28,7 @@ export default function Arena1v1Page() {
     sequence,
     gridSize,
     opponentProgress,
+    timeLeft,
     isWinner,
     gameResult,
     matchCancelled,
@@ -142,6 +144,8 @@ export default function Arena1v1Page() {
           />
         )}
       </main>
+
+      <RoundTimer timeLeft={timeLeft} />
     </div>
   );
 }
