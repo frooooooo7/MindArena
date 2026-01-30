@@ -1,39 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, ArrowRight, Sparkles, KeyRound } from "lucide-react";
-
-const games = [
-  {
-    id: "sequence-memory",
-    title: "Sequence Memory",
-    description: "Remember and repeat the sequence of highlighted cells. Grid grows as you level up!",
-    icon: Brain,
-    href: "/games/sequence-memory",
-    gradient: "from-violet-500 to-indigo-600",
-    shadow: "shadow-violet-500/30",
-  },
-  {
-    id: "chimp-memory",
-    title: "Chimp Memory",
-    description: "Numbers flash briefly on the grid. Memorize and click them in ascending order!",
-    icon: Sparkles,
-    href: "/games/chimp-memory",
-    gradient: "from-amber-500 to-orange-600",
-    shadow: "shadow-amber-500/30",
-  },
-  {
-    id: "code-memory",
-    title: "Code Memory",
-    description: "See a random code for a few seconds, then type it from memory!",
-    icon: KeyRound,
-    href: "/games/code-memory",
-    gradient: "from-cyan-500 to-blue-600",
-    shadow: "shadow-cyan-500/30",
-  },
-];
+import { ArrowRight } from "lucide-react";
+import { GAME_TYPES } from "@/lib/games/game-types";
 
 export default function GamesPage() {
   return (
@@ -56,32 +29,35 @@ export default function GamesPage() {
 
           {/* Games Grid */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full max-w-4xl mt-8 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150 fill-mode-both">
-            {games.map((game) => (
-              <Card
-                key={game.id}
-                className="group relative overflow-hidden border-violet-500/10 bg-gradient-to-b from-background to-violet-500/5 transition-all hover:shadow-2xl hover:shadow-violet-500/10 hover:border-violet-500/30"
-              >
-                <CardHeader className="pb-4">
-                  <div
-                    className={`mb-3 h-14 w-14 rounded-xl bg-gradient-to-br ${game.gradient} p-3 text-white shadow-lg ${game.shadow} transition-transform group-hover:scale-110`}
-                  >
-                    <game.icon className="h-full w-full" />
+            {GAME_TYPES.map((game) => {
+              const Icon = game.icon;
+              return (
+                <Card
+                  key={game.id}
+                  className="group relative overflow-hidden border-violet-500/10 bg-gradient-to-b from-background to-violet-500/5 transition-all hover:shadow-2xl hover:shadow-violet-500/10 hover:border-violet-500/30"
+                >
+                  <CardHeader className="pb-4">
+                    <div
+                      className={`mb-3 h-14 w-14 rounded-xl bg-gradient-to-br ${game.color} p-3 text-white shadow-lg ${game.shadow ?? ''} transition-transform group-hover:scale-110`}
+                    >
+                      <Icon className="h-full w-full" />
+                    </div>
+                    <CardTitle className="text-xl">{game.name}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {game.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <div className="px-6 pb-6">
+                    <Button asChild className="w-full group/btn">
+                      <Link href={game.href ?? `/games/${game.id}`}>
+                        Play Now
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                      </Link>
+                    </Button>
                   </div>
-                  <CardTitle className="text-xl">{game.title}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {game.description}
-                  </CardDescription>
-                </CardHeader>
-                <div className="px-6 pb-6">
-                  <Button asChild className="w-full group/btn">
-                    <Link href={game.href}>
-                      Play Now
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                    </Link>
-                  </Button>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </div>
       </main>

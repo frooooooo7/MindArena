@@ -10,17 +10,38 @@ import {
     MatchmakingOverlay,
     CombatRulesCard,
     RankSystemCard,
-    SectionHeader
+    SectionHeader,
+    GameTypeSelector,
+    GameTypeId
 } from "@/components/arena";
 import { useArena } from "@/hooks/use-arena";
 
 export default function ArenaPage() {
-    const [selectedGame, setSelectedGame] = useState("");
+    // Game type selector state
+    const [selectorOpen, setSelectorOpen] = useState(false);
+    const [selectedArenaMode, setSelectedArenaMode] = useState("");
+    const [selectedGameType, setSelectedGameType] = useState("");
+    
     const { isSearching, match, joinQueue, leaveQueue } = useArena();
 
-    const handleJoinQueue = (gameType: string) => {
-        setSelectedGame(gameType);
+    // Called when user clicks "Enter Arena" on a mode card
+    const handleModeSelect = (arenaMode: string) => {
+        setSelectedArenaMode(arenaMode);
+        setSelectorOpen(true);
+    };
+
+    // Called when user selects a game type and confirms
+    const handleGameTypeSelect = (gameType: GameTypeId, arenaMode: string) => {
+        setSelectedGameType(gameType);
+        setSelectorOpen(false);
+        // Join queue with game type (e.g., "sequence", "chimp", "code")
         joinQueue(gameType);
+    };
+
+    // Close selector without joining
+    const handleSelectorClose = () => {
+        setSelectorOpen(false);
+        setSelectedArenaMode("");
     };
 
     return (
@@ -39,7 +60,7 @@ export default function ArenaPage() {
                                 title="Available Arenas" 
                                 description="Select your battlefield and start competing." 
                             />
-                            <ArenaModes onJoin={handleJoinQueue} />
+                            <ArenaModes onJoin={handleModeSelect} />
                             <CombatRulesCard />
                         </div>
 
@@ -52,10 +73,19 @@ export default function ArenaPage() {
                 </div>
             </main>
 
+            {/* Game Type Selector Modal */}
+            <GameTypeSelector
+                isOpen={selectorOpen}
+                onClose={handleSelectorClose}
+                onSelect={handleGameTypeSelect}
+                arenaMode={selectedArenaMode}
+            />
+
+            {/* Matchmaking Overlay */}
             <MatchmakingOverlay 
                 isOpen={isSearching || !!match} 
                 onClose={leaveQueue} 
-                gameType={selectedGame}
+                gameType={selectedGameType}
             />
         </div>
     );
