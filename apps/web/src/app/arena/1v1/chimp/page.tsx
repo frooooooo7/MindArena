@@ -10,6 +10,7 @@ import {
   WaitingState,
   CountdownState,
   GameHeader,
+  LevelCompleteOverlay,
 } from "@/components/arena/game";
 import { X, Eye, MousePointerClick } from "lucide-react";
 
@@ -26,6 +27,7 @@ export default function ArenaChimpPage() {
     numbersCount,
     completedCount,
     opponentProgress,
+    waitingForOpponent,
     isWinner,
     gameResult,
     matchCancelled,
@@ -39,6 +41,7 @@ export default function ArenaChimpPage() {
   const isGameActive =
     gameStatus === "memorize" ||
     gameStatus === "playing" ||
+    gameStatus === "levelComplete" ||
     gameStatus === "finished";
   const isMemorizing = gameStatus === "memorize";
   const isPlaying = gameStatus === "playing";
@@ -108,13 +111,23 @@ export default function ArenaChimpPage() {
                     Memorize the numbers!
                   </p>
                 )}
-                {isPlaying && (
+                {isPlaying && !waitingForOpponent && (
                   <p className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                     <MousePointerClick className="h-4 w-4" />
                     Click in order: 1, 2, 3...
                   </p>
                 )}
               </div>
+
+              {/* Waiting for opponent overlay */}
+              {waitingForOpponent && (
+                <LevelCompleteOverlay
+                  level={level}
+                  opponentName={match.opponent.name}
+                  opponentProgress={opponentProgress}
+                  total={numbersCount}
+                />
+              )}
 
               {/* Numbers indicator */}
               <div className="mt-2 text-xs text-muted-foreground">
