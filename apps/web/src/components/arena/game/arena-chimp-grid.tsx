@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { ChimpCell } from "@mindarena/shared";
 import { ChimpGrid } from "@/components/games/chimp-memory";
 import type { Cell } from "@/lib/games/chimp-memory";
@@ -15,7 +16,7 @@ interface ArenaChimpGridProps {
  * Wrapper around solo ChimpGrid for arena mode
  * Converts shared ChimpCell type to local Cell type
  */
-export function ArenaChimpGrid({
+export const ArenaChimpGrid = memo(function ArenaChimpGrid({
   cells,
   disabled,
   onCellClick,
@@ -35,4 +36,4 @@ export function ArenaChimpGrid({
       onCellClick={onCellClick}
     />
   );
-}
+});
