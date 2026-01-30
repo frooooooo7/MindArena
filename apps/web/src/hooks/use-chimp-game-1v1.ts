@@ -11,6 +11,7 @@ import {
   ChimpMoveResultPayload,
   ChimpLevelCompletePayload,
   ChimpOpponentProgressPayload,
+  ChimpPlayerCompletePayload,
   GameEndPayload,
 } from "@mindarena/shared";
 
@@ -199,22 +200,16 @@ export function useChimpGame1v1() {
       console.log("[ChimpGame] Move result:", data);
       if (!data.correct) return;
 
-      setGameState((prev) => {
-        const newCompletedCount = prev.completedCount + 1;
-        const isLevelDone = newCompletedCount >= prev.numbersCount;
-
-        return {
-          ...prev,
-          nextNumber: prev.nextNumber + 1,
-          completedCount: newCompletedCount,
-          status: isLevelDone ? "levelComplete" : prev.status,
-          cells: prev.cells.map((cell) =>
-            cell.number === data.completedNumber
-              ? { ...cell, completed: true, revealed: true }
-              : cell,
-          ),
-        };
-      });
+      setGameState((prev) => ({
+        ...prev,
+        nextNumber: prev.nextNumber + 1,
+        completedCount: prev.completedCount + 1,
+        cells: prev.cells.map((cell) =>
+          cell.number === data.completedNumber
+            ? { ...cell, completed: true, revealed: true }
+            : cell,
+        ),
+      }));
     };
 
     // Opponent progress event
@@ -230,6 +225,15 @@ export function useChimpGame1v1() {
     const handleMatchCancelled = () => {
       console.log("[ChimpGame] Match cancelled");
       setMatchCancelled(true);
+    };
+
+    // Player completed level - waiting for opponent (from server)
+    const handlePlayerComplete = (data: ChimpPlayerCompletePayload) => {
+      console.log("[ChimpGame] Player complete, waiting for opponent:", data);
+      setGameState((prev) => ({
+        ...prev,
+        status: "levelComplete",
+      }));
     };
 
     // Level complete event
@@ -266,6 +270,7 @@ export function useChimpGame1v1() {
     socket.on(GAME_EVENTS.CHIMP_MOVE_RESULT, handleMoveResult);
     socket.on(GAME_EVENTS.CHIMP_OPPONENT_PROGRESS, handleOpponentProgress);
     socket.on(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
+    socket.on(GAME_EVENTS.CHIMP_PLAYER_COMPLETE, handlePlayerComplete);
     socket.on(GAME_EVENTS.CHIMP_LEVEL_COMPLETE, handleLevelComplete);
     socket.on(GAME_EVENTS.END, handleGameEnd);
 
@@ -276,6 +281,7 @@ export function useChimpGame1v1() {
       socket.off(GAME_EVENTS.CHIMP_MOVE_RESULT, handleMoveResult);
       socket.off(GAME_EVENTS.CHIMP_OPPONENT_PROGRESS, handleOpponentProgress);
       socket.off(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
+      socket.off(GAME_EVENTS.CHIMP_PLAYER_COMPLETE, handlePlayerComplete);
       socket.off(GAME_EVENTS.CHIMP_LEVEL_COMPLETE, handleLevelComplete);
       socket.off(GAME_EVENTS.END, handleGameEnd);
     };

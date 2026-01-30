@@ -134,6 +134,11 @@ export interface ChimpOpponentProgressPayload {
   currentLevel: number;
 }
 
+export interface ChimpPlayerCompletePayload {
+  level: number;
+  waitingForOpponent: boolean;
+}
+
 // Game Socket Events
 export const GAME_EVENTS = {
   READY: "game:ready",
@@ -151,6 +156,7 @@ export const GAME_EVENTS = {
   CHIMP_MOVE: "game:chimp-move",
   CHIMP_MOVE_RESULT: "game:chimp-move-result",
   CHIMP_LEVEL_COMPLETE: "game:chimp-level-complete",
+  CHIMP_PLAYER_COMPLETE: "game:chimp-player-complete",
   CHIMP_OPPONENT_PROGRESS: "game:chimp-opponent-progress",
 } as const;
 

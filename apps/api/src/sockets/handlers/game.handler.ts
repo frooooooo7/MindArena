@@ -256,6 +256,13 @@ function handleChimpMove(
     // Clean up chimp room data
     setTimeout(() => chimpMemory.cleanupRoom(roomId), 30000);
   } else if (result.allCompleted) {
+    // Player completed their level - notify them
+    socket.emit(GAME_EVENTS.CHIMP_PLAYER_COMPLETE, {
+      level: room.level,
+      waitingForOpponent: true,
+    });
+
+    // Check if both players are done
     handleChimpLevelComplete(io, roomId);
   }
 }
