@@ -14,45 +14,111 @@ import {
   RoundTimer,
 } from "@/components/arena/game";
 import { X, Eye, MousePointerClick } from "lucide-react";
+import { useChimpStore } from "@/store/game/chimp.store";
+import { useAuthStore } from "@/store/auth.store";
 
-export default function ArenaChimpPage() {
-  const {
-    // Match info
-    match,
-    user,
-    // Game state
-    gameStatus,
-    countdown,
-    level,
-    cells,
-    numbersCount,
-    completedCount,
-    opponentProgress,
-    waitingForOpponent,
-    timeLeft,
-    isWinner,
-    gameResult,
-    matchCancelled,
-    // Actions
-    handleCellClick,
-    handleBackToArena,
-  } = useChimpGame1v1();
+// Separate components to minimize re-renders
+const GameTimer = () => {
+    const timeLeft = useChimpStore((state) => state.timeLeft);
+    const gameStatus = useChimpStore((state) => state.status);
+    const isGameActive =
+        gameStatus === "memorize" ||
+        gameStatus === "playing" ||
+        gameStatus === "levelComplete";
 
-  if (!match) return null;
+    if (!isGameActive || gameStatus === "levelComplete") return null;
 
-  const isGameActive =
-    gameStatus === "memorize" ||
-    gameStatus === "playing" ||
-    gameStatus === "levelComplete" ||
-    gameStatus === "finished";
-  const isMemorizing = gameStatus === "memorize";
-  const isPlaying = gameStatus === "playing";
+    return <RoundTimer timeLeft={timeLeft} />;
+};
 
-  return (
-    <div className="relative min-h-screen bg-background">
-      <BackgroundGradients />
-      <Navbar />
+const PlayerProgress = () => {
+    const user = useAuthStore((state) => state.user);
+    const progress = useChimpStore((state) => state.completedCount);
+    const total = useChimpStore((state) => state.numbersCount);
+    
+    return (
+        <PlayerCard
+            name={user?.name || "You"}
+            avatar={user?.name?.charAt(0).toUpperCase()}
+            progress={progress}
+            total={total}
+            variant="player"
+        />
+    );
+};
 
+const OpponentProgress = () => {
+    const match = useChimpStore((state) => state.match);
+    const progress = useChimpStore((state) => state.opponentProgress);
+    const total = useChimpStore((state) => state.numbersCount);
+
+    if (!match) return null;
+
+    return (
+        <PlayerCard
+            name={match.opponent.name}
+            avatar={match.opponent.avatar}
+            progress={progress}
+            total={total}
+            variant="opponent"
+        />
+    );
+};
+
+const GameStatusIndicator = () => {
+    const gameStatus = useChimpStore((state) => state.status);
+    const isMemorizing = gameStatus === "memorize";
+    const isPlaying = gameStatus === "playing";
+    const isWaiting = gameStatus === "levelComplete";
+
+    if (isMemorizing) {
+        return (
+            <p className="text-sm font-semibold text-amber-500 animate-pulse flex items-center gap-2">
+                <Eye className="h-4 w-4" />
+                Memorize the numbers!
+            </p>
+        );
+    }
+
+    if (isPlaying && !isWaiting) {
+         return (
+             <p className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                 <MousePointerClick className="h-4 w-4" />
+                 Click in order: 1, 2, 3...
+             </p>
+         );
+    }
+    return null;
+}
+
+const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (id: number) => void, handleBackToArena: () => void }) => {
+    const gameStatus = useChimpStore((state) => state.status);
+    const matchCancelled = useChimpStore((state) => state.matchCancelled);
+    const match = useChimpStore((state) => state.match);
+    const countdown = useChimpStore((state) => state.countdown);
+    const level = useChimpStore((state) => state.level);
+    
+    // Grid state
+    const cells = useChimpStore((state) => state.cells);
+    const numbersCount = useChimpStore((state) => state.numbersCount);
+    const opponentProgress = useChimpStore((state) => state.opponentProgress);
+    
+    // Result state
+    const gameResult = useChimpStore((state) => state.gameResult);
+    const isWinner = useChimpStore((state) => state.isWinner);
+
+    const isGameActive =
+        gameStatus === "memorize" ||
+        gameStatus === "playing" ||
+        gameStatus === "levelComplete" ||
+        gameStatus === "finished";
+
+    const waitingForOpponent = gameStatus === "levelComplete";
+    const isPlaying = gameStatus === "playing";
+
+    if (!match) return null;
+
+    return (
       <main className="container relative mx-auto px-4 py-8 max-w-6xl">
         <GameHeader gameType="Chimp" level={level} />
 
@@ -90,13 +156,7 @@ export default function ArenaChimpPage() {
 
         {isGameActive && !matchCancelled && (
           <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_200px] gap-8 items-start">
-            <PlayerCard
-              name={user?.name || "You"}
-              avatar={user?.name?.charAt(0).toUpperCase()}
-              progress={completedCount}
-              total={numbersCount}
-              variant="player"
-            />
+            <PlayerProgress />
 
             <div className="flex flex-col items-center">
               <ArenaChimpGrid
@@ -107,18 +167,7 @@ export default function ArenaChimpPage() {
 
               {/* Status message for chimp memory */}
               <div className="mt-4 flex items-center gap-2">
-                {isMemorizing && (
-                  <p className="text-sm font-semibold text-amber-500 animate-pulse flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    Memorize the numbers!
-                  </p>
-                )}
-                {isPlaying && !waitingForOpponent && (
-                  <p className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                    <MousePointerClick className="h-4 w-4" />
-                    Click in order: 1, 2, 3...
-                  </p>
-                )}
+                 <GameStatusIndicator />
               </div>
 
               {/* Waiting for opponent overlay */}
@@ -137,13 +186,7 @@ export default function ArenaChimpPage() {
               </div>
             </div>
 
-            <PlayerCard
-              name={match.opponent.name}
-              avatar={match.opponent.avatar}
-              progress={opponentProgress}
-              total={numbersCount}
-              variant="opponent"
-            />
+            <OpponentProgress />
           </div>
         )}
 
@@ -155,12 +198,21 @@ export default function ArenaChimpPage() {
           />
         )}
       </main>
+    );
+}
 
-      {/* Round Timer - fixed at bottom */}
-      {isGameActive &&
-        !matchCancelled &&
-        !waitingForOpponent &&
-        gameStatus !== "finished" && <RoundTimer timeLeft={timeLeft} />}
+export default function ArenaChimpPage() {
+  const { handleCellClick, handleBackToArena } = useChimpGame1v1();
+  const match = useChimpStore((state) => state.match);
+
+  if (!match) return null;
+
+  return (
+    <div className="relative min-h-screen bg-background">
+      <BackgroundGradients />
+      <Navbar />
+      <GameArea handleCellClick={handleCellClick} handleBackToArena={handleBackToArena} />
+      <GameTimer />
     </div>
   );
 }

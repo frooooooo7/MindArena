@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { socket } from "@/lib/socket";
 import { useArenaStore } from "@/store/arena.store";
 import { useSequenceStore } from "@/store/game/sequence.store";
+import { useAuthStore } from "@/store/auth.store";
 import {
   GAME_EVENTS,
   ARENA_EVENTS,
@@ -100,7 +101,7 @@ export function useSequenceGame1v1() {
 
     const handleGameEnd = (data: GameEndPayload) => {
         // Need current user name to determine winner
-        const currentUserName = match?.user?.name || "Player"; 
+        const currentUserName = useAuthStore.getState().user?.name || "Player"; 
         store.endGame(data, currentUserName);
     };
 
