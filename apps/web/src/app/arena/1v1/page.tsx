@@ -15,43 +15,74 @@ import {
   RoundTimer,
 } from "@/components/arena/game";
 import { X } from "lucide-react";
+import { useSequenceStore } from "@/store/game/sequence.store";
+import { useAuthStore } from "@/store/auth.store";
 
-export default function Arena1v1Page() {
-  const {
-    // Match info
-    match,
-    user,
-    // Game state
-    gameStatus,
-    countdown,
-    level,
-    sequence,
-    gridSize,
-    opponentProgress,
-    timeLeft,
-    isWinner,
-    gameResult,
-    matchCancelled,
-    // Local UI state
-    showingSequence,
-    activeCell,
-    clickedCell,
-    playerIndex,
-    waitingForOpponent,
-    // Actions
-    handleCellClick,
-    handleBackToArena,
-  } = useSequenceGame1v1();
+const GameTimer = () => {
+    const timeLeft = useSequenceStore((state) => state.timeLeft);
+    return <RoundTimer timeLeft={timeLeft} />;
+};
 
-  if (!match) return null;
+const PlayerProgress = () => {
+    const user = useAuthStore((state) => state.user);
+    const progress = useSequenceStore((state) => state.currentIndex);
+    const total = useSequenceStore((state) => state.sequence.length);
+    
+    return (
+        <PlayerCard
+            name={user?.name || "You"}
+            avatar={user?.name?.charAt(0).toUpperCase()}
+            progress={progress}
+            total={total}
+            variant="player"
+        />
+    );
+};
 
-  const isGameActive = gameStatus === "playing" || gameStatus === "finished";
+const OpponentProgress = () => {
+    const match = useSequenceStore((state) => state.match);
+    const progress = useSequenceStore((state) => state.opponentProgress);
+    const total = useSequenceStore((state) => state.sequence.length);
+
+    if (!match) return null;
+
+    return (
+        <PlayerCard
+            name={match.opponent.name}
+            avatar={match.opponent.avatar}
+            progress={progress}
+            total={total}
+            variant="opponent"
+        />
+    );
+};
+
+const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (idx: number) => void, handleBackToArena: () => void }) => {
+    const gameStatus = useSequenceStore((state) => state.status);
+    const matchCancelled = useSequenceStore((state) => state.matchCancelled);
+    const match = useSequenceStore((state) => state.match);
+    const user = useAuthStore((state) => state.user);
+    const countdown = useSequenceStore((state) => state.countdown);
+    const level = useSequenceStore((state) => state.level);
+    const gridSize = useSequenceStore((state) => state.gridSize);
+    
+    // Grid state
+    const activeCell = useSequenceStore((state) => state.activeCell);
+    const clickedCell = useSequenceStore((state) => state.clickedCell);
+    const showingSequence = useSequenceStore((state) => state.showingSequence);
+    
+    // Result state
+    const gameResult = useSequenceStore((state) => state.gameResult);
+    const isWinner = useSequenceStore((state) => state.isWinner);
+    const opponentProgress = useSequenceStore((state) => state.opponentProgress);
+    const sequenceLength = useSequenceStore((state) => state.sequence.length);
+
+    const isGameActive = gameStatus === "playing" || gameStatus === "finished" || gameStatus === "level-complete";
+    const waitingForOpponent = gameStatus === "level-complete";
+
+    if (!match) return null;
 
   return (
-    <div className="relative min-h-screen bg-background">
-      <BackgroundGradients />
-      <Navbar />
-
       <main className="container relative mx-auto px-4 py-8 max-w-5xl">
         <GameHeader gameType={match.gameType} level={level} />
 
@@ -89,13 +120,7 @@ export default function Arena1v1Page() {
 
         {isGameActive && !matchCancelled && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <PlayerCard
-              name={user?.name || "You"}
-              avatar={user?.name?.charAt(0).toUpperCase()}
-              progress={playerIndex}
-              total={sequence.length}
-              variant="player"
-            />
+            <PlayerProgress />
 
             <div className="flex flex-col items-center">
               <GameGrid
@@ -121,18 +146,12 @@ export default function Arena1v1Page() {
                   level={level}
                   opponentName={match.opponent.name}
                   opponentProgress={opponentProgress}
-                  total={sequence.length}
+                  total={sequenceLength}
                 />
               )}
             </div>
 
-            <PlayerCard
-              name={match.opponent.name}
-              avatar={match.opponent.avatar}
-              progress={opponentProgress}
-              total={sequence.length}
-              variant="opponent"
-            />
+            <OpponentProgress />
           </div>
         )}
 
@@ -144,8 +163,22 @@ export default function Arena1v1Page() {
           />
         )}
       </main>
+  );
+}
 
-      <RoundTimer timeLeft={timeLeft} />
+export default function Arena1v1Page() {
+  const { handleCellClick, handleBackToArena } = useSequenceGame1v1();
+  const match = useSequenceStore((state) => state.match);
+
+  // Initial check to prevent flash of content if no match
+  if (!match) return null;
+
+  return (
+    <div className="relative min-h-screen bg-background">
+      <BackgroundGradients />
+      <Navbar />
+      <GameArea handleCellClick={handleCellClick} handleBackToArena={handleBackToArena} />
+      <GameTimer />
     </div>
   );
 }

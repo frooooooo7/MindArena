@@ -95,22 +95,43 @@ export function registerGameHandlers(socket: Socket, io: Server) {
  * Start game countdown and then the appropriate game
  */
 function startGameCountdown(io: Server, roomId: string) {
-  const room = roomService.getRoom(roomId);
-  if (!room) return;
+  let count = 3;
 
-  // Start countdown
-  io.to(roomId).emit(GAME_EVENTS.COUNTDOWN, { seconds: 3 });
+  // Check room existence initially
+  if (!roomService.getRoom(roomId)) return;
 
-  // After countdown, start the game based on game type
-  setTimeout(() => {
-    const gameType = room.gameType.toLowerCase();
-
-    if (gameType === "chimp") {
-      startChimpGame(io, roomId);
-    } else {
-      startSequenceGame(io, roomId);
+  // Helper to check room and emit
+  const emitCountdown = (val: number) => {
+    if (roomService.getRoom(roomId)) {
+      io.to(roomId).emit(GAME_EVENTS.COUNTDOWN, { seconds: val });
     }
-  }, 3000);
+  };
+
+  // Initial emit (3)
+  emitCountdown(count);
+  count--;
+
+  const interval = setInterval(() => {
+    const room = roomService.getRoom(roomId);
+    if (!room) {
+      clearInterval(interval);
+      return;
+    }
+
+    if (count > 0) {
+      emitCountdown(count);
+      count--;
+    } else {
+      clearInterval(interval);
+      // Start Game
+      const gameType = room.gameType.toLowerCase();
+      if (gameType === "chimp") {
+        startChimpGame(io, roomId);
+      } else {
+        startSequenceGame(io, roomId);
+      }
+    }
+  }, 1000);
 }
 
 // Re-export for external use

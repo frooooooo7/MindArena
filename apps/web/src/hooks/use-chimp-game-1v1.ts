@@ -184,19 +184,6 @@ export function useChimpGame1v1() {
         status: "countdown",
         countdown: data.seconds,
       }));
-
-      let remaining = data.seconds;
-      countdownTimerRef.current = setInterval(() => {
-        remaining--;
-        if (!isMountedRef.current) {
-          clearAllTimers();
-          return;
-        }
-        setGameState((prev) => ({ ...prev, countdown: remaining }));
-        if (remaining <= 0) {
-          clearAllTimers();
-        }
-      }, 1000);
     };
 
     // Chimp game start event
