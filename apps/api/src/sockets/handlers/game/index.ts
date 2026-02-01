@@ -73,6 +73,18 @@ export function registerGameHandlers(socket: Socket, io: Server) {
     },
   );
 
+  // Player explicitly leaves the game (forfeit)
+  socket.on(GAME_EVENTS.LEAVE, () => {
+    console.log(`[GAME] Player ${user?.name} forfeiting game`);
+    handlePlayerDisconnect(
+      socket,
+      io,
+      userId,
+      user?.name,
+      "opponent_forfeited",
+    );
+  });
+
   // Handle disconnect during game
   socket.on("disconnecting", () => {
     handlePlayerDisconnect(socket, io, userId, user?.name);

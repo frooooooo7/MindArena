@@ -56,6 +56,7 @@ export function handlePlayerDisconnect(
   io: Server,
   userId: string,
   userName?: string,
+  reason: "opponent_disconnected" | "opponent_forfeited" = "opponent_disconnected",
 ) {
   socket.rooms.forEach((roomId) => {
     if (roomId === socket.id) return; // Skip default room
@@ -74,7 +75,7 @@ export function handlePlayerDisconnect(
           loserId: userId,
           winnerName: opponent.name,
           loserName: userName || "Unknown",
-          reason: "opponent_disconnected",
+          reason: reason,
           finalLevel: room.level,
         });
 

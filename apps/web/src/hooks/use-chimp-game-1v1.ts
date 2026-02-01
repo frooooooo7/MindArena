@@ -16,6 +16,7 @@ import {
   GameEndPayload,
   ROUND_TIME_LIMIT,
 } from "@mindarena/shared";
+import { useGameProtection } from "./use-game-protection";
 
 const MEMORIZE_TIME = 2000; // ms to show numbers before hiding
 
@@ -72,6 +73,14 @@ export function useChimpGame1v1() {
   const [gameResult, setGameResult] = useState<GameEndPayload | null>(null);
   const [isWinner, setIsWinner] = useState<boolean | null>(null);
   const [timeLeft, setTimeLeft] = useState(ROUND_TIME_LIMIT);
+
+  // Use generic game protection hook
+  useGameProtection({
+    gameStatus: gameState.status,
+    gameResult,
+    matchCancelled,
+    activeStatuses: ["playing", "countdown", "memorize"],
+  });
 
   // Refs for cleanup and mounted state tracking
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);

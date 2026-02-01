@@ -82,7 +82,7 @@ export interface GameEndPayload {
   loserId: string;
   winnerName: string;
   loserName: string;
-  reason: "opponent_failed" | "opponent_disconnected";
+  reason: "opponent_failed" | "opponent_disconnected" | "opponent_forfeited";
   finalLevel: number;
 }
 
@@ -165,6 +165,7 @@ export const GAME_EVENTS = {
   ERROR: "game:error",
   ROUND_TIMER: "game:round-timer",
   TIMEOUT: "game:timeout",
+  LEAVE: "game:leave",
   // Chimp Memory specific events
   CHIMP_START: "game:chimp-start",
   CHIMP_MOVE: "game:chimp-move",

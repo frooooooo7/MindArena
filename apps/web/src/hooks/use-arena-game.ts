@@ -11,6 +11,7 @@ import {
   RoundTimerPayload,
   ROUND_TIME_LIMIT,
 } from "@mindarena/shared";
+import { useGameProtection } from "./use-game-protection";
 
 interface UseArenaGameReturn {
   // Game state
@@ -59,6 +60,14 @@ export function useArenaGame(): UseArenaGameReturn {
   // Result
   const [gameResult, setGameResult] = useState<GameEndPayload | null>(null);
   const [isWinner, setIsWinner] = useState<boolean | null>(null);
+  
+  // Use generic game protection hook
+  useGameProtection({
+    gameStatus,
+    gameResult,
+    matchCancelled,
+    activeStatuses: ["playing", "countdown"],
+  });
 
   // Ref for countdown timer cleanup
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
