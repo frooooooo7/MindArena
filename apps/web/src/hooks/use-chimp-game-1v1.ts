@@ -28,11 +28,11 @@ const MEMORIZE_TIME = 2000; // ms to show numbers before hiding
 export function useChimpGame1v1() {
   const router = useRouter();
   const { match, resetArena } = useArenaStore();
-  
+
   // Connect store to global match state on mount
   useEffect(() => {
     if (match) {
-        useChimpStore.getState().setMatch(match);
+      useChimpStore.getState().setMatch(match);
     }
     return () => useChimpStore.getState().resetGame();
   }, [match]);
@@ -40,7 +40,7 @@ export function useChimpGame1v1() {
   const roomId = match?.room ?? "";
 
   // Game Protection
-  const status = useChimpStore(s => s.status);
+  const status = useChimpStore((s: any) => s.status);
   useGameProtection({
     gameStatus: status,
     gameResult: useChimpStore.getState().gameResult,
@@ -62,15 +62,15 @@ export function useChimpGame1v1() {
 
   // Helpers
   const clearMemorizeTimer = useCallback(() => {
-      if (memorizeTimerRef.current) {
-          clearTimeout(memorizeTimerRef.current);
-          memorizeTimerRef.current = null;
-      }
+    if (memorizeTimerRef.current) {
+      clearTimeout(memorizeTimerRef.current);
+      memorizeTimerRef.current = null;
+    }
   }, []);
 
   // Cleanup on unmount
   useEffect(() => {
-      return clearMemorizeTimer;
+    return clearMemorizeTimer;
   }, [clearMemorizeTimer]);
 
   // Start memorize phase
@@ -89,34 +89,34 @@ export function useChimpGame1v1() {
     },
     [clearMemorizeTimer]
   );
-  
+
   // Socket event handlers
   useEffect(() => {
     if (!roomId) return;
     const store = useChimpStore.getState();
 
     const handleCountdown = (data: { seconds: number }) => {
-        store.setStatus("countdown");
-        store.setCountdown(data.seconds);
-        clearMemorizeTimer();
+      store.setStatus("countdown");
+      store.setCountdown(data.seconds);
+      clearMemorizeTimer();
     };
 
     const handleChimpStart = (data: ChimpGameStartPayload) => {
-        clearMemorizeTimer();
-        startMemorizePhase(data.cells, data.level, data.numbersCount);
+      clearMemorizeTimer();
+      startMemorizePhase(data.cells, data.level, data.numbersCount);
     };
 
     const handleMoveResult = (data: ChimpMoveResultPayload) => {
-        if (!data.correct) return;
-        store.handleCorrectMove(data.completedNumber);
+      if (!data.correct) return;
+      store.handleCorrectMove(data.completedNumber);
     };
 
     const handleOpponentProgress = (data: ChimpOpponentProgressPayload) => {
-        store.updateOpponent(data);
+      store.updateOpponent(data);
     };
 
     const handleMatchCancelled = () => {
-        store.setMatchCancelled(true);
+      store.setMatchCancelled(true);
     };
 
     const handlePlayerComplete = (data: ChimpPlayerCompletePayload) => {
@@ -134,9 +134,9 @@ export function useChimpGame1v1() {
     };
 
     const handleGameEnd = (data: GameEndPayload) => {
-       clearMemorizeTimer();
-       const currentUserName = useAuthStore.getState().user?.name || "Player";
-       store.endGame(data, currentUserName);
+      clearMemorizeTimer();
+      const currentUserName = useAuthStore.getState().user?.name || "Player";
+      store.endGame(data, currentUserName);
     };
 
     socket.on(GAME_EVENTS.COUNTDOWN, handleCountdown);
@@ -151,9 +151,9 @@ export function useChimpGame1v1() {
 
     // Auto-Send Ready
     if (store.status === "waiting") {
-        setTimeout(() => {
-            socket.emit(GAME_EVENTS.READY, { roomId });
-        }, 1000);
+      setTimeout(() => {
+        socket.emit(GAME_EVENTS.READY, { roomId });
+      }, 1000);
     }
 
     return () => {
@@ -176,10 +176,6 @@ export function useChimpGame1v1() {
   ]);
 
   // Handle cell click
-  const cellsMap = useMemo(
-      () => new Map(useChimpStore.getState().cells.map((cell) => [cell.id, cell])),
-      [useChimpStore((s) => s.cells)]
-  );
 
   const handleCellClick = useCallback(
     (cellId: number) => {
@@ -189,8 +185,8 @@ export function useChimpGame1v1() {
       // Note: O(n) find in store state vs Map. 
       // Ideally cells should be a Map in store or we trust the passed ID.
       // For now finding from current state array.
-      const cell = store.cells.find(c => c.id === cellId);
-      
+      const cell = store.cells.find((c: any) => c.id === cellId);
+
       if (!cell || cell.number === null || cell.completed) return;
       socket.emit(GAME_EVENTS.CHIMP_MOVE, { roomId, cellId });
     },

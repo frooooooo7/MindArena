@@ -147,7 +147,7 @@ describe('Sequence Memory Service', () => {
             vi.mocked(roomService.getRoom).mockReturnValue(mockRoom);
             vi.mocked(roomService.getRoom).mockReturnValue(mockRoom);
 
-            const nextRoom = sequenceMemory.advanceToNextLevel(roomId);
+            sequenceMemory.advanceToNextLevel(roomId);
 
             expect(roomService.updateRoomGameData).toHaveBeenCalledWith(roomId, expect.objectContaining({
                 level: 3,

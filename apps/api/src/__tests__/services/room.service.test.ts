@@ -2,7 +2,7 @@
  * Room Service Tests
  * Tests for game room lifecycle management
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import * as roomService from '../../services/room.service';
 
 describe('Room Service', () => {

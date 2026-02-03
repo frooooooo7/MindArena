@@ -1,5 +1,5 @@
 import { Socket, Server } from "socket.io";
-import { GAME_EVENTS, GameMovePayload } from "@mindarena/shared";
+import { GAME_EVENTS } from "@mindarena/shared";
 import * as roomService from "../../../services/room.service";
 import { sequenceMemory } from "../../../services/games";
 import { clearRoundTimer, startRoundTimer } from "./timer";
