@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { GameState, generateCode, MEMORIZE_TIME } from "./types";
+import { gameResultApi } from "@/lib/game-result-api";
+import { useAuthStore } from "@/store/auth.store";
 
 export function useCodeMemory() {
   const [level, setLevel] = useState(1);
@@ -10,16 +12,19 @@ export function useCodeMemory() {
   const [gameState, setGameState] = useState<GameState>("idle");
   const [score, setScore] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const { isAuthenticated } = useAuthStore();
 
-  const codeLength = 3 + level; // Start with 4 chars at level 1
+  const codeLength = 3 + level;
 
   const startGame = useCallback(() => {
-    const newCode = generateCode(4); // Start with 4 chars
+    const newCode = generateCode(4);
     setLevel(1);
     setScore(0);
     setCode(newCode);
     setUserInput("");
     setGameState("memorize");
+    startTimeRef.current = Date.now();
 
     timeoutRef.current = setTimeout(() => {
       setGameState("input");
@@ -42,17 +47,29 @@ export function useCodeMemory() {
     }, MEMORIZE_TIME);
   }, [level, code.length]);
 
+  // Save game result when game ends
+  useEffect(() => {
+    if (gameState === "gameover" && isAuthenticated && startTimeRef.current) {
+      const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      gameResultApi.save({
+        gameType: "code",
+        score,
+        level,
+        duration,
+        mode: "local",
+      }).catch((err) => console.error("Failed to save game result:", err));
+    }
+  }, [gameState, isAuthenticated, score, level]);
+
   const handleSubmit = useCallback(() => {
     if (gameState !== "input") return;
 
     if (userInput.toUpperCase() === code) {
-      // Correct!
       setGameState("success");
       setTimeout(() => {
         nextLevel();
       }, 800);
     } else {
-      // Wrong!
       setGameState("gameover");
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -61,7 +78,6 @@ export function useCodeMemory() {
   }, [gameState, userInput, code, nextLevel]);
 
   const handleInputChange = useCallback((value: string) => {
-    // Only allow alphanumeric characters
     const filtered = value.toUpperCase().replace(/[^0-9A-Z]/g, "");
     setUserInput(filtered);
   }, []);

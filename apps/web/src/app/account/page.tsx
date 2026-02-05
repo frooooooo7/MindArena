@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
 import { ProfileHeader } from "@/components/account/profile-header";
-import { StatsCards } from "@/components/account/stats-cards";
-import { AccountSettings } from "@/components/account/account-settings";
+import { LocalStatsSection } from "@/components/account/local-stats-section";
+import { ArenaStatsSection } from "@/components/account/arena-stats-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Shield, BarChart3, Trophy } from "lucide-react";
+import { User, Shield, BarChart3, Trophy, Gamepad2, Swords } from "lucide-react";
+
+type GameMode = "local" | "arena";
 
 export default function AccountPage() {
     const { isAuthenticated, user, isHydrated } = useAuthStore();
     const router = useRouter();
+    const [gameMode, setGameMode] = useState<GameMode>("local");
 
     useEffect(() => {
         if (isHydrated && !isAuthenticated) {
@@ -22,7 +25,7 @@ export default function AccountPage() {
     }, [isAuthenticated, isHydrated, router]);
 
     if (!isHydrated || !isAuthenticated) {
-        return null; // Or a loading spinner
+        return null; 
     }
 
     return (
@@ -32,7 +35,6 @@ export default function AccountPage() {
 
             <main className="container relative mx-auto px-4 py-8 md:px-8 max-w-6xl">
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    {/* Header Section */}
                     <div className="flex flex-col gap-6">
                         <div>
                             <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
@@ -66,24 +68,38 @@ export default function AccountPage() {
                         </TabsList>
 
                         <TabsContent value="overview" className="space-y-6">
-                            <StatsCards />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <AccountSettings user={user!} />
-                                {/* Quick Actions Placeholder */}
-                                <div className="p-6 rounded-2xl border border-border/40 bg-card/60">
-                                    <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <button className="flex flex-col items-center justify-center p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors duration-200 border border-border/40">
-                                            <Trophy className="h-6 w-6 text-violet-500 mb-2" />
-                                            <span className="text-xs font-medium">Daily Challenge</span>
-                                        </button>
-                                        <button className="flex flex-col items-center justify-center p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors duration-200 border border-border/40">
-                                            <BarChart3 className="h-6 w-6 text-indigo-500 mb-2" />
-                                            <span className="text-xs font-medium">View Global Ranking</span>
-                                        </button>
-                                    </div>
-                                </div>
+                            {/* Game Mode Toggle */}
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setGameMode("local")}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                                        gameMode === "local"
+                                            ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/20"
+                                            : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50"
+                                    }`}
+                                >
+                                    <Gamepad2 className="h-4 w-4" />
+                                    Local
+                                </button>
+                                <button
+                                    onClick={() => setGameMode("arena")}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                                        gameMode === "arena"
+                                            ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/20"
+                                            : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50"
+                                    }`}
+                                >
+                                    <Swords className="h-4 w-4" />
+                                    Arena
+                                </button>
                             </div>
+
+                            {/* Mode-specific Content */}
+                            {gameMode === "local" ? (
+                                <LocalStatsSection isAuthenticated={isAuthenticated} />
+                            ) : (
+                                <ArenaStatsSection />
+                            )}
                         </TabsContent>
 
                         <TabsContent value="stats">
