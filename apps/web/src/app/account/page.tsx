@@ -98,7 +98,7 @@ export default function AccountPage() {
                             {gameMode === "local" ? (
                                 <LocalStatsSection isAuthenticated={isAuthenticated} />
                             ) : (
-                                <ArenaStatsSection />
+                                <ArenaStatsSection isAuthenticated={isAuthenticated} />
                             )}
                         </TabsContent>
 

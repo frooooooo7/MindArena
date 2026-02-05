@@ -8,7 +8,7 @@ const gameRooms: Map<string, GameRoom> = new Map();
 // Config for room cleanup
 const WAITING_ROOM_TIMEOUT_MS = 15 * 1000; // 15 seconds for confirmation
 const CLEANUP_INTERVAL_MS = 10 * 1000; // 10 seconds check
-const FINISHED_ROOM_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+const FINISHED_ROOM_TIMEOUT_MS = 30 * 1000; // 30 seconds for cleanup after finish
 
 // Cleanup timer
 let cleanupInterval: NodeJS.Timeout | null = null;
@@ -61,8 +61,8 @@ export function startRoomCleanup(io: Server): void {
 export function createRoom(
     roomId: string, 
     gameType: string,
-    player1: { id: string; name: string; socketId: string },
-    player2: { id: string; name: string; socketId: string },
+    player1: { id: string; name: string; socketId: string; isGuest?: boolean },
+    player2: { id: string; name: string; socketId: string; isGuest?: boolean },
     initialGameData: { sequence: number[]; gridSize: number }
 ): GameRoom {
     const room: GameRoom = {
@@ -87,7 +87,7 @@ export function createRoom(
     return room;
 }
 
-function createPlayer(data: { id: string; name: string; socketId: string }): GamePlayer {
+function createPlayer(data: { id: string; name: string; socketId: string; isGuest?: boolean }): GamePlayer {
     return {
         id: data.id,
         name: data.name,
@@ -96,6 +96,7 @@ function createPlayer(data: { id: string; name: string; socketId: string }): Gam
         currentLevel: 1,
         currentIndex: 0,
         hasFailed: false,
+        isGuest: !!data.isGuest,
     };
 }
 

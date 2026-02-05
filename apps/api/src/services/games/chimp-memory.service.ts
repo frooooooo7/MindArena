@@ -78,8 +78,8 @@ export function getNumbersCountForLevel(level: number): number {
  */
 export function createGameRoom(
   roomId: string,
-  player1: { id: string; name: string; socketId: string },
-  player2: { id: string; name: string; socketId: string },
+  player1: { id: string; name: string; socketId: string; isGuest?: boolean },
+  player2: { id: string; name: string; socketId: string; isGuest?: boolean },
 ) {
   const numbersCount = getNumbersCountForLevel(1);
   const cells = generateCells(numbersCount);

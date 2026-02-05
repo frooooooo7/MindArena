@@ -2,18 +2,24 @@
 
 import { GameStatsByType, gameResultApi } from "@/lib/game-result-api";
 import { GAME_TYPES } from "@/lib/games/game-types";
-import { Trophy } from "lucide-react";
+import { Trophy, Gamepad2, Swords } from "lucide-react";
 import { AccountPlaceholder } from "./account-placeholder";
 import { useAuthenticatedQuery } from "@/hooks/use-authenticated-query";
+import { useState } from "react";
+import { GameMode } from "@mindarena/shared";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface GameRecordsSectionProps {
   isAuthenticated: boolean;
 }
 
 export function GameRecordsSection({ isAuthenticated }: GameRecordsSectionProps) {
+  const [mode, setMode] = useState<GameMode>("local");
+  
   const { data: stats, isLoading, error } = useAuthenticatedQuery<GameStatsByType[]>(
-    () => gameResultApi.getStatsByGameType("local"),
-    isAuthenticated
+    () => gameResultApi.getStatsByGameType(mode),
+    isAuthenticated,
+    [mode] // Refetch when mode changes
   );
 
   if (!isAuthenticated) {
@@ -42,19 +48,52 @@ export function GameRecordsSection({ isAuthenticated }: GameRecordsSectionProps)
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="p-6 rounded-2xl border border-border/40 bg-card/60 h-48" />
-        ))}
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-4">
+            <Skeleton className="h-8 w-48 rounded-xl" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-48 rounded-2xl" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Trophy className="h-5 w-5 text-violet-500" />
-        <h3 className="text-lg font-semibold">Your Records</h3>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-violet-500" />
+          <h3 className="text-lg font-semibold">Your Records</h3>
+        </div>
+
+        {/* Mode Toggle */}
+        <div className="flex items-center gap-1 p-1 bg-secondary/20 rounded-xl border border-border/40 w-fit">
+          <button
+            onClick={() => setMode("local")}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+              mode === "local"
+                ? "bg-violet-600 text-white shadow-md shadow-violet-500/20"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Gamepad2 className="h-3.5 w-3.5" />
+            Local
+          </button>
+          <button
+            onClick={() => setMode("arena")}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+              mode === "arena"
+                ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Swords className="h-3.5 w-3.5" />
+            Arena
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

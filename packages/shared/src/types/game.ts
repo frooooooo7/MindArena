@@ -19,6 +19,25 @@ export interface GameStatsByType {
   highestLevel: number;
 }
 
+// Full Game Result DTO
+export interface GameResult {
+  id: string;
+  userId: string;
+  gameType: GameTypeId;
+  score: number;
+  level: number;
+  duration: number;
+  mode: GameMode;
+  createdAt: string;
+}
+
+export interface GetHistoryResponse {
+  results: GameResult[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 // Aggregate Stats (overall)
 export interface GameStats {
   totalGames: number;

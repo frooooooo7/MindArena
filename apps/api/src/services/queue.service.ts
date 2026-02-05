@@ -16,6 +16,7 @@ export interface QueuedPlayer {
     socketId: string;
     gameType: string;
     joinedAt: Date;
+    isGuest?: boolean;
 }
 
 // ==========================================

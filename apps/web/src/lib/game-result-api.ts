@@ -1,19 +1,15 @@
 import { api } from "./axios";
-import { GameMode, GameTypeId, GameStats, GameStatsByType } from "@mindarena/shared";
+import { 
+  GameMode, 
+  GameTypeId, 
+  GameStats, 
+  GameStatsByType,
+  GameResult,
+  GetHistoryResponse 
+} from "@mindarena/shared";
 
 // Re-export shared types for convenience
-export type { GameStats, GameStatsByType, GameMode, GameTypeId };
-
-export interface GameResult {
-  id: string;
-  userId: string;
-  gameType: GameTypeId;
-  score: number;
-  level: number;
-  duration: number;
-  mode: GameMode;
-  createdAt: string;
-}
+export type { GameStats, GameStatsByType, GameMode, GameTypeId, GameResult, GetHistoryResponse };
 
 export interface SaveGameResultInput {
   gameType: GameTypeId;
@@ -21,13 +17,6 @@ export interface SaveGameResultInput {
   level: number;
   duration: number;
   mode: GameMode;
-}
-
-export interface GetHistoryResponse {
-  results: GameResult[];
-  total: number;
-  limit: number;
-  offset: number;
 }
 
 export const gameResultApi = {

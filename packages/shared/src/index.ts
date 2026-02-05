@@ -8,3 +8,6 @@ export * from "./types/game";
 
 // Constants
 export const APP_NAME = "MindArena";
+
+// Utils
+export * from "./utils/game-logic";
