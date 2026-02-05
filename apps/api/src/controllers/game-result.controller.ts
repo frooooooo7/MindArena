@@ -1,15 +1,7 @@
 import { Response, NextFunction } from "express";
-import { z } from "zod";
 import { gameResultService } from "../services/game-result.service";
 import { AuthRequest } from "../middleware/auth.middleware";
-
-const saveResultSchema = z.object({
-  gameType: z.enum(["sequence", "chimp", "code"]),
-  score: z.number().int().min(0),
-  level: z.number().int().min(1),
-  duration: z.number().int().min(0),
-  mode: z.enum(["local", "arena"]),
-});
+import { GameMode, saveGameResultSchema } from "@mindarena/shared";
 
 export const gameResultController = {
   async saveResult(req: AuthRequest, res: Response, next: NextFunction) {
@@ -18,7 +10,7 @@ export const gameResultController = {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const result = saveResultSchema.safeParse(req.body);
+      const result = saveGameResultSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({
           error: "Validation failed",
@@ -43,7 +35,7 @@ export const gameResultController = {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const mode = req.query.mode as "local" | "arena" | undefined;
+      const mode = req.query.mode as GameMode | undefined;
       const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
       const offset = req.query.offset ? parseInt(req.query.offset as string, 10) : 0;
 
@@ -66,8 +58,23 @@ export const gameResultController = {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const mode = req.query.mode as "local" | "arena" | undefined;
+      const mode = req.query.mode as GameMode | undefined;
       const stats = await gameResultService.getStats(req.userId, mode);
+
+      return res.json(stats);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getStatsByGameType(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      if (!req.userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const mode = req.query.mode as GameMode | undefined;
+      const stats = await gameResultService.getStatsByGameType(req.userId, mode);
 
       return res.json(stats);
     } catch (error) {

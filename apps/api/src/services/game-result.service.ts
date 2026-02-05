@@ -2,6 +2,7 @@ import {
   gameResultRepository,
   CreateGameResultData,
 } from "../repositories/game-result.repository";
+import { GameMode } from "@mindarena/shared";
 
 export interface SaveGameResultInput {
   userId: string;
@@ -9,12 +10,12 @@ export interface SaveGameResultInput {
   score: number;
   level: number;
   duration: number;
-  mode: "local" | "arena";
+  mode: GameMode;
 }
 
 export interface GetHistoryInput {
   userId: string;
-  mode?: "local" | "arena";
+  mode?: GameMode;
   limit?: number;
   offset?: number;
 }
@@ -46,7 +47,11 @@ export const gameResultService = {
     return { results, total };
   },
 
-  async getStats(userId: string, mode?: "local" | "arena") {
+  async getStats(userId: string, mode?: GameMode) {
     return gameResultRepository.getStats(userId, mode);
+  },
+
+  async getStatsByGameType(userId: string, mode?: GameMode) {
+    return gameResultRepository.getStatsByGameType(userId, mode);
   },
 };

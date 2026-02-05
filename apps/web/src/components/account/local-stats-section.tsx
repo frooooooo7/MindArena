@@ -1,52 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { GameResult, GameStats, gameResultApi } from "@/lib/game-result-api";
 import { Gamepad2 } from "lucide-react";
 import { StatsOverview } from "./stats-overview";
 import { GameHistoryList } from "./game-history-list";
+import { AccountPlaceholder } from "./account-placeholder";
+import { useAuthenticatedQuery } from "@/hooks/use-authenticated-query";
 
 interface LocalStatsSectionProps {
   isAuthenticated: boolean;
 }
 
 export function LocalStatsSection({ isAuthenticated }: LocalStatsSectionProps) {
-  const [stats, setStats] = useState<GameStats | null>(null);
-  const [history, setHistory] = useState<GameResult[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: stats, isLoading: statsLoading, error: statsError } = useAuthenticatedQuery<GameStats>(
+    () => gameResultApi.getStats("local"),
+    isAuthenticated
+  );
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setIsLoading(false);
-      return;
-    }
+  const { data: historyData, isLoading: historyLoading, error: historyError } = useAuthenticatedQuery(
+    () => gameResultApi.getHistory({ mode: "local", limit: 10 }),
+    isAuthenticated
+  );
 
-    const fetchData = async () => {
-      try {
-        const [statsData, historyData] = await Promise.all([
-          gameResultApi.getStats("local"),
-          gameResultApi.getHistory({ mode: "local", limit: 10 }),
-        ]);
-        setStats(statsData);
-        setHistory(historyData.results);
-      } catch (error) {
-        console.error("Failed to fetch local stats:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [isAuthenticated]);
+  const history: GameResult[] = historyData?.results ?? [];
+  const isLoading = statsLoading || historyLoading;
+  const error = statsError || historyError;
 
   if (!isAuthenticated) {
     return (
-      <div className="p-12 text-center rounded-2xl border border-dashed border-border/60 bg-secondary/5">
-        <Gamepad2 className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-        <h3 className="text-xl font-semibold mb-2">Login to See Your Stats</h3>
-        <p className="text-muted-foreground max-w-md mx-auto">
-          Sign in to track your local game progress and view your game history.
-        </p>
+      <AccountPlaceholder
+        icon={Gamepad2}
+        title="Login to See Your Stats"
+        description="Sign in to track your local game progress and view your game history."
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 text-center rounded-2xl border border-red-500/20 bg-red-500/5">
+        <p className="text-sm text-red-500 font-medium mb-3">Failed to load statistics</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="text-xs font-semibold px-4 py-2 bg-secondary/50 hover:bg-secondary rounded-lg transition-colors"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -54,8 +53,8 @@ export function LocalStatsSection({ isAuthenticated }: LocalStatsSectionProps) {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, i) => (
             <div key={i} className="p-6 rounded-2xl border border-border/40 bg-card/60 h-36" />
           ))}
         </div>

@@ -8,10 +8,10 @@ import { BackgroundGradients } from "@/components/home";
 import { ProfileHeader } from "@/components/account/profile-header";
 import { LocalStatsSection } from "@/components/account/local-stats-section";
 import { ArenaStatsSection } from "@/components/account/arena-stats-section";
+import { GameRecordsSection } from "@/components/account/game-records-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Shield, BarChart3, Trophy, Gamepad2, Swords } from "lucide-react";
-
-type GameMode = "local" | "arena";
+import { GameMode } from "@mindarena/shared";
 
 export default function AccountPage() {
     const { isAuthenticated, user, isHydrated } = useAuthStore();
@@ -103,13 +103,7 @@ export default function AccountPage() {
                         </TabsContent>
 
                         <TabsContent value="stats">
-                            <div className="p-12 text-center rounded-2xl border border-dashed border-border/60 bg-secondary/5">
-                                <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-                                <h3 className="text-xl font-semibold mb-2">Detailed Statistics Coming Soon</h3>
-                                <p className="text-muted-foreground max-w-md mx-auto">
-                                    We are working on advanced analytical charts to help you track your memory progress over time.
-                                </p>
-                            </div>
+                            <GameRecordsSection isAuthenticated={isAuthenticated} />
                         </TabsContent>
 
                         <TabsContent value="achievements">

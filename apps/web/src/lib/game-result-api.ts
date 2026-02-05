@@ -1,30 +1,26 @@
 import { api } from "./axios";
+import { GameMode, GameTypeId, GameStats, GameStatsByType } from "@mindarena/shared";
+
+// Re-export shared types for convenience
+export type { GameStats, GameStatsByType, GameMode, GameTypeId };
 
 export interface GameResult {
   id: string;
   userId: string;
-  gameType: "sequence" | "chimp" | "code";
+  gameType: GameTypeId;
   score: number;
   level: number;
   duration: number;
-  mode: "local" | "arena";
+  mode: GameMode;
   createdAt: string;
 }
 
-export interface GameStats {
-  totalGames: number;
-  totalScore: number;
-  averageScore: number;
-  highestLevel: number;
-  totalPlayTime: number;
-}
-
 export interface SaveGameResultInput {
-  gameType: "sequence" | "chimp" | "code";
+  gameType: GameTypeId;
   score: number;
   level: number;
   duration: number;
-  mode: "local" | "arena";
+  mode: GameMode;
 }
 
 export interface GetHistoryResponse {
@@ -41,7 +37,7 @@ export const gameResultApi = {
   },
 
   async getHistory(options?: {
-    mode?: "local" | "arena";
+    mode?: GameMode;
     limit?: number;
     offset?: number;
   }): Promise<GetHistoryResponse> {
@@ -56,9 +52,15 @@ export const gameResultApi = {
     return response.data;
   },
 
-  async getStats(mode?: "local" | "arena"): Promise<GameStats> {
+  async getStats(mode?: GameMode): Promise<GameStats> {
     const params = mode ? `?mode=${mode}` : "";
     const response = await api.get<GameStats>(`/game-results/stats${params}`);
+    return response.data;
+  },
+
+  async getStatsByGameType(mode?: GameMode): Promise<GameStatsByType[]> {
+    const params = mode ? `?mode=${mode}` : "";
+    const response = await api.get<GameStatsByType[]>(`/game-results/stats-by-game${params}`);
     return response.data;
   },
 };

@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import { GameMode, GAME_TYPE_IDS } from "@mindarena/shared";
 
 export interface CreateGameResultData {
   userId: string;
@@ -6,7 +7,7 @@ export interface CreateGameResultData {
   score: number;
   level: number;
   duration: number;
-  mode: "local" | "arena";
+  mode: GameMode;
 }
 
 export const gameResultRepository = {
@@ -19,7 +20,7 @@ export const gameResultRepository = {
   async findByUserId(
     userId: string,
     options?: {
-      mode?: "local" | "arena";
+      mode?: GameMode;
       limit?: number;
       offset?: number;
     }
@@ -35,7 +36,7 @@ export const gameResultRepository = {
     });
   },
 
-  async getStats(userId: string, mode?: "local" | "arena") {
+  async getStats(userId: string, mode?: GameMode) {
     const aggregations = await prisma.gameResult.aggregate({
       where: {
         userId,
@@ -68,12 +69,39 @@ export const gameResultRepository = {
     };
   },
 
-  async countByUserId(userId: string, mode?: "local" | "arena") {
+  async countByUserId(userId: string, mode?: GameMode) {
     return prisma.gameResult.count({
       where: {
         userId,
         ...(mode && { mode }),
       },
     });
+  },
+
+  async getStatsByGameType(userId: string, mode?: GameMode) {
+    const statsPerGame = await Promise.all(
+      GAME_TYPE_IDS.map(async (gameType) => {
+        const aggregations = await prisma.gameResult.aggregate({
+          where: {
+            userId,
+            gameType,
+            ...(mode && { mode }),
+          },
+          _count: { _all: true },
+          _sum: { score: true },
+          _max: { score: true, level: true },
+        });
+
+        return {
+          gameType,
+          totalGames: aggregations._count._all,
+          totalScore: aggregations._sum.score ?? 0,
+          bestScore: aggregations._max.score ?? 0,
+          highestLevel: aggregations._max.level ?? 0,
+        };
+      })
+    );
+
+    return statsPerGame;
   },
 };
