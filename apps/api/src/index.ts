@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { createServer } from "http";
 import { env } from "./config/env";
 import authRoutes from "./routes/auth.routes";
+import gameResultRoutes from "./routes/game-result.routes";
 import { errorHandler } from "./middleware/error.middleware";
 import { SocketManager } from "./sockets";
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/auth", authRoutes);
+app.use("/game-results", gameResultRoutes);
 
 // Error handling
 app.use(errorHandler);

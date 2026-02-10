@@ -47,8 +47,8 @@ export function generateSequence(level: number): { sequence: number[]; gridSize:
  */
 export function createGameRoom(
     roomId: string,
-    player1: { id: string; name: string; socketId: string },
-    player2: { id: string; name: string; socketId: string }
+    player1: { id: string; name: string; socketId: string; isGuest?: boolean },
+    player2: { id: string; name: string; socketId: string; isGuest?: boolean }
 ) {
     const initialData = generateSequence(1);
     return roomService.createRoom(roomId, "Sequence", player1, player2, initialData);

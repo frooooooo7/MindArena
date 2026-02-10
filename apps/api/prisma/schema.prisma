@@ -18,6 +18,7 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   refreshTokens RefreshToken[]
+  gameResults   GameResult[]
 }
 
 model RefreshToken {
@@ -29,4 +30,19 @@ model RefreshToken {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+model GameResult {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameType  String   // "sequence" | "chimp" | "code"
+  score     Int
+  level     Int
+  duration  Int      // seconds
+  mode      String   // "local" | "arena"
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, mode])
 }

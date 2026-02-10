@@ -36,6 +36,7 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
             socketId: socket.id,
             gameType,
             joinedAt: new Date(),
+            isGuest: !user,
         });
         // Check if already in queue, if so, emit queue status
         if (!added) {

@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { GameState, getGridSizeForLevel } from "./types";
+import { gameResultApi } from "@/lib/game-result-api";
+import { useAuthStore } from "@/store/auth.store";
 
 export function useSequenceMemory() {
   const [level, setLevel] = useState(1);
@@ -15,6 +17,8 @@ export function useSequenceMemory() {
   const gridSize = getGridSizeForLevel(level);
   const totalCells = gridSize * gridSize;
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const { isAuthenticated } = useAuthStore();
 
   const generateSequence = useCallback((length: number, maxCell: number): number[] => {
     const seq: number[] = [];
@@ -51,6 +55,7 @@ export function useSequenceMemory() {
     setScore(0);
     setSequence(newSequence);
     setPlayerIndex(0);
+    startTimeRef.current = Date.now();
     showSequence(newSequence);
   }, [generateSequence, showSequence]);
 
@@ -69,6 +74,20 @@ export function useSequenceMemory() {
       showSequence(newSequence);
     }, 500);
   }, [level, generateSequence, showSequence]);
+
+  // Save game result when game ends
+  useEffect(() => {
+    if (gameState === "gameover" && isAuthenticated && startTimeRef.current) {
+      const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      gameResultApi.save({
+        gameType: "sequence",
+        score,
+        level,
+        duration,
+        mode: "local",
+      }).catch((err) => console.error("Failed to save game result:", err));
+    }
+  }, [gameState, isAuthenticated, score, level]);
 
   const handleCellClick = useCallback((cellIndex: number) => {
     if (gameState !== "playing") return;

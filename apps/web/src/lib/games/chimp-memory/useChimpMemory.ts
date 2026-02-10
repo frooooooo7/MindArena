@@ -1,18 +1,21 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { GameState, Cell, TOTAL_CELLS, MEMORIZE_TIME } from "./types";
+import { gameResultApi } from "@/lib/game-result-api";
+import { useAuthStore } from "@/store/auth.store";
 
 export function useChimpMemory() {
   const [level, setLevel] = useState(1);
   const [cells, setCells] = useState<Cell[]>([]);
   const [nextNumber, setNextNumber] = useState(1);
   const [gameState, setGameState] = useState<GameState>("idle");
-  const [numbersCount, setNumbersCount] = useState(4); // Start with 4 numbers
+  const [numbersCount, setNumbersCount] = useState(4);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const { isAuthenticated } = useAuthStore();
 
   const generateLevel = useCallback((count: number): Cell[] => {
-    // Create empty cells
     const newCells: Cell[] = Array.from({ length: TOTAL_CELLS }, (_, i) => ({
       id: i,
       number: null,
@@ -20,7 +23,6 @@ export function useChimpMemory() {
       completed: false,
     }));
 
-    // Pick random positions for numbers
     const positions: number[] = [];
     while (positions.length < count) {
       const pos = Math.floor(Math.random() * TOTAL_CELLS);
@@ -29,7 +31,6 @@ export function useChimpMemory() {
       }
     }
 
-    // Assign numbers 1 to count at random positions
     positions.forEach((pos, index) => {
       newCells[pos].number = index + 1;
     });
@@ -38,7 +39,7 @@ export function useChimpMemory() {
   }, []);
 
   const startGame = useCallback(() => {
-    const count = 4; // Reset to 4 numbers
+    const count = 4;
     const newCells = generateLevel(count);
     
     setLevel(1);
@@ -46,13 +47,13 @@ export function useChimpMemory() {
     setCells(newCells);
     setNextNumber(1);
     setGameState("memorize");
+    startTimeRef.current = Date.now();
 
-    // Hide numbers after memorize time
     timeoutRef.current = setTimeout(() => {
       setCells((prev) =>
         prev.map((cell) => ({
           ...cell,
-          revealed: cell.number === null, // Keep empty cells revealed, hide numbers
+          revealed: cell.number === null,
         }))
       );
       setGameState("playing");
@@ -81,6 +82,21 @@ export function useChimpMemory() {
     }, MEMORIZE_TIME);
   }, [level, numbersCount, generateLevel]);
 
+  // Save game result when game ends
+  useEffect(() => {
+    if (gameState === "gameover" && isAuthenticated && startTimeRef.current) {
+      const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      const score = (level - 1) * 100 + (numbersCount - 4) * 50;
+      gameResultApi.save({
+        gameType: "chimp",
+        score,
+        level,
+        duration,
+        mode: "local",
+      }).catch((err) => console.error("Failed to save game result:", err));
+    }
+  }, [gameState, isAuthenticated, level, numbersCount]);
+
   const handleCellClick = useCallback((cellId: number) => {
     if (gameState !== "playing") return;
 
@@ -88,7 +104,6 @@ export function useChimpMemory() {
     if (!cell || cell.number === null || cell.completed) return;
 
     if (cell.number === nextNumber) {
-      // Correct!
       setCells((prev) =>
         prev.map((c) =>
           c.id === cellId ? { ...c, completed: true, revealed: true } : c
@@ -96,7 +111,6 @@ export function useChimpMemory() {
       );
 
       if (nextNumber === numbersCount) {
-        // Completed all numbers!
         setGameState("success");
         setTimeout(() => {
           nextLevel();
@@ -105,9 +119,7 @@ export function useChimpMemory() {
         setNextNumber((prev) => prev + 1);
       }
     } else {
-      // Wrong!
       setGameState("gameover");
-      // Reveal all numbers on game over
       setCells((prev) =>
         prev.map((c) => ({ ...c, revealed: true }))
       );

@@ -44,6 +44,7 @@ export interface GamePlayer {
   currentLevel: number;
   currentIndex: number; // position in current sequence
   hasFailed: boolean;
+  isGuest?: boolean;
 }
 
 export interface GameRoom {
