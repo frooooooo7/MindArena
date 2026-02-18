@@ -123,3 +123,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* MindRank promotion particle animation */
+@keyframes float-up {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-400px) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-float-up {
+  animation: float-up 2s ease-out forwards;
+}

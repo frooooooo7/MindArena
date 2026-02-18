@@ -15,6 +15,7 @@ import {
   ChimpPlayerCompletePayload,
   RoundTimerPayload,
   GameEndPayload,
+  RankUpdatePayload,
 } from "@mindarena/shared";
 import { useGameProtection } from "./use-game-protection";
 
@@ -40,7 +41,7 @@ export function useChimpGame1v1() {
   const roomId = match?.room ?? "";
 
   // Game Protection
-  const status = useChimpStore((s: any) => s.status);
+  const status = useChimpStore((s) => s.status);
   useGameProtection({
     gameStatus: status,
     gameResult: useChimpStore.getState().gameResult,
@@ -135,8 +136,8 @@ export function useChimpGame1v1() {
 
     const handleGameEnd = (data: GameEndPayload) => {
       clearMemorizeTimer();
-      const currentUserName = useAuthStore.getState().user?.name || "Player";
-      store.endGame(data, currentUserName);
+      const currentUserId = useAuthStore.getState().user?.id;
+      store.endGame(data, currentUserId);
     };
 
     socket.on(GAME_EVENTS.COUNTDOWN, handleCountdown);
@@ -148,6 +149,13 @@ export function useChimpGame1v1() {
     socket.on(GAME_EVENTS.CHIMP_LEVEL_COMPLETE, handleLevelComplete);
     socket.on(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
     socket.on(GAME_EVENTS.END, handleGameEnd);
+
+    // Rank update event
+    const handleRankUpdate = (data: RankUpdatePayload) => {
+      console.log("[ChimpGame] Rank updated:", data);
+      store.setRankUpdate(data);
+    };
+    socket.on(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
 
     // Auto-Send Ready
     if (store.status === "waiting") {
@@ -167,6 +175,7 @@ export function useChimpGame1v1() {
       socket.off(GAME_EVENTS.CHIMP_LEVEL_COMPLETE, handleLevelComplete);
       socket.off(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
       socket.off(GAME_EVENTS.END, handleGameEnd);
+      socket.off(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
     };
   }, [
     roomId,
@@ -185,7 +194,7 @@ export function useChimpGame1v1() {
       // Note: O(n) find in store state vs Map. 
       // Ideally cells should be a Map in store or we trust the passed ID.
       // For now finding from current state array.
-      const cell = store.cells.find((c: any) => c.id === cellId);
+      const cell = store.cells.find((c: ChimpCell) => c.id === cellId);
 
       if (!cell || cell.number === null || cell.completed) return;
       socket.emit(GAME_EVENTS.CHIMP_MOVE, { roomId, cellId });

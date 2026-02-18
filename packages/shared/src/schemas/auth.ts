@@ -41,6 +41,8 @@ export interface User {
     name: string;
     email: string;
     createdAt: Date;
+    rankPoints: number;
+    rankName: string;
 }
 
 export interface AuthResponse {

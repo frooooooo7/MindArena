@@ -4,6 +4,7 @@ import {
   ChimpGameStartPayload,
   ChimpLevelCompletePayload,
   ChimpOpponentProgressPayload,
+  RankUpdatePayload,
   ROUND_TIME_LIMIT,
   ArenaMatch,
   ChimpCell,
@@ -31,6 +32,7 @@ interface ChimpGameState {
   // Result
   gameResult: GameEndPayload | null;
   isWinner: boolean | null;
+  rankUpdate: RankUpdatePayload | null;
 
   // Actions
   setMatch: (match: ArenaMatch | null) => void;
@@ -42,12 +44,13 @@ interface ChimpGameState {
   startGame: (data: ChimpGameStartPayload) => void;
   updateLevel: (data: ChimpLevelCompletePayload) => void;
   updateOpponent: (data: ChimpOpponentProgressPayload) => void;
-  endGame: (data: GameEndPayload, currentUserName?: string) => void;
+  endGame: (data: GameEndPayload, currentUserId?: string) => void;
   
   // Game Logic Actions
   handleCorrectMove: (completedNumber: number) => void;
   showNumbers: () => void; // Reset cells to visible
   hideNumbers: () => void; // Hide numbers for playing phase (memorize end)
+  setRankUpdate: (data: RankUpdatePayload) => void;
   
   // Management
   resetGame: () => void;
@@ -68,6 +71,7 @@ const initialGameState = {
   opponentLevel: 1,
   gameResult: null,
   isWinner: null,
+  rankUpdate: null,
 };
 
 export const useChimpStore = create<ChimpGameState>((set, get) => ({
@@ -79,6 +83,7 @@ export const useChimpStore = create<ChimpGameState>((set, get) => ({
   setCountdown: (countdown) => set({ countdown }),
   setTimeLeft: (timeLeft) => set({ timeLeft }),
   setMatchCancelled: (matchCancelled) => set({ matchCancelled }),
+  setRankUpdate: (rankUpdate) => set({ rankUpdate }),
 
   // Complex Actions
   startGame: (data) => set({
@@ -108,15 +113,8 @@ export const useChimpStore = create<ChimpGameState>((set, get) => ({
     opponentLevel: data.currentLevel,
   }),
 
-  endGame: (data, currentUserName) => set((state) => {
-    const opponentName = state.match?.opponent?.name;
-    let isWinner = false;
-    
-    if (opponentName && data.loserName === opponentName) {
-      isWinner = true;
-    } else if (currentUserName && data.loserName !== currentUserName) {
-      isWinner = true;
-    }
+  endGame: (data, currentUserId) => set((state) => {
+    const isWinner = currentUserId ? data.winnerId === currentUserId : false;
 
     return {
       status: "finished",

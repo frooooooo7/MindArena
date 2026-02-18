@@ -32,4 +32,11 @@ export const userRepository = {
         });
         return !!user;
     },
+
+    async updateRank(id: string, rankPoints: number, rankName: string) {
+        return prisma.user.update({
+            where: { id },
+            data: { rankPoints, rankName },
+        });
+    },
 };

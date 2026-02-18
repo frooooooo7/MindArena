@@ -12,6 +12,7 @@ import {
   OpponentProgressPayload,
   RoundTimerPayload,
   GameEndPayload,
+  RankUpdatePayload,
 } from "@mindarena/shared";
 import { useGameProtection } from "./use-game-protection";
 
@@ -100,9 +101,8 @@ export function useSequenceGame1v1() {
     };
 
     const handleGameEnd = (data: GameEndPayload) => {
-        // Need current user name to determine winner
-        const currentUserName = useAuthStore.getState().user?.name || "Player"; 
-        store.endGame(data, currentUserName);
+        const currentUserId = useAuthStore.getState().user?.id; 
+        store.endGame(data, currentUserId);
     };
 
     socket.on(GAME_EVENTS.COUNTDOWN, handleCountdown);
@@ -113,6 +113,13 @@ export function useSequenceGame1v1() {
     socket.on(GAME_EVENTS.LEVEL_COMPLETE, handleLevelComplete);
     socket.on(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
     socket.on(GAME_EVENTS.END, handleGameEnd);
+
+    // Rank update event
+    const handleRankUpdate = (data: RankUpdatePayload) => {
+      console.log("[SequenceGame] Rank updated:", data);
+      store.setRankUpdate(data);
+    };
+    socket.on(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
 
     // Auto-Send Ready
     if (store.status === "waiting") {
@@ -131,6 +138,7 @@ export function useSequenceGame1v1() {
       socket.off(GAME_EVENTS.LEVEL_COMPLETE, handleLevelComplete);
       socket.off(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
       socket.off(GAME_EVENTS.END, handleGameEnd);
+      socket.off(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
     };
   }, [roomId, match]);
 

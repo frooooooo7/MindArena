@@ -74,6 +74,7 @@ const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (id
     // Result state
     const gameResult = useSequenceStore((state) => state.gameResult);
     const isWinner = useSequenceStore((state) => state.isWinner);
+    const rankUpdate = useSequenceStore((state) => state.rankUpdate);
     const opponentProgress = useSequenceStore((state) => state.opponentProgress);
     const sequenceLength = useSequenceStore((state) => state.sequence.length);
 
@@ -159,6 +160,7 @@ const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (id
           <GameResultModal
             isWinner={isWinner ?? false}
             gameResult={gameResult}
+            rankUpdate={rankUpdate}
             onBackToArena={handleBackToArena}
           />
         )}
