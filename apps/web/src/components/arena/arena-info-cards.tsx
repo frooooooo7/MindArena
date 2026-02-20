@@ -1,6 +1,7 @@
 "use client";
 
 import { ShieldAlert, Info } from "lucide-react";
+import { RANK_TIERS, RANK_COLORS_MAP } from "@mindarena/shared";
 
 /**
  * Combat Rules Info Box
@@ -28,12 +29,6 @@ export function CombatRulesCard() {
 /**
  * Arena Rank System Card
  */
-const RANKS = [
-    { tier: "Cyber", color: "text-cyan-400", range: "0 - 1500 RP" },
-    { tier: "Quantum", color: "text-violet-400", range: "1501 - 3000 RP" },
-    { tier: "Nova", color: "text-amber-400", range: "3001+ RP" },
-];
-
 export function RankSystemCard() {
     return (
         <div className="p-8 rounded-[2rem] border border-border/40 bg-gradient-to-br from-indigo-600/10 to-violet-600/10 backdrop-blur-md">
@@ -41,20 +36,34 @@ export function RankSystemCard() {
                 <ShieldAlert className="h-5 w-5 text-indigo-400" />
                 Arena Rank System
             </h3>
-            <div className="space-y-4">
-                {RANKS.map((rank) => (
-                    <div 
-                        key={rank.tier} 
-                        className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5"
-                    >
-                        <span className={`text-xs font-black uppercase tracking-widest ${rank.color}`}>
-                            {rank.tier}
-                        </span>
-                        <span className="text-[10px] font-medium opacity-60 italic">
-                            {rank.range}
-                        </span>
-                    </div>
-                ))}
+            <div className="space-y-3">
+                {RANK_TIERS.map((rank, index) => {
+                    const nextRank = RANK_TIERS[index + 1];
+                    const rangeText = nextRank 
+                        ? `${rank.minPoints} - ${nextRank.minPoints - 1} RP`
+                        : `${rank.minPoints}+ RP`;
+                    
+                    const colorClass = RANK_COLORS_MAP[rank.name] || "text-slate-400";
+
+                    return (
+                        <div 
+                            key={rank.name} 
+                            className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group"
+                        >
+                            <div className="flex items-center gap-3">
+                                <span className="text-xl group-hover:scale-110 transition-transform cursor-default">
+                                    {rank.icon}
+                                </span>
+                                <span className={`text-xs font-black uppercase tracking-widest ${colorClass}`}>
+                                    {rank.name}
+                                </span>
+                            </div>
+                            <span className="text-[10px] font-medium opacity-60 tabular-nums">
+                                {rangeText}
+                            </span>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

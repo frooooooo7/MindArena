@@ -1,4 +1,5 @@
 // Arena Types
+import { RankName } from "../game/mind-rank";
 
 export interface ArenaOpponent {
   id?: string;
@@ -39,7 +40,7 @@ export interface RankUpdatePayload {
   oldPoints: number;
   currentPoints: number;
   pointsDelta: number;
-  rankName: string;
+  rankName: RankName;
   rankIcon: string;
   isPromotion: boolean;
   isDemotion: boolean;

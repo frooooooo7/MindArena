@@ -24,6 +24,14 @@ export interface RankTier {
   icon: string;
 }
 
+/** Visual mapping for rank colors across the application */
+export const RANK_COLORS_MAP: Record<RankName, string> = {
+  Neuron: "text-cyan-400",
+  Synapsa: "text-blue-400",
+  Kora: "text-violet-400",
+  Geniusz: "text-amber-400",
+};
+
 // ============================================
 // ELO CONSTANTS
 // ============================================
