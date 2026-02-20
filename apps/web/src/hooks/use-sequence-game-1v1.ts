@@ -45,6 +45,14 @@ export function useSequenceGame1v1() {
   const roomId = match?.room || "";
   const animationRef = useRef<boolean>(false);
   const lastSequenceRef = useRef<string>("");
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Refs for animation control (Directly modify store)
   const showSequenceAnimation = useCallback(async (seq: number[]) => {
@@ -55,13 +63,18 @@ export function useSequenceGame1v1() {
     store.setShowingSequence(true);
 
     for (let i = 0; i < seq.length; i++) {
+      if (!isMountedRef.current) return;
       await new Promise((resolve) => setTimeout(resolve, 600));
+      if (!isMountedRef.current) return;
       store.setActiveCell(seq[i]);
       await new Promise((resolve) => setTimeout(resolve, 400));
+      if (!isMountedRef.current) return;
       store.setActiveCell(null);
     }
 
+    if (!isMountedRef.current) return;
     await new Promise((resolve) => setTimeout(resolve, 300));
+    if (!isMountedRef.current) return;
     store.setShowingSequence(false);
     animationRef.current = false;
   }, []);
@@ -114,17 +127,17 @@ export function useSequenceGame1v1() {
     socket.on(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
     socket.on(GAME_EVENTS.END, handleGameEnd);
 
-    // Rank update event
+    // Rank update event 
     const handleRankUpdate = (data: RankUpdatePayload) => {
-      console.log("[SequenceGame] Rank updated:", data);
       store.setRankUpdate(data);
+      useAuthStore.getState().updateRank(data.currentPoints, data.rankName);
     };
     socket.on(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
 
     // Auto-Send Ready
     if (store.status === "waiting") {
         setTimeout(() => {
-            console.log("Sending READY");
+            if (!isMountedRef.current) return;
             socket.emit(GAME_EVENTS.READY, { roomId });
         }, 1000);
     }

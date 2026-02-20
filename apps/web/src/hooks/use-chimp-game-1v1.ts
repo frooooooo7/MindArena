@@ -152,14 +152,15 @@ export function useChimpGame1v1() {
 
     // Rank update event
     const handleRankUpdate = (data: RankUpdatePayload) => {
-      console.log("[ChimpGame] Rank updated:", data);
       store.setRankUpdate(data);
+      useAuthStore.getState().updateRank(data.currentPoints, data.rankName);
     };
     socket.on(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
 
     // Auto-Send Ready
     if (store.status === "waiting") {
       setTimeout(() => {
+        if (!isMountedRef.current) return;
         socket.emit(GAME_EVENTS.READY, { roomId });
       }, 1000);
     }
