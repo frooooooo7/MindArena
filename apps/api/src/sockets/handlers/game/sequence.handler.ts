@@ -80,6 +80,8 @@ export function startSequenceGame(io: Server, roomId: string) {
   const startedRoom = roomService.startGame(roomId);
   if (!startedRoom) return;
 
+  roomService.broadcastLiveGames(io);
+
   io.to(roomId).emit(GAME_EVENTS.START, {
     roomId: startedRoom.id,
     sequence: startedRoom.sequence,

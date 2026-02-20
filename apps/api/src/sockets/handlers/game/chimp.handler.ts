@@ -89,6 +89,8 @@ export function startChimpGame(io: Server, roomId: string) {
   const startedRoom = roomService.startGame(roomId);
   if (!startedRoom) return;
 
+  roomService.broadcastLiveGames(io);
+
   const chimpData = chimpMemory.getChimpRoomData(roomId);
   if (!chimpData) return;
 

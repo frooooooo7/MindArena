@@ -30,6 +30,8 @@ export const ARENA_EVENTS = {
   QUEUE_STATUS: "arena:queue-status",
   MATCH_CANCELLED: "arena:match-cancelled",
   RANK_UPDATED: "arena:rank-updated",
+  LIVE_GAMES_UPDATE: "arena:live-games-update",
+  REQUEST_LIVE_GAMES: "arena:request-live-games",
 } as const;
 
 export type ArenaEventName = (typeof ARENA_EVENTS)[keyof typeof ARENA_EVENTS];
@@ -44,6 +46,18 @@ export interface RankUpdatePayload {
   rankIcon: string;
   isPromotion: boolean;
   isDemotion: boolean;
+}
+
+// Live feed info for lobby
+export interface LiveGameInfo {
+  id: string;
+  p1Name: string;
+  p2Name: string;
+  gameType: string;
+  status: "waiting" | "playing" | "finished";
+  winnerName?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 
@@ -72,6 +86,7 @@ export interface GameRoom {
   level: number;
   winnerId: string | null;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface GameStartPayload {

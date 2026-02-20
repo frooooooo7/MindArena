@@ -14,6 +14,14 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
     const user = socket.data.user;
     const odId = user?.id || socket.id;
     const userName = user?.name || `Player_${socket.id.slice(0, 4)}`;
+    
+    // Send initial live games state
+    socket.emit(ARENA_EVENTS.LIVE_GAMES_UPDATE, roomService.getLiveGames());
+
+    // Handle on-demand live feed requests (e.g. when client navigates back to /arena)
+    socket.on(ARENA_EVENTS.REQUEST_LIVE_GAMES, () => {
+        socket.emit(ARENA_EVENTS.LIVE_GAMES_UPDATE, roomService.getLiveGames());
+    });
 
     // ==========================================
 
@@ -51,7 +59,9 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
         emitQueueStatus(socket, queueSize, queueSize >= 2 ? "~5s" : "waiting for opponent");
 
         // Try to match players
-        matchmaking.attemptMatch(gameType, io);
+        if (matchmaking.attemptMatch(gameType, io)) {
+            roomService.broadcastLiveGames(io);
+        }
     });
 
     // ==========================================
@@ -83,6 +93,8 @@ function handlePlayerLeaving(socket: Socket, io: Server, odId: string) {
 
     // 2. Check if player was in a waiting room
     const rooms = Array.from(socket.rooms);
+    let roomRemoved = false;
+    
     rooms.forEach(roomId => {
         if (roomId.startsWith("game-")) {
             const room = roomService.getRoom(roomId);
@@ -93,9 +105,14 @@ function handlePlayerLeaving(socket: Socket, io: Server, odId: string) {
                 });
                 // Remove the room as it's no longer valid
                 roomService.removeRoom(roomId);
+                roomRemoved = true;
             }
         }
     });
+
+    if (roomRemoved) {
+        roomService.broadcastLiveGames(io);
+    }
 }
 
 
@@ -130,3 +147,4 @@ export function getQueueStats() {
         rateLimitedUsers: rateLimiter.getRateLimitedCount()
     };
 }
+
