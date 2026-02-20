@@ -1,8 +1,9 @@
 import { Socket, Server } from "socket.io";
-import { GAME_EVENTS, scoring } from "@mindarena/shared";
+import { GAME_EVENTS, ARENA_EVENTS, RankUpdatePayload, scoring } from "@mindarena/shared";
 import * as roomService from "../../../services/room.service";
 import { clearRoundTimer } from "./timer";
 import { gameResultService } from "../../../services/game-result.service";
+import * as rankService from "../../../services/rank.service";
 
 /**
  * Helper to calculate score based on game type and level
@@ -38,6 +39,60 @@ async function saveArenaResults(roomId: string) {
         }
     }
   }
+}
+
+/**
+ * Process and emit rank updates for both players after a match.
+ * Only processes ranks for authenticated (non-guest) players.
+ */
+async function processAndEmitRanks(
+  io: Server,
+  roomId: string,
+  winnerId: string,
+  loserId: string,
+) {
+  const room = roomService.getRoom(roomId);
+  if (!room) return;
+
+  const winner = room.players.find((p) => p.id === winnerId);
+  const loser = room.players.find((p) => p.id === loserId);
+
+  // Only process ranks if both players are authenticated
+  if (!winner || !loser || winner.isGuest || loser.isGuest) {
+    console.log(`[RANK] Skipping rank update (guest players in room ${roomId})`);
+    return;
+  }
+
+  const result = await rankService.processMatchRanks(winnerId, loserId);
+  if (!result) return;
+
+  // Emit rank update to winner
+  const winnerPayload: RankUpdatePayload = {
+    playerId: winnerId,
+    oldPoints: result.winnerRank.oldPoints,
+    currentPoints: result.winnerRank.newPoints,
+    pointsDelta: result.winnerRank.pointsDelta,
+    rankName: result.winnerRank.newRankName,
+    rankIcon: result.winnerRank.newRankIcon,
+    isPromotion: result.winnerRank.isPromotion,
+    isDemotion: result.winnerRank.isDemotion,
+  };
+
+  // Emit rank update to loser
+  const loserPayload: RankUpdatePayload = {
+    playerId: loserId,
+    oldPoints: result.loserRank.oldPoints,
+    currentPoints: result.loserRank.newPoints,
+    pointsDelta: result.loserRank.pointsDelta,
+    rankName: result.loserRank.newRankName,
+    rankIcon: result.loserRank.newRankIcon,
+    isPromotion: result.loserRank.isPromotion,
+    isDemotion: result.loserRank.isDemotion,
+  };
+
+  // Send to each player individually (so they get their own personalized data)
+  io.to(winner.socketId).emit(ARENA_EVENTS.RANK_UPDATED, winnerPayload);
+  io.to(loser.socketId).emit(ARENA_EVENTS.RANK_UPDATED, loserPayload);
 }
 
 /**
@@ -82,6 +137,9 @@ export async function handlePlayerFailed(io: Server, roomId: string) {
 
     // Save results to database
     await saveArenaResults(roomId);
+
+    // Process and emit rank changes
+    await processAndEmitRanks(io, roomId, winner.id, loser.id);
   }
 }
 
@@ -120,7 +178,11 @@ export async function handlePlayerDisconnect(
 
         // Save results to database
         await saveArenaResults(roomId);
+
+        // Process and emit rank changes
+        await processAndEmitRanks(io, roomId, opponent.id, userId);
       }
     }
   }
 }
+

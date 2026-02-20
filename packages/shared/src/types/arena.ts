@@ -28,9 +28,23 @@ export const ARENA_EVENTS = {
   MATCH_FOUND: "arena:match-found",
   QUEUE_STATUS: "arena:queue-status",
   MATCH_CANCELLED: "arena:match-cancelled",
+  RANK_UPDATED: "arena:rank-updated",
 } as const;
 
 export type ArenaEventName = (typeof ARENA_EVENTS)[keyof typeof ARENA_EVENTS];
+
+// Rank Update Payload (sent after each match)
+export interface RankUpdatePayload {
+  playerId: string;
+  oldPoints: number;
+  currentPoints: number;
+  pointsDelta: number;
+  rankName: string;
+  rankIcon: string;
+  isPromotion: boolean;
+  isDemotion: boolean;
+}
+
 
 // ============================================
 // GAME TYPES FOR 1v1 MULTIPLAYER

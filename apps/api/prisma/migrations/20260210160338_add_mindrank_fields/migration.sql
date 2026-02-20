@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "rankName" TEXT NOT NULL DEFAULT 'Neuron',
+ADD COLUMN     "rankPoints" INTEGER NOT NULL DEFAULT 0;

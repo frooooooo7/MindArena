@@ -106,6 +106,7 @@ const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (id
     // Result state
     const gameResult = useChimpStore((state) => state.gameResult);
     const isWinner = useChimpStore((state) => state.isWinner);
+    const rankUpdate = useChimpStore((state) => state.rankUpdate);
 
     const isGameActive =
         gameStatus === "memorize" ||
@@ -194,6 +195,7 @@ const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (id
           <GameResultModal
             isWinner={isWinner ?? false}
             gameResult={gameResult}
+            rankUpdate={rankUpdate}
             onBackToArena={handleBackToArena}
           />
         )}

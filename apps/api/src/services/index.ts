@@ -9,5 +9,8 @@ export * as matchmakingService from "./matchmaking.service";
 export * as roomService from "./room.service";
 export * as rateLimiter from "./rate-limiter.service";
 
+// Ranking
+export * as rankService from "./rank.service";
+
 // Game-specific logic
 export * from "./games";

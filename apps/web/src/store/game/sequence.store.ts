@@ -4,6 +4,7 @@ import {
   GameStartPayload,
   LevelCompletePayload,
   OpponentProgressPayload,
+  RankUpdatePayload,
   ROUND_TIME_LIMIT,
   ArenaMatch,
 } from "@mindarena/shared";
@@ -34,6 +35,7 @@ interface SequenceGameState {
   // Result
   gameResult: GameEndPayload | null;
   isWinner: boolean | null;
+  rankUpdate: RankUpdatePayload | null;
 
   // Actions
   setMatch: (match: ArenaMatch | null) => void;
@@ -45,13 +47,14 @@ interface SequenceGameState {
   startGame: (data: GameStartPayload) => void;
   updateLevel: (data: LevelCompletePayload) => void;
   updateOpponent: (data: OpponentProgressPayload) => void;
-  endGame: (data: GameEndPayload, currentUserName?: string) => void;
+  endGame: (data: GameEndPayload, currentUserId?: string) => void;
   
   // Interaction Actions
   setActiveCell: (cell: number | null) => void; // For showing sequence
   setClickedCell: (cell: number | null) => void; // For user clicks
   setShowingSequence: (showing: boolean) => void;
   incrementIndex: () => void;
+  setRankUpdate: (data: RankUpdatePayload) => void;
   
   // Management
   resetGame: () => void;
@@ -75,6 +78,7 @@ export const useSequenceStore = create<SequenceGameState>((set) => ({
   opponentLevel: 1,
   gameResult: null,
   isWinner: null,
+  rankUpdate: null,
 
   // Simple Setters
   setMatch: (match) => set({ match }),
@@ -86,6 +90,7 @@ export const useSequenceStore = create<SequenceGameState>((set) => ({
   setClickedCell: (clickedCell) => set({ clickedCell }),
   setShowingSequence: (showingSequence) => set({ showingSequence }),
   incrementIndex: () => set((state) => ({ currentIndex: state.currentIndex + 1 })),
+  setRankUpdate: (rankUpdate) => set({ rankUpdate }),
 
   // Complex Actions
   startGame: (data) => set({
@@ -113,15 +118,8 @@ export const useSequenceStore = create<SequenceGameState>((set) => ({
     opponentLevel: data.currentLevel,
   }),
 
-  endGame: (data, currentUserName) => set((state) => {
-    const opponentName = state.match?.opponent?.name;
-    let isWinner = false;
-    
-    if (opponentName && data.loserName === opponentName) {
-      isWinner = true;
-    } else if (currentUserName && data.loserName !== currentUserName) {
-      isWinner = true;
-    }
+  endGame: (data, currentUserId) => set(() => {
+    const isWinner = currentUserId ? data.winnerId === currentUserId : false;
 
     return {
       status: "finished",
@@ -135,6 +133,7 @@ export const useSequenceStore = create<SequenceGameState>((set) => ({
     countdown: 0,
     timeLeft: ROUND_TIME_LIMIT,
     matchCancelled: false,
+    match: null,
     level: 1,
     sequence: [],
     gridSize: 3,
@@ -146,5 +145,6 @@ export const useSequenceStore = create<SequenceGameState>((set) => ({
     opponentLevel: 1,
     gameResult: null,
     isWinner: null,
+    rankUpdate: null,
   }),
 }));

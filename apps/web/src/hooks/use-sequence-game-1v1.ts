@@ -12,6 +12,7 @@ import {
   OpponentProgressPayload,
   RoundTimerPayload,
   GameEndPayload,
+  RankUpdatePayload,
 } from "@mindarena/shared";
 import { useGameProtection } from "./use-game-protection";
 
@@ -44,6 +45,14 @@ export function useSequenceGame1v1() {
   const roomId = match?.room || "";
   const animationRef = useRef<boolean>(false);
   const lastSequenceRef = useRef<string>("");
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Refs for animation control (Directly modify store)
   const showSequenceAnimation = useCallback(async (seq: number[]) => {
@@ -54,13 +63,18 @@ export function useSequenceGame1v1() {
     store.setShowingSequence(true);
 
     for (let i = 0; i < seq.length; i++) {
+      if (!isMountedRef.current) return;
       await new Promise((resolve) => setTimeout(resolve, 600));
+      if (!isMountedRef.current) return;
       store.setActiveCell(seq[i]);
       await new Promise((resolve) => setTimeout(resolve, 400));
+      if (!isMountedRef.current) return;
       store.setActiveCell(null);
     }
 
+    if (!isMountedRef.current) return;
     await new Promise((resolve) => setTimeout(resolve, 300));
+    if (!isMountedRef.current) return;
     store.setShowingSequence(false);
     animationRef.current = false;
   }, []);
@@ -100,9 +114,8 @@ export function useSequenceGame1v1() {
     };
 
     const handleGameEnd = (data: GameEndPayload) => {
-        // Need current user name to determine winner
-        const currentUserName = useAuthStore.getState().user?.name || "Player"; 
-        store.endGame(data, currentUserName);
+        const currentUserId = useAuthStore.getState().user?.id; 
+        store.endGame(data, currentUserId);
     };
 
     socket.on(GAME_EVENTS.COUNTDOWN, handleCountdown);
@@ -114,10 +127,17 @@ export function useSequenceGame1v1() {
     socket.on(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
     socket.on(GAME_EVENTS.END, handleGameEnd);
 
+    // Rank update event 
+    const handleRankUpdate = (data: RankUpdatePayload) => {
+      store.setRankUpdate(data);
+      useAuthStore.getState().updateRank(data.currentPoints, data.rankName);
+    };
+    socket.on(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
+
     // Auto-Send Ready
     if (store.status === "waiting") {
         setTimeout(() => {
-            console.log("Sending READY");
+            if (!isMountedRef.current) return;
             socket.emit(GAME_EVENTS.READY, { roomId });
         }, 1000);
     }
@@ -131,6 +151,7 @@ export function useSequenceGame1v1() {
       socket.off(GAME_EVENTS.LEVEL_COMPLETE, handleLevelComplete);
       socket.off(GAME_EVENTS.ROUND_TIMER, handleRoundTimer);
       socket.off(GAME_EVENTS.END, handleGameEnd);
+      socket.off(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
     };
   }, [roomId, match]);
 

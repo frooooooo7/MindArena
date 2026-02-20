@@ -16,6 +16,8 @@ model User {
   name          String
   passwordHash  String
   createdAt     DateTime       @default(now())
+  rankPoints    Int            @default(0)
+  rankName      String         @default("Neuron")
   updatedAt     DateTime       @updatedAt
   refreshTokens RefreshToken[]
   gameResults   GameResult[]
