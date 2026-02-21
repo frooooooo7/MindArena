@@ -9,8 +9,9 @@ import { ProfileHeader } from "@/components/account/profile-header";
 import { LocalStatsSection } from "@/components/account/local-stats-section";
 import { ArenaStatsSection } from "@/components/account/arena-stats-section";
 import { GameRecordsSection } from "@/components/account/game-records-section";
+import { FriendsSection } from "@/components/account/friends-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Shield, BarChart3, Trophy, Gamepad2, Swords } from "lucide-react";
+import { User, Shield, BarChart3, Trophy, Gamepad2, Swords, Users } from "lucide-react";
 import { GameMode } from "@mindarena/shared";
 
 export default function AccountPage() {
@@ -56,6 +57,10 @@ export default function AccountPage() {
                             <TabsTrigger value="stats" className="gap-2">
                                 <BarChart3 className="h-4 w-4" />
                                 <span className="hidden sm:inline">Statistics</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="social" className="gap-2">
+                                <Users className="h-4 w-4" />
+                                <span className="hidden sm:inline">Social</span>
                             </TabsTrigger>
                             <TabsTrigger value="achievements" className="gap-2">
                                 <Trophy className="h-4 w-4" />
@@ -104,6 +109,10 @@ export default function AccountPage() {
 
                         <TabsContent value="stats">
                             <GameRecordsSection isAuthenticated={isAuthenticated} />
+                        </TabsContent>
+                        
+                        <TabsContent value="social">
+                            <FriendsSection isAuthenticated={isAuthenticated} />
                         </TabsContent>
 
                         <TabsContent value="achievements">

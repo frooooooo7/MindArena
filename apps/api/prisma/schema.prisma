@@ -11,16 +11,18 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  name          String
-  passwordHash  String
-  createdAt     DateTime       @default(now())
-  rankPoints    Int            @default(0)
-  rankName      String         @default("Neuron")
-  updatedAt     DateTime       @updatedAt
-  refreshTokens RefreshToken[]
-  gameResults   GameResult[]
+  id               String         @id @default(cuid())
+  email            String         @unique
+  name             String
+  passwordHash     String
+  createdAt        DateTime       @default(now())
+  rankPoints       Int            @default(0)
+  rankName         String         @default("Neuron")
+  updatedAt        DateTime       @updatedAt
+  refreshTokens    RefreshToken[]
+  gameResults      GameResult[]
+  sentRequests     Friendship[]   @relation("Requester")
+  receivedRequests Friendship[]   @relation("Addressee")
 }
 
 model RefreshToken {
@@ -47,4 +49,25 @@ model GameResult {
 
   @@index([userId])
   @@index([userId, mode])
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Friendship {
+  id          String       @id @default(cuid())
+  requesterId String
+  requester   User         @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User         @relation("Addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+  status      FriendStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId, status])
+  @@index([addresseeId, status])
 }

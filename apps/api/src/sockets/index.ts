@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
 import { socketAuthMiddleware } from "./middleware/auth.middleware";
 import { registerArenaHandlers, registerGameHandlers } from "./handlers";
+import { initFriendSocketEvents, registerFriendHandlers } from "./handlers/friend.handler";
 import * as roomService from "../services/room.service";
 import * as queueService from "../services/queue.service";
 
@@ -30,6 +31,7 @@ export class SocketManager {
         // Start background services
         roomService.startRoomCleanup(this.io);
         queueService.startCleanup(this.io);
+        initFriendSocketEvents(this.io);
 
         // Apply authentication middleware
 
@@ -40,10 +42,15 @@ export class SocketManager {
         this.io.on("connection", (socket: Socket) => {
             const user = socket.data.user;
             console.log(`[SOCKET] User connected: ${user?.name || socket.id}`);
+            
+            if (user?.id) {
+                socket.join(`user:${user.id}`);
+            }
 
             // Register all handlers (pass io for room broadcasting)
             registerArenaHandlers(socket, this.io);
             registerGameHandlers(socket, this.io);
+            registerFriendHandlers(socket);
 
             socket.on("disconnect", (reason) => {
                 console.log(`[SOCKET] User disconnected: ${user?.name || socket.id} (${reason})`);
