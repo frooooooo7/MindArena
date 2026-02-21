@@ -135,14 +135,16 @@ export function useSequenceGame1v1() {
     socket.on(ARENA_EVENTS.RANK_UPDATED, handleRankUpdate);
 
     // Auto-Send Ready
+    let readyTimer: NodeJS.Timeout | null = null;
     if (store.status === "waiting") {
-        setTimeout(() => {
+        readyTimer = setTimeout(() => {
             if (!isMountedRef.current) return;
             socket.emit(GAME_EVENTS.READY, { roomId });
         }, 1000);
     }
 
     return () => {
+      if (readyTimer) clearTimeout(readyTimer);
       socket.off(GAME_EVENTS.COUNTDOWN, handleCountdown);
       socket.off(GAME_EVENTS.START, handleGameStart);
       socket.off(GAME_EVENTS.MOVE_RESULT, handleMoveResult);

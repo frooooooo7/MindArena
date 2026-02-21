@@ -1,15 +1,15 @@
 "use client";
 
-import { Activity, ShieldCheck, Sword, Zap } from "lucide-react";
+import { Activity, Sword, Zap } from "lucide-react";
 
-const matches = [
-  { id: 1, p1: "Neo", p2: "Trinity", game: "Sequence", status: "In Progress", score: "14 - 12" },
-  { id: 2, p1: "Morpheus", p2: "Smith", game: "Chimp", status: "Finished", winner: "Morpheus" },
-  { id: 3, p1: "Cypher", p2: "Tank", game: "Code", status: "Matching...", score: "0 - 0" },
-  { id: 4, p1: "Link", p2: "Niobe", game: "Sequence", status: "Finished", winner: "Link" },
-];
+import { useArena } from "@/hooks/use-arena";
 
 export function LiveFeed() {
+  const { liveGames } = useArena();
+  
+  // Display only 4 latest games
+  const displayedGames = liveGames.slice(0, 4);
+
   return (
     <div className="p-6 md:p-8 rounded-[2rem] border border-border/40 bg-card/40">
       <div className="flex items-center justify-between mb-8">
@@ -27,48 +27,58 @@ export function LiveFeed() {
       </div>
 
       <div className="space-y-4">
-        {matches.map((match) => (
-          <div key={match.id} className="group p-4 rounded-2xl bg-secondary/10 border border-border/20 hover:border-violet-500/30 transition-colors duration-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4 flex-1">
-               <div className="flex -space-x-3">
-                  <div className="h-10 w-10 rounded-full bg-violet-600 border-2 border-background flex items-center justify-center text-xs font-bold text-white shadow-lg">
-                    {match.p1[0]}
-                  </div>
-                  <div className="h-10 w-10 rounded-full bg-indigo-600 border-2 border-background flex items-center justify-center text-xs font-bold text-white shadow-lg">
-                    {match.p2[0]}
-                  </div>
-               </div>
-               <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold">{match.p1}</span>
-                    <Sword className="h-3 w-3 text-muted-foreground opacity-30" />
-                    <span className="text-sm font-bold">{match.p2}</span>
-                  </div>
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{match.game} Memory</p>
-               </div>
-            </div>
-
-            <div className="flex items-center gap-6">
-               <div className="text-center md:text-right">
-                  <p className="text-xs font-black italic tracking-tighter">
-                    {match.status === "Finished" ? (
-                      <span className="text-emerald-500">Won by {match.winner}</span>
-                    ) : (
-                      <span className="text-violet-500">{match.score}</span>
-                    )}
-                  </p>
-                  <p className="text-[10px] font-bold text-muted-foreground/60 uppercase">{match.status}</p>
-               </div>
-               <button className="p-2 rounded-xl bg-violet-600 text-white shadow-lg hover:brightness-110 transition-all duration-200">
-                  <Activity className="h-4 w-4" />
-               </button>
-            </div>
+        {displayedGames.length === 0 ? (
+          <div className="p-8 text-center rounded-2xl bg-secondary/10 border border-dashed border-border/20">
+            <p className="text-sm text-muted-foreground italic">No ongoing matches at the moment. Join the queue to start one!</p>
           </div>
-        ))}
+        ) : (
+          displayedGames.map((match) => (
+            <div key={match.id} className="group p-4 rounded-2xl bg-secondary/10 border border-border/20 hover:border-violet-500/30 transition-colors duration-200 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4 flex-1">
+                 <div className="flex -space-x-3">
+                    <div className="h-10 w-10 rounded-full bg-violet-600 border-2 border-background flex items-center justify-center text-xs font-bold text-white shadow-lg">
+                      {match.p1Name[0].toUpperCase()}
+                    </div>
+                    <div className="h-10 w-10 rounded-full bg-indigo-600 border-2 border-background flex items-center justify-center text-xs font-bold text-white shadow-lg">
+                      {match.p2Name[0].toUpperCase()}
+                    </div>
+                 </div>
+                 <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold">{match.p1Name}</span>
+                      <Sword className="h-3 w-3 text-muted-foreground opacity-30" />
+                      <span className="text-sm font-bold">{match.p2Name}</span>
+                    </div>
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{match.gameType} Memory</p>
+                 </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                 <div className="text-center md:text-right min-w-[120px]">
+                    <p className="text-xs font-black italic tracking-tighter uppercase">
+                      {match.status === "finished" ? (
+                        <span className="text-emerald-500">Won by {match.winnerName || "Unknown"}</span>
+                      ) : match.status === "playing" ? (
+                        <span className="text-violet-500 animate-pulse">In Progress</span>
+                      ) : (
+                        <span className="text-amber-500">Starting...</span>
+                      )}
+                    </p>
+                    <p className="text-[10px] font-bold text-muted-foreground/60 uppercase">
+                      {match.status === "finished" ? "Finished" : match.status === "playing" ? "Live" : "Waiting"}
+                    </p>
+                 </div>
+                 <div className="p-2 rounded-xl bg-violet-600/20 text-violet-400 border border-violet-500/20">
+                    <Zap className="h-4 w-4" />
+                 </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
-      <button className="w-full mt-6 py-3 rounded-xl border border-dashed border-border/60 text-[10px] font-bold text-muted-foreground uppercase tracking-widest hover:bg-secondary/20 transition-colors">
-        View All Active Matches
+      <button disabled className="w-full mt-6 py-3 rounded-xl border border-dashed border-border/60 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest cursor-not-allowed">
+        View All Active Matches · Coming Soon
       </button>
     </div>
   );

@@ -2,14 +2,14 @@ import { useEffect, useCallback, useState } from "react";
 import { socket, connectSocket } from "@/lib/socket";
 import { useAuthStore } from "@/store/auth.store";
 import { useArenaStore } from "@/store/arena.store";
-import { ArenaMatch, ARENA_EVENTS } from "@mindarena/shared";
+import { ArenaMatch, ARENA_EVENTS, LiveGameInfo } from "@mindarena/shared";
 
 // Connection error types for user feedback
 type ConnectionError = "not_connected" | "rate_limited" | null;
 
 export function useArena() {
     const { accessToken, isAuthenticated } = useAuthStore();
-    const { isSearching, match, setSearching, setMatch, resetArena } = useArenaStore();
+    const { isSearching, match, liveGames, setSearching, setMatch, setLiveGames, resetArena } = useArenaStore();
     const [connectionError, setConnectionError] = useState<ConnectionError>(null);
     const [matchCancelled, setMatchCancelled] = useState(false);
 
@@ -44,6 +44,11 @@ export function useArena() {
             }
         };
 
+        const handleLiveGamesUpdate = (games: LiveGameInfo[]) => {
+            console.log("[useArena] Live games update:", games);
+            setLiveGames(games);
+        };
+
         const handleConnect = () => {
             console.log("[useArena] Socket connected!");
             setConnectionError(null);
@@ -69,6 +74,12 @@ export function useArena() {
         socket.on(ARENA_EVENTS.MATCH_FOUND, handleMatchFound);
         socket.on(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
         socket.on(ARENA_EVENTS.QUEUE_STATUS, handleQueueStatus);
+        socket.on(ARENA_EVENTS.LIVE_GAMES_UPDATE, handleLiveGamesUpdate);
+
+        // Request current live feed state on mount (handles returning from a game)
+        if (socket.connected) {
+            socket.emit(ARENA_EVENTS.REQUEST_LIVE_GAMES);
+        }
 
         return () => {
             socket.off("connect", handleConnect);
@@ -77,8 +88,9 @@ export function useArena() {
             socket.off(ARENA_EVENTS.MATCH_FOUND, handleMatchFound);
             socket.off(ARENA_EVENTS.MATCH_CANCELLED, handleMatchCancelled);
             socket.off(ARENA_EVENTS.QUEUE_STATUS, handleQueueStatus);
+            socket.off(ARENA_EVENTS.LIVE_GAMES_UPDATE, handleLiveGamesUpdate);
         };
-    }, [isAuthenticated, accessToken, setMatch, isSearching, resetArena]);
+    }, [isAuthenticated, accessToken, setMatch, setLiveGames, isSearching, resetArena]);
 
     const joinQueue = useCallback((gameType: string): { success: boolean; error?: string } => {
         if (!socket.connected) {
@@ -112,6 +124,7 @@ export function useArena() {
         leaveQueue,
         connectionError,
         matchCancelled,
+        liveGames,
         isConnected: socket.connected,
     };
 }

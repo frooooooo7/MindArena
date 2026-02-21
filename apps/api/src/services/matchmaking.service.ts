@@ -10,10 +10,11 @@ import { sequenceMemory, chimpMemory } from "./games";
 
 /**
  * Attempt to match two players from a queue
+ * Returns true if a match was made
  */
-export function attemptMatch(gameType: string, io: Server): void {
+export function attemptMatch(gameType: string, io: Server): boolean {
   const players = queueService.takeTwoPlayers(gameType);
-  if (!players) return;
+  if (!players) return false;
 
   const [player1, player2] = players;
 
@@ -27,16 +28,14 @@ export function attemptMatch(gameType: string, io: Server): void {
     if (socket2?.connected) {
       queueService.returnToFront(player2);
     }
-    attemptMatch(gameType, io);
-    return;
+    return attemptMatch(gameType, io);
   }
 
   // Validate player 2
   if (!socket2?.connected) {
     console.log(`[MATCH] ${player2.name} disconnected before match`);
     queueService.returnToFront(player1);
-    attemptMatch(gameType, io);
-    return;
+    return attemptMatch(gameType, io);
   }
 
   // Create room
@@ -54,6 +53,8 @@ export function attemptMatch(gameType: string, io: Server): void {
   // Notify both players
   notifyMatchFound(socket1, player2, roomId, gameType);
   notifyMatchFound(socket2, player1, roomId, gameType);
+
+  return true;
 }
 
 /**

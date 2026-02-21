@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { GameRoom, GamePlayer } from "@mindarena/shared";
+import { GameRoom, GamePlayer, LiveGameInfo } from "@mindarena/shared";
 import { ARENA_EVENTS } from "@mindarena/shared";
 
 // In-memory storage for active game rooms
@@ -12,6 +12,11 @@ const FINISHED_ROOM_TIMEOUT_MS = 30 * 1000; // 30 seconds for cleanup after fini
 
 // Cleanup timer
 let cleanupInterval: NodeJS.Timeout | null = null;
+
+// Throttling for broadcasts
+const BROADCAST_THROTTLE_MS = 1000;
+let lastBroadcastTimestamp = 0;
+let broadcastTimeout: NodeJS.Timeout | null = null;
 
 /**
  * Start cleanup timer for stale rooms
@@ -39,15 +44,19 @@ export function startRoomCleanup(io: Server): void {
                 removed++;
             }
             
-            // 2. Remove finished rooms after timeout
-            if (room.status === "finished" && age > FINISHED_ROOM_TIMEOUT_MS) {
-                gameRooms.delete(roomId);
-                removed++;
+            // 2. Remove finished rooms after timeout (measured from when game ended)
+            if (room.status === "finished") {
+                const finishedAge = now.getTime() - room.updatedAt.getTime();
+                if (finishedAge > FINISHED_ROOM_TIMEOUT_MS) {
+                    gameRooms.delete(roomId);
+                    removed++;
+                }
             }
         });
         
         if (removed > 0) {
             console.log(`[ROOM] Cleanup: removed ${removed} stale rooms, ${gameRooms.size} remaining`);
+            broadcastLiveGames(io);
         }
     }, CLEANUP_INTERVAL_MS);
     
@@ -79,6 +88,7 @@ export function createRoom(
         level: 1,
         winnerId: null,
         createdAt: new Date(),
+        updatedAt: new Date(),
     };
     
     gameRooms.set(roomId, room);
@@ -130,6 +140,7 @@ export function startGame(roomId: string): GameRoom | undefined {
     if (!room) return undefined;
     
     room.status = "playing";
+    room.updatedAt = new Date();
     return room;
 }
 
@@ -142,6 +153,7 @@ export function endGame(roomId: string, winnerId: string): GameRoom | undefined 
     
     room.status = "finished";
     room.winnerId = winnerId;
+    room.updatedAt = new Date();
     
     return room;
 }
@@ -243,3 +255,62 @@ export function getRoomStats() {
     return stats;
 }
 
+/**
+ * Get simplified info for live feed (active and recently finished games)
+ */
+export function getLiveGames(): LiveGameInfo[] {
+    try {
+        const MAX_GAMES = 20; // Internal limit to prevent massive payload
+        
+        return Array.from(gameRooms.values())
+            .filter(room => room && (room.status === "waiting" || room.status === "playing" || room.status === "finished"))
+            .map(room => ({
+                id: room.id,
+                p1Name: room.players[0]?.name || "Unknown",
+                p2Name: room.players[1]?.name || "Unknown",
+                gameType: (room.gameType || "unknown").charAt(0).toUpperCase() + room.gameType.slice(1).toLowerCase(),
+                status: (room.status || "waiting") as "waiting" | "playing" | "finished",
+                winnerName: room.winnerId ? room.players.find(p => p.id === room.winnerId)?.name : undefined,
+                createdAt: room.createdAt.toISOString(),
+                updatedAt: room.updatedAt.toISOString(),
+            }))
+            .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+            .slice(0, MAX_GAMES);
+    } catch (error) {
+        console.error("[ROOM] Error getting live games:", error);
+        return [];
+    }
+}
+
+/**
+ * Broadcast live games update to all connected clients (Throttled)
+ */
+export function broadcastLiveGames(io: Server) {
+    const now = Date.now();
+    
+    // Clear any pending broadcast
+    if (broadcastTimeout) {
+        clearTimeout(broadcastTimeout);
+        broadcastTimeout = null;
+    }
+
+    const performBroadcast = () => {
+        try {
+            const games = getLiveGames();
+            io.emit(ARENA_EVENTS.LIVE_GAMES_UPDATE, games);
+            lastBroadcastTimestamp = Date.now();
+            broadcastTimeout = null;
+        } catch (error) {
+            console.error("[ROOM] Broadcast failed:", error);
+        }
+    };
+
+    if (now - lastBroadcastTimestamp > BROADCAST_THROTTLE_MS) {
+        // Enough time passed, broadcast immediately
+        performBroadcast();
+    } else {
+        // Too soon, schedule a broadcast at the end of the throttle window
+        const delay = BROADCAST_THROTTLE_MS - (now - lastBroadcastTimestamp);
+        broadcastTimeout = setTimeout(performBroadcast, delay);
+    }
+}

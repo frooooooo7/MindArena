@@ -123,6 +123,7 @@ export async function handlePlayerFailed(io: Server, roomId: string) {
 
   if (winner && loser) {
     roomService.endGame(roomId, winner.id);
+    roomService.broadcastLiveGames(io);
 
     io.to(roomId).emit(GAME_EVENTS.END, {
       winnerId: winner.id,
@@ -164,6 +165,7 @@ export async function handlePlayerDisconnect(
       const opponent = roomService.getOpponent(roomId, userId);
       if (opponent) {
         roomService.endGame(roomId, opponent.id);
+        roomService.broadcastLiveGames(io);
 
         io.to(opponent.socketId).emit(GAME_EVENTS.END, {
           winnerId: opponent.id,

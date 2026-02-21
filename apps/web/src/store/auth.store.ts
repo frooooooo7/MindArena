@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { User } from "@mindarena/shared";
+import { User, RankName } from "@mindarena/shared";
 
 interface AuthState {
     user: User | null;
@@ -10,7 +10,7 @@ interface AuthState {
     setAuth: (user: User, accessToken: string) => void;
     clearAuth: () => void;
     updateUser: (user: User) => void;
-    updateRank: (points: number, rankName: string) => void;
+    updateRank: (points: number, rankName: RankName) => void;
     setHydrated: () => void;
 }
 
