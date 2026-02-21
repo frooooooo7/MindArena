@@ -102,6 +102,30 @@ export const gameResultRepository = {
       })
     );
 
-    return statsPerGame;
+        return statsPerGame;
   },
+
+  async getGlobalStats() {
+    const aggregations = await prisma.gameResult.aggregate({
+      _count: {
+        _all: true,
+      },
+      _sum: {
+        score: true,
+      },
+      _max: {
+        level: true,
+      },
+    });
+
+    const totalGames = aggregations._count._all;
+    const totalScore = aggregations._sum.score ?? 0;
+    const highestLevel = aggregations._max.level ?? 0;
+    const averageScore = totalGames > 0 ? Math.round(totalScore / totalGames) : 0;
+
+    return {
+      averageScore,
+      highestLevel
+    };
+  }
 };

@@ -5,6 +5,7 @@ import { createServer } from "http";
 import { env } from "./config/env";
 import authRoutes from "./routes/auth.routes";
 import gameResultRoutes from "./routes/game-result.routes";
+import statsRoutes from "./routes/stats.routes";
 import { errorHandler } from "./middleware/error.middleware";
 import { SocketManager } from "./sockets";
 
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 // Routes
 app.use("/auth", authRoutes);
 app.use("/game-results", gameResultRoutes);
+app.use("/stats", statsRoutes);
 
 // Error handling
 app.use(errorHandler);

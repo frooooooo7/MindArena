@@ -6,6 +6,7 @@ export * from "./schemas/rank.schema";
 // Types
 export * from "./types/arena";
 export * from "./types/game";
+export * from "./types/stats";
 
 // Constants
 export const APP_NAME = "MindArena";
