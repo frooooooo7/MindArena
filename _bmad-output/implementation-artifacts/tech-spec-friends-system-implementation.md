@@ -156,3 +156,18 @@ Dodanie nowego modelu bazy danych (`Friendship` z odpowiednimi statusami, np. PE
 - Skipped (2/8):
   - 🟢 F7: Pagination page explosion (PaginationEllipsis) — UX improvement for later
   - 🟢 F8: `structure.md` update — deferred to next task
+
+- Adversarial review #2 completed (2026-02-23)
+- Findings: 9 total (3 CRITICAL, 3 MEDIUM, 3 LOW)
+- Fixed (6/9):
+  - 🔴 F1: `FriendRequestListener` setTimeout memory leak → timer stored in `useRef`, cleared on unmount/new request
+  - 🔴 F2: Duplicated state management between popup and `useFriends` → custom DOM event `FRIEND_ACTION_EVENT` syncs state on accept/reject
+  - 🔴 F3: Untyped `EventBus` → fully type-safe `AppEventBus` with typed `EventMap` payloads
+  - 🟡 F4: `SocketManager` `data: any` → `data: unknown`
+  - 🟡 F5: No confirmation for destructive friend actions → `AlertDialog` added before remove/decline/cancel
+  - 🟡 F6: Server/Client boundary risk in `layout.tsx` → acknowledged as valid Next.js pattern, low risk
+- Skipped (3/9):
+  - 🟢 F7: Pagination still renders all pages without ellipsis — UX improvement for later
+  - 🟢 F8: Test file uses `as any` extensively — deferred, tests pass correctly
+  - 🟢 F9: Uncommitted changes — user to commit at discretion
+

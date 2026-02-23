@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { UserPlus, UserMinus, Search, Users, Trophy } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,16 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useFriends } from "@/hooks/use-friends";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -33,6 +43,14 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
   const [searchPage, setSearchPage] = useState(1);
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
+  // Confirmation dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    id: string;
+    name: string;
+    type: "friend" | "request";
+  }>({ open: false, id: "", name: "", type: "friend" });
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(searchQuery);
@@ -45,6 +63,15 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
       searchUsers(debouncedQuery, searchPage);
     }
   }, [debouncedQuery, searchPage, searchUsers]);
+
+  const handleConfirmDelete = async () => {
+    await deleteRequestOrFriend(confirmDialog.id);
+    setConfirmDialog(prev => ({ ...prev, open: false }));
+  };
+
+  const openDeleteConfirmation = (id: string, name: string, type: "friend" | "request") => {
+    setConfirmDialog({ open: true, id, name, type });
+  };
 
   if (!isAuthenticated || !user) return null;
 
@@ -98,7 +125,7 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
                       variant="ghost" 
                       size="icon"
                       className="text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10"
-                      onClick={() => deleteRequestOrFriend(f.id)}
+                      onClick={() => openDeleteConfirmation(f.id, f.friend?.name ?? "this friend", "friend")}
                     >
                       <UserMinus className="h-4 w-4" />
                     </Button>
@@ -123,7 +150,7 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
                       <p className="text-xs text-muted-foreground">{req.friend?.rankName} • {req.friend?.rankPoints} RP</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => deleteRequestOrFriend(req.id)}>Decline</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDeleteConfirmation(req.id, req.friend?.name ?? "this request", "request")}>Decline</Button>
                       <Button size="sm" onClick={() => acceptRequest(req.id)} className="bg-emerald-600 hover:bg-emerald-700">Accept</Button>
                     </div>
                   </div>
@@ -143,7 +170,7 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
                     <div>
                       <p className="font-semibold">{req.friend?.name}</p>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => deleteRequestOrFriend(req.id)}>Cancel</Button>
+                    <Button variant="ghost" size="sm" onClick={() => openDeleteConfirmation(req.id, req.friend?.name ?? "this request", "request")}>Cancel</Button>
                   </div>
                 ))}
               </div>
@@ -238,10 +265,33 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
           )}
           
           {!loading && searchQuery.length >= 3 && searchResults?.users.length === 0 && (
-            <p className="text-sm text-muted-foreground">No players found matching "{searchQuery}".</p>
+            <p className="text-sm text-muted-foreground">No players found matching &quot;{searchQuery}&quot;.</p>
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Confirmation Dialog for Destructive Actions */}
+      <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, open }))}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmDialog.type === "friend" ? "Remove Friend" : "Cancel Request"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmDialog.type === "friend"
+                ? `Are you sure you want to remove ${confirmDialog.name} from your friends list? You can always send a new friend request later.`
+                : `Are you sure you want to cancel the request involving ${confirmDialog.name}?`
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleConfirmDelete}>
+              {confirmDialog.type === "friend" ? "Remove" : "Confirm"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

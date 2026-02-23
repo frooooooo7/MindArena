@@ -24,6 +24,10 @@ export class FriendRepository {
         addresseeId,
         status: "PENDING",
       },
+      include: {
+        requester: { select: { id: true, name: true, rankName: true, rankPoints: true } },
+        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true } },
+      }
     });
   }
 

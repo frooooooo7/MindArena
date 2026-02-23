@@ -3,6 +3,7 @@ import { api } from "@/lib/axios";
 import { socket } from "@/lib/socket";
 import type { FriendshipDTO, SearchPlayersResponse } from "@mindarena/shared";
 import { useAuthStore } from "@/store/auth.store";
+import { FRIEND_ACTION_EVENT } from "@/components/friend-request-listener";
 
 export const useFriends = () => {
     const { user } = useAuthStore();
@@ -110,12 +111,20 @@ export const useFriends = () => {
             setFriends(prev => [request, ...prev]);
         };
 
+        // Sync state when the global popup accepts/rejects a request
+        const handleFriendAction = () => {
+            loadFriends();
+            loadRequests();
+        };
+
         socket.on("FRIEND_REQUEST_RECEIVED", handleRequestReceived);
         socket.on("FRIEND_REQUEST_ACCEPTED", handleRequestAccepted);
+        window.addEventListener(FRIEND_ACTION_EVENT, handleFriendAction);
 
         return () => {
             socket.off("FRIEND_REQUEST_RECEIVED", handleRequestReceived);
             socket.off("FRIEND_REQUEST_ACCEPTED", handleRequestAccepted);
+            window.removeEventListener(FRIEND_ACTION_EVENT, handleFriendAction);
         };
     }, [user, loadFriends, loadRequests]);
 

@@ -40,20 +40,28 @@ export class FriendService {
       throw error;
     }
     
-    const payload: FriendshipDTO = {
+    // Payload for the sender's UI (friend = the person they sent the request to)
+    const senderPayload: FriendshipDTO = {
       id: newFriendship.id,
       requesterId: newFriendship.requesterId,
       addresseeId: newFriendship.addresseeId,
       status: newFriendship.status as FriendStatus,
       createdAt: newFriendship.createdAt.toISOString(),
+      friend: newFriendship.addressee as FriendUserDTO,
+    };
+
+    // Payload for the receiver's popup (friend = the person who sent the request)
+    const receiverPayload: FriendshipDTO = {
+      ...senderPayload,
+      friend: newFriendship.requester as FriendUserDTO,
     };
 
     eventBus.emit(EVENTS.FRIEND_REQUEST_SENT, { 
       targetUserId: addresseeId, 
-      request: payload 
+      request: receiverPayload 
     });
 
-    return payload;
+    return senderPayload;
   }
 
   async acceptRequest(userId: string, requestId: string): Promise<FriendshipDTO> {

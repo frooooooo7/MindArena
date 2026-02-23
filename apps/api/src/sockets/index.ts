@@ -63,11 +63,11 @@ export class SocketManager {
         return this.io;
     }
 
-    public emitToRoom(room: string, event: string, data: any) {
+    public emitToRoom(room: string, event: string, data: unknown) {
         this.io.to(room).emit(event, data);
     }
 
-    public emitToAll(event: string, data: any) {
+    public emitToAll(event: string, data: unknown) {
         this.io.emit(event, data);
     }
 }
