@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
@@ -17,7 +17,16 @@ import { GameMode } from "@mindarena/shared";
 export default function AccountPage() {
     const { isAuthenticated, user, isHydrated } = useAuthStore();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [gameMode, setGameMode] = useState<GameMode>("local");
+    const [activeTab, setActiveTab] = useState("overview");
+
+    useEffect(() => {
+        const tab = searchParams.get("tab");
+        if (tab && ["overview", "stats", "social", "achievements", "security"].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         if (isHydrated && !isAuthenticated) {
@@ -48,7 +57,7 @@ export default function AccountPage() {
                     </div>
 
                     {/* Main Content Tabs */}
-                    <Tabs defaultValue="overview" className="w-full">
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         <TabsList className="bg-secondary/20 p-1 border border-border/40 mb-6">
                             <TabsTrigger value="overview" className="gap-2">
                                 <User className="h-4 w-4" />
