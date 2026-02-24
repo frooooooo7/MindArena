@@ -12,5 +12,8 @@ export * as rateLimiter from "./rate-limiter.service";
 // Ranking
 export * as rankService from "./rank.service";
 
+// Friend System
+export * as friendService from "./friend.service";
+
 // Game-specific logic
 export * from "./games";

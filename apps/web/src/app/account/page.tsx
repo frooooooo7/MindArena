@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
@@ -9,14 +9,24 @@ import { ProfileHeader } from "@/components/account/profile-header";
 import { LocalStatsSection } from "@/components/account/local-stats-section";
 import { ArenaStatsSection } from "@/components/account/arena-stats-section";
 import { GameRecordsSection } from "@/components/account/game-records-section";
+import { FriendsSection } from "@/components/account/friends-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Shield, BarChart3, Trophy, Gamepad2, Swords } from "lucide-react";
+import { User, Shield, BarChart3, Trophy, Gamepad2, Swords, Users } from "lucide-react";
 import { GameMode } from "@mindarena/shared";
 
 export default function AccountPage() {
     const { isAuthenticated, user, isHydrated } = useAuthStore();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [gameMode, setGameMode] = useState<GameMode>("local");
+    const [activeTab, setActiveTab] = useState("overview");
+
+    useEffect(() => {
+        const tab = searchParams.get("tab");
+        if (tab && ["overview", "stats", "social", "achievements", "security"].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         if (isHydrated && !isAuthenticated) {
@@ -47,7 +57,7 @@ export default function AccountPage() {
                     </div>
 
                     {/* Main Content Tabs */}
-                    <Tabs defaultValue="overview" className="w-full">
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         <TabsList className="bg-secondary/20 p-1 border border-border/40 mb-6">
                             <TabsTrigger value="overview" className="gap-2">
                                 <User className="h-4 w-4" />
@@ -56,6 +66,10 @@ export default function AccountPage() {
                             <TabsTrigger value="stats" className="gap-2">
                                 <BarChart3 className="h-4 w-4" />
                                 <span className="hidden sm:inline">Statistics</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="social" className="gap-2">
+                                <Users className="h-4 w-4" />
+                                <span className="hidden sm:inline">Social</span>
                             </TabsTrigger>
                             <TabsTrigger value="achievements" className="gap-2">
                                 <Trophy className="h-4 w-4" />
@@ -104,6 +118,10 @@ export default function AccountPage() {
 
                         <TabsContent value="stats">
                             <GameRecordsSection isAuthenticated={isAuthenticated} />
+                        </TabsContent>
+                        
+                        <TabsContent value="social">
+                            <FriendsSection isAuthenticated={isAuthenticated} />
                         </TabsContent>
 
                         <TabsContent value="achievements">

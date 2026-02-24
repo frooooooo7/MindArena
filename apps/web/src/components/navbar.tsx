@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Brain, Swords, Gamepad2, Trophy, BarChart3, User, Menu, X, LogOut, Settings, Sun, Moon } from "lucide-react";
+import { Brain, Swords, Gamepad2, Trophy, BarChart3, User, Users, Menu, X, LogOut, Settings, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
 import { authService } from "@/services/auth.service";
@@ -80,10 +80,16 @@ export function Navbar() {
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <Link href="/account">
+                  <Link href="/account?tab=overview">
                     <DropdownMenuItem className="gap-2 cursor-pointer font-semibold">
                       <User className="h-4 w-4 text-violet-500" />
                       <span>My Account</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/account?tab=social">
+                    <DropdownMenuItem className="gap-2 cursor-pointer">
+                      <Users className="h-4 w-4 text-violet-500" />
+                      <span>Friends</span>
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuSeparator />

@@ -18,6 +18,8 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { FriendRequestListener } from "@/components/friend-request-listener";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -36,6 +38,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <FriendRequestListener />
+          <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>
     </html>
