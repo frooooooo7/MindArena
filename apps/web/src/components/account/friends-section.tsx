@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { UserPlus, UserMinus, Search, Users, Trophy } from "lucide-react";
+import { UserPlus, UserMinus, Search, Users, Trophy, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/ui/user-avatar";
@@ -43,6 +43,7 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
   const [searchQuery, setSearchQuery] = useState("");
   const [searchPage, setSearchPage] = useState(1);
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [sendingTo, setSendingTo] = useState<string | null>(null);
 
   // Confirmation dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -230,9 +231,23 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
                         ) : isPendingSent ? (
                           <span className="text-xs text-amber-500 font-medium px-2 py-1 bg-amber-500/10 rounded-full">Requested</span>
                         ) : (
-                          <Button size="sm" variant="secondary" onClick={() => sendRequest(u.id)} className="gap-1.5 hover:bg-violet-600 hover:text-white transition-colors">
-                            <UserPlus className="h-4 w-4" />
-                            Add
+                          <Button 
+                            size="sm" 
+                            variant="secondary" 
+                            disabled={sendingTo === u.id}
+                            onClick={async () => {
+                              setSendingTo(u.id);
+                              await sendRequest(u.id);
+                              setSendingTo(null);
+                            }} 
+                            className="gap-1.5 hover:bg-violet-600 hover:text-white transition-colors"
+                          >
+                            {sendingTo === u.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <UserPlus className="h-4 w-4" />
+                            )}
+                            {sendingTo === u.id ? "Sending..." : "Add"}
                           </Button>
                         )}
                       </div>

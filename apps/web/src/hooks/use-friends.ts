@@ -111,6 +111,14 @@ export const useFriends = () => {
             setFriends(prev => [request, ...prev]);
         };
 
+        const handleFriendRemoved = (payload: { friendshipId: string }) => {
+            setFriends(prev => prev.filter(f => f.id !== payload.friendshipId));
+            setPendingRequests(prev => ({
+                received: prev.received.filter(r => r.id !== payload.friendshipId),
+                sent: prev.sent.filter(s => s.id !== payload.friendshipId),
+            }));
+        };
+
         // Sync state when the global popup accepts/rejects a request
         const handleFriendAction = () => {
             loadFriends();
@@ -119,11 +127,13 @@ export const useFriends = () => {
 
         socket.on("FRIEND_REQUEST_RECEIVED", handleRequestReceived);
         socket.on("FRIEND_REQUEST_ACCEPTED", handleRequestAccepted);
+        socket.on("FRIEND_REMOVED", handleFriendRemoved);
         window.addEventListener(FRIEND_ACTION_EVENT, handleFriendAction);
 
         return () => {
             socket.off("FRIEND_REQUEST_RECEIVED", handleRequestReceived);
             socket.off("FRIEND_REQUEST_ACCEPTED", handleRequestAccepted);
+            socket.off("FRIEND_REMOVED", handleFriendRemoved);
             window.removeEventListener(FRIEND_ACTION_EVENT, handleFriendAction);
         };
     }, [user, loadFriends, loadRequests]);

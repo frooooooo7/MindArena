@@ -8,6 +8,7 @@ import { UserAvatar } from "@/components/ui/user-avatar";
 import { UserPlus, X, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { api } from "@/lib/axios";
+import { AxiosError } from "axios";
 import { toast } from "sonner";
 
 /**
@@ -60,10 +61,17 @@ export function FriendRequestListener() {
       });
     };
 
+    // Auto-dismiss if the sender cancels their request while popup is showing
+    const handleFriendRemoved = (payload: { friendshipId: string }) => {
+      setRequestsQueue((prev) => prev.filter((req) => req.id !== payload.friendshipId));
+    };
+
     socket.on("FRIEND_REQUEST_RECEIVED", handleRequestReceived);
+    socket.on("FRIEND_REMOVED", handleFriendRemoved);
 
     return () => {
       socket.off("FRIEND_REQUEST_RECEIVED", handleRequestReceived);
+      socket.off("FRIEND_REMOVED", handleFriendRemoved);
     };
   }, [user, accessToken]);
 
@@ -92,10 +100,13 @@ export function FriendRequestListener() {
       notifyFriendListUpdate();
       toast.success(`Accepted friend request from ${currentRequest.friend?.name}`);
       closePopup();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to accept friend request", err);
+      const message = err instanceof AxiosError
+        ? err.response?.data?.message
+        : undefined;
       toast.error("Failed to accept request", {
-        description: err.response?.data?.message || "An unexpected error occurred.",
+        description: message || "An unexpected error occurred.",
       });
       setIsLoading(false);
     }
@@ -109,10 +120,13 @@ export function FriendRequestListener() {
       await api.delete(`/friends/requests/${currentRequest.id}`);
       notifyFriendListUpdate();
       closePopup();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to reject friend request", err);
+      const message = err instanceof AxiosError
+        ? err.response?.data?.message
+        : undefined;
       toast.error("Failed to decline request", {
-        description: err.response?.data?.message || "An unexpected error occurred.",
+        description: message || "An unexpected error occurred.",
       });
       setIsLoading(false);
     }

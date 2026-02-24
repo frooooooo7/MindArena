@@ -5,12 +5,14 @@ import type { FriendshipDTO } from "@mindarena/shared";
 export const EVENTS = {
   FRIEND_REQUEST_SENT: "FRIEND_REQUEST:SENT",
   FRIEND_REQUEST_ACCEPTED: "FRIEND_REQUEST:ACCEPTED",
+  FRIEND_REMOVED: "FRIEND:REMOVED",
 } as const;
 
 // Typed event payloads
 interface EventMap {
   [EVENTS.FRIEND_REQUEST_SENT]: { targetUserId: string; request: FriendshipDTO };
   [EVENTS.FRIEND_REQUEST_ACCEPTED]: { requesterId: string; addresseeId: string; request: FriendshipDTO };
+  [EVENTS.FRIEND_REMOVED]: { targetUserId: string; friendshipId: string };
 }
 
 type EventKey = keyof EventMap;

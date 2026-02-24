@@ -171,3 +171,16 @@ Dodanie nowego modelu bazy danych (`Friendship` z odpowiednimi statusami, np. PE
   - 🟢 F8: Test file uses `as any` extensively — deferred, tests pass correctly
   - 🟢 F9: Uncommitted changes — user to commit at discretion
 
+- Adversarial review #3 completed (2026-02-24) — Final edge-case & security review
+- Findings: 9 total (3 CRITICAL, 3 MEDIUM, 3 LOW)
+- Fixed (7/9):
+  - 🔴 F1: `err: any` survived in `friend-request-listener.tsx` catch blocks → replaced with `unknown` + `AxiosError` typeguard
+  - 🔴 F2: `req.params.id` unvalidated in controller → added `FriendshipIdParamsSchema` Zod validation (`.cuid()`)
+  - 🔴 F3: No real-time notification when friendship deleted → added `FRIEND_REMOVED` event (event-bus → socket handler → frontend listeners)
+  - 🟡 F4: Duplicated `FRIEND_REQUEST_RECEIVED` listeners partially addressed → added `FRIEND_REMOVED` listener to both popup and hook for full sync
+  - 🟡 F5: No rate limiting on friend REST endpoints → created `rateLimitMiddleware` and applied to all routes (30/20/10 per 15s by tier)
+  - 🟡 F6: Unbounded `findMany` in repository → added `take` limits (200 friends, 100 pending/sent)
+  - 🟢 F9: Add button no loading state → added `sendingTo` state with `Loader2` spinner and disabled during request
+- Skipped (2/9):
+  - 🟢 F7: `searchResults` flash on query shortening — minor UX, debounce handles most cases
+  - 🟢 F8: Unused full `React` import — cosmetic, no functional impact

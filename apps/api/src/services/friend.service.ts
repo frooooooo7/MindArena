@@ -98,6 +98,16 @@ export class FriendService {
     }
 
     await friendRepository.deleteFriendship(requestId);
+
+    // Notify the other party so their UI updates in real-time
+    const targetUserId = friendship.requesterId === userId 
+      ? friendship.addresseeId 
+      : friendship.requesterId;
+    
+    eventBus.emit(EVENTS.FRIEND_REMOVED, { 
+      targetUserId, 
+      friendshipId: requestId 
+    });
   }
 
   async getFriendsList(userId: string): Promise<FriendshipDTO[]> {

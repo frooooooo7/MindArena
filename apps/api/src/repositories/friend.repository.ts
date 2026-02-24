@@ -59,6 +59,7 @@ export class FriendRepository {
         addressee: { select: { id: true, name: true, rankName: true, rankPoints: true } },
       },
       orderBy: { updatedAt: "desc" },
+      take: 200,
     });
   }
 
@@ -72,6 +73,7 @@ export class FriendRepository {
         requester: { select: { id: true, name: true, rankName: true, rankPoints: true } },
       },
       orderBy: { createdAt: "desc" },
+      take: 100,
     });
   }
 
@@ -85,6 +87,7 @@ export class FriendRepository {
         addressee: { select: { id: true, name: true, rankName: true, rankPoints: true } },
       },
       orderBy: { createdAt: "desc" },
+      take: 100,
     });
   }
 

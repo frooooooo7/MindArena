@@ -10,13 +10,15 @@ export const initFriendSocketEvents = (io: Server) => {
   initialized = true;
 
   eventBus.on(EVENTS.FRIEND_REQUEST_SENT, (payload) => {
-    // Powiadomienie gracza online, kiedy dostaje zaproszenie
     io.to(`user:${payload.targetUserId}`).emit("FRIEND_REQUEST_RECEIVED", payload.request);
   });
 
   eventBus.on(EVENTS.FRIEND_REQUEST_ACCEPTED, (payload) => {
-    // Powiadomienie drugiego gracza że zaproszenie zostało zaakceptowane
     io.to(`user:${payload.requesterId}`).emit("FRIEND_REQUEST_ACCEPTED", payload.request);
+  });
+
+  eventBus.on(EVENTS.FRIEND_REMOVED, (payload) => {
+    io.to(`user:${payload.targetUserId}`).emit("FRIEND_REMOVED", { friendshipId: payload.friendshipId });
   });
 };
 

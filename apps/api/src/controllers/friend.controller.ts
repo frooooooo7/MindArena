@@ -5,6 +5,11 @@ import {
   SearchPlayersSchema,
   SendFriendRequestSchema,
 } from "@mindarena/shared";
+import { z } from "zod";
+
+const FriendshipIdParamsSchema = z.object({
+  id: z.string().cuid("Invalid friendship ID"),
+});
 
 export class FriendController {
   searchUsers = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -42,8 +47,11 @@ export class FriendController {
   acceptRequest = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
-      const { id } = req.params;
-      const result = await friendService.acceptRequest(req.userId, id);
+      const paramsParsed = FriendshipIdParamsSchema.safeParse(req.params);
+      if (!paramsParsed.success) {
+        return res.status(400).json({ error: "Invalid request ID", details: paramsParsed.error });
+      }
+      const result = await friendService.acceptRequest(req.userId, paramsParsed.data.id);
       return res.status(200).json(result);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
@@ -54,8 +62,11 @@ export class FriendController {
   discardOrCancel = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.userId) return res.status(401).json({ error: "Unauthorized" });
-      const { id } = req.params;
-      await friendService.declineOrCancelRequest(req.userId, id);
+      const paramsParsed = FriendshipIdParamsSchema.safeParse(req.params);
+      if (!paramsParsed.success) {
+        return res.status(400).json({ error: "Invalid request ID", details: paramsParsed.error });
+      }
+      await friendService.declineOrCancelRequest(req.userId, paramsParsed.data.id);
       return res.status(200).json({ message: "Success" });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
