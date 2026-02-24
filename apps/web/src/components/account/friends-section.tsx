@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { UserPlus, UserMinus, Search, Users, Trophy } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Pagination, 
@@ -114,11 +115,14 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
               {friends.map((f) => (
                 <div key={f.id} className="flex flex-col p-4 bg-card/60 border border-border/40 rounded-xl hover:border-violet-500/30 transition-colors">
                   <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-semibold text-lg">{f.friend?.name}</p>
-                      <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
-                        <Trophy className="h-3.5 w-3.5 text-amber-500" />
-                        <span>{f.friend?.rankName} • {f.friend?.rankPoints} RP</span>
+                    <div className="flex items-center gap-3">
+                      <UserAvatar name={f.friend?.name} avatarUrl={null} />
+                      <div>
+                        <p className="font-semibold text-lg">{f.friend?.name}</p>
+                        <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
+                          <Trophy className="h-3.5 w-3.5 text-amber-500" />
+                          <span>{f.friend?.rankName} • {f.friend?.rankPoints} RP</span>
+                        </div>
                       </div>
                     </div>
                     <Button 
@@ -145,9 +149,12 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
               <div className="grid gap-4 md:grid-cols-2">
                 {pendingRequests.received.map(req => (
                   <div key={req.id} className="flex items-center justify-between p-4 bg-card/60 border border-border/40 rounded-xl">
-                    <div>
-                      <p className="font-semibold">{req.friend?.name}</p>
-                      <p className="text-xs text-muted-foreground">{req.friend?.rankName} • {req.friend?.rankPoints} RP</p>
+                    <div className="flex items-center gap-3">
+                      <UserAvatar name={req.friend?.name} avatarUrl={null} size="sm" />
+                      <div>
+                        <p className="font-semibold">{req.friend?.name}</p>
+                        <p className="text-xs text-muted-foreground">{req.friend?.rankName} • {req.friend?.rankPoints} RP</p>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <Button variant="ghost" size="sm" onClick={() => openDeleteConfirmation(req.id, req.friend?.name ?? "this request", "request")}>Decline</Button>
@@ -167,8 +174,11 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
               <div className="grid gap-4 md:grid-cols-2">
                 {pendingRequests.sent.map(req => (
                   <div key={req.id} className="flex items-center justify-between p-4 bg-card/60 border border-border/40 rounded-xl">
-                    <div>
-                      <p className="font-semibold">{req.friend?.name}</p>
+                    <div className="flex items-center gap-3">
+                      <UserAvatar name={req.friend?.name} avatarUrl={null} size="sm" />
+                      <div>
+                        <p className="font-semibold">{req.friend?.name}</p>
+                      </div>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => openDeleteConfirmation(req.id, req.friend?.name ?? "this request", "request")}>Cancel</Button>
                   </div>
@@ -205,9 +215,12 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
 
                   return (
                     <div key={u.id} className="flex items-center justify-between p-4 bg-card/60 border border-border/40 rounded-xl">
-                      <div>
-                        <p className="font-semibold">{u.name}</p>
-                        <p className="text-xs text-muted-foreground">{u.rankName} • {u.rankPoints} RP</p>
+                      <div className="flex items-center gap-3">
+                        <UserAvatar name={u.name} avatarUrl={null} size="sm" />
+                        <div>
+                          <p className="font-semibold">{u.name}</p>
+                          <p className="text-xs text-muted-foreground">{u.rankName} • {u.rankPoints} RP</p>
+                        </div>
                       </div>
                       <div>
                         {isFriend ? (

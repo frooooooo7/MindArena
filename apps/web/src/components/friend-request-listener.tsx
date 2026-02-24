@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { socket, connectSocket, disconnectSocket } from "@/lib/socket";
 import type { FriendshipDTO } from "@mindarena/shared";
 import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { UserPlus, X, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { api } from "@/lib/axios";
@@ -143,8 +144,11 @@ export function FriendRequestListener() {
 
         <div className="p-4 flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/20">
-              <UserPlus size={18} className="text-white" />
+            <div className="relative shrink-0">
+              <UserAvatar name={currentRequest.friend.name} avatarUrl={null} />
+              <div className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center ring-2 ring-background">
+                <UserPlus size={10} className="text-white" />
+              </div>
             </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold truncate">Friend Request</p>
