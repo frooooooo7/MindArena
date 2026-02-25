@@ -159,7 +159,7 @@ export function FriendRequestListener() {
         <div className="p-4 flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <div className="relative shrink-0">
-              <UserAvatar name={currentRequest.friend.name} avatarUrl={null} />
+              <UserAvatar name={currentRequest.friend.name} avatarUrl={currentRequest.friend?.avatarUrl ?? null} />
               <div className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center ring-2 ring-background">
                 <UserPlus size={10} className="text-white" />
               </div>

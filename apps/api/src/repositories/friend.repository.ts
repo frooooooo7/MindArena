@@ -11,8 +11,8 @@ export class FriendRepository {
         ],
       },
       include: {
-        requester: { select: { id: true, name: true, rankName: true, rankPoints: true } },
-        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true } },
+        requester: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
+        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
       }
     });
   }
@@ -25,8 +25,8 @@ export class FriendRepository {
         status: "PENDING",
       },
       include: {
-        requester: { select: { id: true, name: true, rankName: true, rankPoints: true } },
-        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true } },
+        requester: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
+        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
       }
     });
   }
@@ -36,8 +36,8 @@ export class FriendRepository {
       where: { id },
       data: { status },
       include: {
-        requester: { select: { id: true, name: true, rankName: true, rankPoints: true } },
-        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true } },
+        requester: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
+        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
       }
     });
   }
@@ -55,8 +55,8 @@ export class FriendRepository {
         OR: [{ requesterId: userId }, { addresseeId: userId }],
       },
       include: {
-        requester: { select: { id: true, name: true, rankName: true, rankPoints: true } },
-        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true } },
+        requester: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
+        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
       },
       orderBy: { updatedAt: "desc" },
       take: 200,
@@ -70,7 +70,7 @@ export class FriendRepository {
         addresseeId: userId,
       },
       include: {
-        requester: { select: { id: true, name: true, rankName: true, rankPoints: true } },
+        requester: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 100,
@@ -84,7 +84,7 @@ export class FriendRepository {
         requesterId: userId,
       },
       include: {
-        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true } },
+        addressee: { select: { id: true, name: true, rankName: true, rankPoints: true, avatarUrl: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 100,
@@ -126,6 +126,7 @@ export class FriendRepository {
           name: true,
           rankName: true,
           rankPoints: true,
+          avatarUrl: true,
         },
         orderBy: { rankPoints: "desc" },
         skip,

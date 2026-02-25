@@ -18,6 +18,7 @@ model User {
   createdAt        DateTime       @default(now())
   rankPoints       Int            @default(0)
   rankName         String         @default("Neuron")
+  avatarUrl        String?
   updatedAt        DateTime       @updatedAt
   refreshTokens    RefreshToken[]
   gameResults      GameResult[]

@@ -117,7 +117,7 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
                 <div key={f.id} className="flex flex-col p-4 bg-card/60 border border-border/40 rounded-xl hover:border-violet-500/30 transition-colors">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <UserAvatar name={f.friend?.name} avatarUrl={null} />
+                      <UserAvatar name={f.friend?.name} avatarUrl={f.friend?.avatarUrl ?? null} />
                       <div>
                         <p className="font-semibold text-lg">{f.friend?.name}</p>
                         <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
@@ -151,7 +151,7 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
                 {pendingRequests.received.map(req => (
                   <div key={req.id} className="flex items-center justify-between p-4 bg-card/60 border border-border/40 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <UserAvatar name={req.friend?.name} avatarUrl={null} size="sm" />
+                      <UserAvatar name={req.friend?.name} avatarUrl={req.friend?.avatarUrl ?? null} size="sm" />
                       <div>
                         <p className="font-semibold">{req.friend?.name}</p>
                         <p className="text-xs text-muted-foreground">{req.friend?.rankName} • {req.friend?.rankPoints} RP</p>
@@ -176,7 +176,7 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
                 {pendingRequests.sent.map(req => (
                   <div key={req.id} className="flex items-center justify-between p-4 bg-card/60 border border-border/40 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <UserAvatar name={req.friend?.name} avatarUrl={null} size="sm" />
+                      <UserAvatar name={req.friend?.name} avatarUrl={req.friend?.avatarUrl ?? null} size="sm" />
                       <div>
                         <p className="font-semibold">{req.friend?.name}</p>
                       </div>
@@ -217,7 +217,7 @@ export function FriendsSection({ isAuthenticated }: { isAuthenticated: boolean }
                   return (
                     <div key={u.id} className="flex items-center justify-between p-4 bg-card/60 border border-border/40 rounded-xl">
                       <div className="flex items-center gap-3">
-                        <UserAvatar name={u.name} avatarUrl={null} size="sm" />
+                        <UserAvatar name={u.name} avatarUrl={u.avatarUrl ?? null} size="sm" />
                         <div>
                           <p className="font-semibold">{u.name}</p>
                           <p className="text-xs text-muted-foreground">{u.rankName} • {u.rankPoints} RP</p>

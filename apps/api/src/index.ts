@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes";
 import gameResultRoutes from "./routes/game-result.routes";
 import statsRoutes from "./routes/stats.routes";
 import friendRoutes from "./routes/friend.routes";
+import avatarRoutes from "./routes/avatar.routes";
 import { errorHandler } from "./middleware/error.middleware";
 import { SocketManager } from "./sockets";
 
@@ -29,6 +30,7 @@ app.use("/auth", authRoutes);
 app.use("/game-results", gameResultRoutes);
 app.use("/stats", statsRoutes);
 app.use("/friends", friendRoutes);
+app.use("/users", avatarRoutes);
 
 // Error handling
 app.use(errorHandler);

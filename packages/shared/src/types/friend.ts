@@ -16,6 +16,7 @@ export interface FriendUserDTO {
   name: string;
   rankName: string;
   rankPoints: number;
+  avatarUrl?: string | null;
 }
 
 export interface FriendshipDTO {

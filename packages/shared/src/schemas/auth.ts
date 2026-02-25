@@ -43,6 +43,7 @@ export interface User {
     createdAt: Date;
     rankPoints: number;
     rankName: string;
+    avatarUrl?: string | null;
 }
 
 export interface AuthResponse {

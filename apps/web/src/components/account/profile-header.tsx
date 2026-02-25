@@ -1,7 +1,10 @@
 "use client";
 
 import { User, getRankForPoints, getRankProgress, getNextRankTier, RankName } from "@mindarena/shared";
-import { Calendar, Mail, TrendingUp } from "lucide-react";
+import { Calendar, Mail, TrendingUp, Edit3 } from "lucide-react";
+import { UserAvatar } from "../../components/ui/user-avatar";
+import { AvatarUploadDialog } from "./avatar-upload-dialog";
+import { useState } from "react";
 
 interface ProfileHeaderProps {
     user: User;
@@ -50,21 +53,25 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
     const progress = getRankProgress(user.rankPoints);
     const nextRank = getNextRankTier(rank.name as RankName);
     const colors = getRankColors(rank.name);
+    
+    const [isUploadOpen, setIsUploadOpen] = useState(false);
 
     return (
         <div className="relative p-6 md:p-8 rounded-3xl border border-border/40 bg-card/60 overflow-hidden">
             {/* Background Accent */}
             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 h-64 w-64 bg-violet-600/10 rounded-full pointer-events-none" />
             
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 relative">
-                {/* Avatar */}
-                <div className="relative">
-                    <div className="h-24 w-24 md:h-32 md:w-32 rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-600 p-1 shadow-2xl shadow-violet-500/20">
-                        <div className="h-full w-full rounded-[20px] bg-card flex items-center justify-center overflow-hidden">
-                             <span className="text-4xl md:text-5xl font-black bg-gradient-to-br from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-                                {user.name.charAt(0).toUpperCase()}
-                             </span>
-                        </div>
+            <div className="flex flex-col md:flex-row items-center md:items-center gap-6 relative">
+                {/* Avatar with Overlay Trigger */}
+                <div 
+                    className="relative group cursor-pointer inline-block rounded-full flex-shrink-0"
+                    onClick={() => setIsUploadOpen(true)}
+                >
+                    <UserAvatar name={user.name} avatarUrl={user.avatarUrl} size="3xl" />
+                    
+                    <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center">
+                        <Edit3 className="w-6 h-6 text-white mb-1" />
+                        <span className="text-xs font-medium text-white shadow-sm">Change</span>
                     </div>
                 </div>
 
@@ -124,11 +131,21 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
                     </div>
                 </div>
 
-                {/* Edit Button Placeholder */}
-                <button className="absolute top-0 right-0 md:relative md:top-auto md:right-auto px-4 py-2 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-sm font-semibold border border-border/40">
+                {/* Edit Button */}
+                <button 
+                    onClick={() => setIsUploadOpen(true)}
+                    className="absolute top-0 right-0 md:relative md:top-auto md:right-auto md:self-end px-4 py-2 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-sm font-semibold border border-border/40"
+                >
                     Edit Profile
                 </button>
             </div>
+            
+            {/* The Avatar Upload Dialog */}
+            <AvatarUploadDialog 
+                open={isUploadOpen} 
+                onOpenChange={setIsUploadOpen} 
+                user={user} 
+            />
         </div>
     );
 }
