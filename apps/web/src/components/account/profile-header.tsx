@@ -3,7 +3,7 @@
 import { User, getRankForPoints, getRankProgress, getNextRankTier, RankName } from "@mindarena/shared";
 import { Calendar, Mail, TrendingUp, Edit3 } from "lucide-react";
 import { UserAvatar } from "../../components/ui/user-avatar";
-import { AvatarUploadDialog } from "./avatar-upload-dialog";
+import { EditProfileDialog } from "./edit-profile-dialog";
 import { useState } from "react";
 
 interface ProfileHeaderProps {
@@ -54,7 +54,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
     const nextRank = getNextRankTier(rank.name as RankName);
     const colors = getRankColors(rank.name);
     
-    const [isUploadOpen, setIsUploadOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     return (
         <div className="relative p-6 md:p-8 rounded-3xl border border-border/40 bg-card/60 overflow-hidden">
@@ -65,7 +65,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
                 {/* Avatar with Overlay Trigger */}
                 <div 
                     className="relative group cursor-pointer inline-block rounded-full flex-shrink-0"
-                    onClick={() => setIsUploadOpen(true)}
+                    onClick={() => setIsEditDialogOpen(true)}
                 >
                     <UserAvatar name={user.name} avatarUrl={user.avatarUrl} size="3xl" />
                     
@@ -133,17 +133,17 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
 
                 {/* Edit Button */}
                 <button 
-                    onClick={() => setIsUploadOpen(true)}
+                    onClick={() => setIsEditDialogOpen(true)}
                     className="absolute top-0 right-0 md:relative md:top-auto md:right-auto md:self-end px-4 py-2 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-sm font-semibold border border-border/40"
                 >
                     Edit Profile
                 </button>
             </div>
             
-            {/* The Avatar Upload Dialog */}
-            <AvatarUploadDialog 
-                open={isUploadOpen} 
-                onOpenChange={setIsUploadOpen} 
+            {/* Edit Profile Dialog */}
+            <EditProfileDialog 
+                open={isEditDialogOpen} 
+                onOpenChange={setIsEditDialogOpen} 
                 user={user} 
             />
         </div>

@@ -46,6 +46,21 @@ export interface User {
     avatarUrl?: string | null;
 }
 
+// ============================================
+// UPDATE PROFILE SCHEMA
+// ============================================
+
+export const updateProfileSchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(2, "Name must be at least 2 characters")
+        .max(30, "Name must be at most 30 characters")
+        .optional(),
+});
+
+export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
+
 export interface AuthResponse {
     user: User;
     accessToken: string;
