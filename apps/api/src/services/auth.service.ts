@@ -50,13 +50,14 @@ const createRefreshToken = async (userId: string): Promise<string> => {
     return token.token;
 };
 
-const formatUser = (user: { id: string; name: string; email: string; createdAt: Date; rankPoints: number; rankName: string }): User => ({
+const formatUser = (user: { id: string; name: string; email: string; createdAt: Date; rankPoints: number; rankName: string; avatarUrl?: string | null }): User => ({
     id: user.id,
     name: user.name,
     email: user.email,
     createdAt: user.createdAt,
     rankPoints: user.rankPoints,
     rankName: user.rankName,
+    avatarUrl: user.avatarUrl,
 });
 
 export const authService = {
