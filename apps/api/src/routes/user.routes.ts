@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { updateUserProfile } from "../controllers/user.controller";
+import {
+  getPublicUserProfileByName,
+  updateUserProfile,
+} from "../controllers/user.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { rateLimitMiddleware } from "../middleware/rate-limit.middleware";
 
@@ -11,5 +14,7 @@ const profileRateLimit = rateLimitMiddleware(10, 60_000);
 // PATCH /users/profile - Update user profile data
 router.patch("/profile", profileRateLimit, authMiddleware, updateUserProfile);
 
-export default router;
+// GET /users/profile/:name - Get public profile by name
+router.get("/profile/:name", authMiddleware, getPublicUserProfileByName);
 
+export default router;
