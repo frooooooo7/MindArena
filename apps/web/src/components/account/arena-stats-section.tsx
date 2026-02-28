@@ -10,17 +10,36 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface ArenaStatsSectionProps {
   isAuthenticated: boolean;
+  profileName?: string;
 }
 
-export function ArenaStatsSection({ isAuthenticated }: ArenaStatsSectionProps) {
-  const { data: stats, isLoading: statsLoading, error: statsError } = useAuthenticatedQuery<GameStats>(
-    () => gameResultApi.getStats("arena"),
-    isAuthenticated
+export function ArenaStatsSection({
+  isAuthenticated,
+  profileName,
+}: ArenaStatsSectionProps) {
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    error: statsError,
+  } = useAuthenticatedQuery<GameStats>(
+    () => gameResultApi.getStats("arena", profileName),
+    isAuthenticated,
+    [profileName],
   );
 
-  const { data: historyData, isLoading: historyLoading, error: historyError } = useAuthenticatedQuery(
-    () => gameResultApi.getHistory({ mode: "arena", limit: 10 }),
-    isAuthenticated
+  const {
+    data: historyData,
+    isLoading: historyLoading,
+    error: historyError,
+  } = useAuthenticatedQuery(
+    () =>
+      gameResultApi.getHistory({
+        mode: "arena",
+        limit: 10,
+        userName: profileName,
+      }),
+    isAuthenticated,
+    [profileName],
   );
 
   const history: GameResult[] = historyData?.results ?? [];
@@ -40,8 +59,10 @@ export function ArenaStatsSection({ isAuthenticated }: ArenaStatsSectionProps) {
   if (error) {
     return (
       <div className="p-8 text-center rounded-2xl border border-red-500/20 bg-red-500/5">
-        <p className="text-sm text-red-500 font-medium mb-3">Failed to load arena statistics</p>
-        <button 
+        <p className="text-sm text-red-500 font-medium mb-3">
+          Failed to load arena statistics
+        </p>
+        <button
           onClick={() => window.location.reload()}
           className="text-xs font-semibold px-4 py-2 bg-secondary/50 hover:bg-secondary rounded-lg transition-colors"
         >
@@ -65,15 +86,16 @@ export function ArenaStatsSection({ isAuthenticated }: ArenaStatsSectionProps) {
   }
 
   if (history.length === 0 && !stats?.totalGames) {
-      return (
-        <div className="p-12 text-center rounded-2xl border border-dashed border-border/60 bg-secondary/5">
-            <Swords className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-            <h3 className="text-xl font-semibold mb-2">No Arena Matches Yet</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-                You haven't played any arena matches yet. Jump into the Arena to compete with others!
-            </p>
-        </div>
-      );
+    return (
+      <div className="p-12 text-center rounded-2xl border border-dashed border-border/60 bg-secondary/5">
+        <Swords className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+        <h3 className="text-xl font-semibold mb-2">No Arena Matches Yet</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          You haven&apos;t played any arena matches yet. Jump into the Arena to
+          compete with others!
+        </p>
+      </div>
+    );
   }
 
   return (

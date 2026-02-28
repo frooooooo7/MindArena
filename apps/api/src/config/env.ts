@@ -17,4 +17,8 @@ export const env = {
     // Cookie config
     COOKIE_SECURE: isProduction,
     COOKIE_SAME_SITE: "lax" as const,
+    
+    // Supabase config
+    SUPABASE_URL: process.env.SUPABASE_URL || "",
+    SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || "",
 } as const;

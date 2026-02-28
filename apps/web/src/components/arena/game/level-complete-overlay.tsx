@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { memo } from "react";
 import { Loader2, Check } from "lucide-react";
 
@@ -37,7 +38,16 @@ export const LevelCompleteOverlay = memo(function LevelCompleteOverlay({
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span>Waiting for {opponentName} to finish...</span>
+          <span>
+            Waiting for{" "}
+            <Link
+              href={`/account/${encodeURIComponent(opponentName)}`}
+              className="font-medium text-foreground hover:text-violet-400 transition-colors"
+            >
+              {opponentName}
+            </Link>{" "}
+            to finish...
+          </span>
         </div>
         <div className="w-full bg-card/50 rounded-lg p-3 text-center">
           <span className="text-xs text-muted-foreground">

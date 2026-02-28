@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
 import { authService } from "@/services/auth.service";
 import { useTheme } from "next-themes";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,8 +72,8 @@ export function Navbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="flex items-center gap-3 bg-secondary/30 pl-1 pr-4 py-1 rounded-full border border-border/40 hover:bg-secondary/50 transition-colors cursor-pointer group/user">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-xs font-bold text-white shadow-md group-hover/user:scale-105 transition-transform">
-                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    <div className="group-hover/user:scale-105 transition-transform">
+                      <UserAvatar name={user?.name || "User"} avatarUrl={user?.avatarUrl} size="sm" />
                     </div>
                     <span className="hidden sm:inline text-sm font-semibold tracking-tight text-foreground">
                       {user?.name}

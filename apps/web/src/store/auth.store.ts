@@ -10,6 +10,7 @@ interface AuthState {
     setAuth: (user: User, accessToken: string) => void;
     clearAuth: () => void;
     updateUser: (user: User) => void;
+    updateAvatarUrl: (avatarUrl: string | null) => void;
     updateRank: (points: number, rankName: RankName) => void;
     setHydrated: () => void;
 }
@@ -24,6 +25,9 @@ export const useAuthStore = create<AuthState>()(
             setAuth: (user, accessToken) => set({ user, accessToken, isAuthenticated: true }),
             clearAuth: () => set({ user: null, accessToken: null, isAuthenticated: false }),
             updateUser: (user) => set({ user }),
+            updateAvatarUrl: (avatarUrl) => set((state) => ({
+                user: state.user ? { ...state.user, avatarUrl } : null,
+            })),
             updateRank: (points, rankName) => set((state) => ({
                 user: state.user ? { ...state.user, rankPoints: points, rankName } : null,
             })),

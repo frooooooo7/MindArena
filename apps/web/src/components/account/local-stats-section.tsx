@@ -9,17 +9,36 @@ import { useAuthenticatedQuery } from "@/hooks/use-authenticated-query";
 
 interface LocalStatsSectionProps {
   isAuthenticated: boolean;
+  profileName?: string;
 }
 
-export function LocalStatsSection({ isAuthenticated }: LocalStatsSectionProps) {
-  const { data: stats, isLoading: statsLoading, error: statsError } = useAuthenticatedQuery<GameStats>(
-    () => gameResultApi.getStats("local"),
-    isAuthenticated
+export function LocalStatsSection({
+  isAuthenticated,
+  profileName,
+}: LocalStatsSectionProps) {
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    error: statsError,
+  } = useAuthenticatedQuery<GameStats>(
+    () => gameResultApi.getStats("local", profileName),
+    isAuthenticated,
+    [profileName],
   );
 
-  const { data: historyData, isLoading: historyLoading, error: historyError } = useAuthenticatedQuery(
-    () => gameResultApi.getHistory({ mode: "local", limit: 10 }),
-    isAuthenticated
+  const {
+    data: historyData,
+    isLoading: historyLoading,
+    error: historyError,
+  } = useAuthenticatedQuery(
+    () =>
+      gameResultApi.getHistory({
+        mode: "local",
+        limit: 10,
+        userName: profileName,
+      }),
+    isAuthenticated,
+    [profileName],
   );
 
   const history: GameResult[] = historyData?.results ?? [];
@@ -39,8 +58,10 @@ export function LocalStatsSection({ isAuthenticated }: LocalStatsSectionProps) {
   if (error) {
     return (
       <div className="p-8 text-center rounded-2xl border border-red-500/20 bg-red-500/5">
-        <p className="text-sm text-red-500 font-medium mb-3">Failed to load statistics</p>
-        <button 
+        <p className="text-sm text-red-500 font-medium mb-3">
+          Failed to load statistics
+        </p>
+        <button
           onClick={() => window.location.reload()}
           className="text-xs font-semibold px-4 py-2 bg-secondary/50 hover:bg-secondary rounded-lg transition-colors"
         >
@@ -55,7 +76,10 @@ export function LocalStatsSection({ isAuthenticated }: LocalStatsSectionProps) {
       <div className="space-y-6 animate-pulse">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[...Array(2)].map((_, i) => (
-            <div key={i} className="p-6 rounded-2xl border border-border/40 bg-card/60 h-36" />
+            <div
+              key={i}
+              className="p-6 rounded-2xl border border-border/40 bg-card/60 h-36"
+            />
           ))}
         </div>
       </div>
