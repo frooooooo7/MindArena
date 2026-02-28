@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { socket, connectSocket, disconnectSocket } from "@/lib/socket";
 import type { FriendshipDTO } from "@mindarena/shared";
@@ -63,7 +64,9 @@ export function FriendRequestListener() {
 
     // Auto-dismiss if the sender cancels their request while popup is showing
     const handleFriendRemoved = (payload: { friendshipId: string }) => {
-      setRequestsQueue((prev) => prev.filter((req) => req.id !== payload.friendshipId));
+      setRequestsQueue((prev) =>
+        prev.filter((req) => req.id !== payload.friendshipId),
+      );
     };
 
     socket.on("FRIEND_REQUEST_RECEIVED", handleRequestReceived);
@@ -98,13 +101,14 @@ export function FriendRequestListener() {
     try {
       await api.put(`/friends/requests/${currentRequest.id}/accept`);
       notifyFriendListUpdate();
-      toast.success(`Accepted friend request from ${currentRequest.friend?.name}`);
+      toast.success(
+        `Accepted friend request from ${currentRequest.friend?.name}`,
+      );
       closePopup();
     } catch (err: unknown) {
       console.error("Failed to accept friend request", err);
-      const message = err instanceof AxiosError
-        ? err.response?.data?.message
-        : undefined;
+      const message =
+        err instanceof AxiosError ? err.response?.data?.message : undefined;
       toast.error("Failed to accept request", {
         description: message || "An unexpected error occurred.",
       });
@@ -122,9 +126,8 @@ export function FriendRequestListener() {
       closePopup();
     } catch (err: unknown) {
       console.error("Failed to reject friend request", err);
-      const message = err instanceof AxiosError
-        ? err.response?.data?.message
-        : undefined;
+      const message =
+        err instanceof AxiosError ? err.response?.data?.message : undefined;
       toast.error("Failed to decline request", {
         description: message || "An unexpected error occurred.",
       });
@@ -159,7 +162,10 @@ export function FriendRequestListener() {
         <div className="p-4 flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <div className="relative shrink-0">
-              <UserAvatar name={currentRequest.friend.name} avatarUrl={currentRequest.friend?.avatarUrl ?? null} />
+              <UserAvatar
+                name={currentRequest.friend.name}
+                avatarUrl={currentRequest.friend?.avatarUrl ?? null}
+              />
               <div className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center ring-2 ring-background">
                 <UserPlus size={10} className="text-white" />
               </div>
@@ -167,7 +173,12 @@ export function FriendRequestListener() {
             <div className="min-w-0">
               <p className="text-sm font-semibold truncate">Friend Request</p>
               <p className="text-xs text-muted-foreground truncate">
-                <span className="font-medium text-violet-400">{currentRequest.friend.name}</span>{" "}
+                <Link
+                  href={`/account/${encodeURIComponent(currentRequest.friend.name)}`}
+                  className="font-medium text-violet-400 hover:text-violet-300 transition-colors"
+                >
+                  {currentRequest.friend.name}
+                </Link>{" "}
                 wants to connect
               </p>
             </div>
@@ -189,7 +200,11 @@ export function FriendRequestListener() {
               className="flex-1 text-xs h-8 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-md shadow-violet-500/20 transition-all"
               onClick={handleAccept}
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Accept"}
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Accept"
+              )}
             </Button>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { useArena } from "@/hooks/use-arena";
 import { X, Swords, Shield, Target, Clock } from "lucide-react";
 import { useEffect, useState, memo, useCallback } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface MatchmakingOverlayProps {
@@ -276,9 +277,12 @@ const MatchFoundState = memo(function MatchFoundState({
             </span>
           </div>
           <div className="text-center">
-            <p className="text-sm font-bold text-indigo-400">
+            <Link
+              href={`/account/${encodeURIComponent(match.opponent.name)}`}
+              className="text-sm font-bold text-indigo-400 hover:text-violet-400 transition-colors"
+            >
               {match.opponent.name}
-            </p>
+            </Link>
             <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
               Rank #{match.opponent.rank}
             </p>
