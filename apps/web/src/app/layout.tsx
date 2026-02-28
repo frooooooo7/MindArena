@@ -14,11 +14,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "MindArena - Memory Games & Challenges",
-  description: "Compete with other players in exciting memory games. Develop your cognitive abilities and climb the rankings!",
+  description:
+    "Compete with other players in exciting memory games. Develop your cognitive abilities and climb the rankings!",
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { FriendRequestListener } from "@/components/friend-request-listener";
+import { DuelInvitationListener } from "@/components/duel-invitation-listener";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
@@ -39,6 +41,7 @@ export default function RootLayout({
         >
           {children}
           <FriendRequestListener />
+          <DuelInvitationListener />
           <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>

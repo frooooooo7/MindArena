@@ -1,5 +1,10 @@
 import { Socket, Server } from "socket.io";
-import { GAME_EVENTS, ARENA_EVENTS, RankUpdatePayload, scoring } from "@mindarena/shared";
+import {
+  GAME_EVENTS,
+  ARENA_EVENTS,
+  RankUpdatePayload,
+  scoring,
+} from "@mindarena/shared";
 import * as roomService from "../../../services/room.service";
 import { clearRoundTimer } from "./timer";
 import { gameResultService } from "../../../services/game-result.service";
@@ -25,18 +30,21 @@ async function saveArenaResults(roomId: string) {
   for (const player of room.players) {
     // Only save if player is an authenticated user (not a guest)
     if (player.id && !player.isGuest) {
-        try {
-            await gameResultService.saveResult({
-                userId: player.id,
-                gameType: room.gameType.toLowerCase(),
-                score: score,
-                level: room.level,
-                duration: duration,
-                mode: "arena"
-            });
-        } catch (error) {
-            console.error(`[GAME] Failed to save arena result for player ${player.id}:`, error);
-        }
+      try {
+        await gameResultService.saveResult({
+          userId: player.id,
+          gameType: room.gameType.toLowerCase(),
+          score: score,
+          level: room.level,
+          duration: duration,
+          mode: "arena",
+        });
+      } catch (error) {
+        console.error(
+          `[GAME] Failed to save arena result for player ${player.id}:`,
+          error,
+        );
+      }
     }
   }
 }
@@ -54,12 +62,20 @@ async function processAndEmitRanks(
   const room = roomService.getRoom(roomId);
   if (!room) return;
 
+  // Skip rank updates for casual (unrated) matches
+  if (room.rated === false) {
+    console.log(`[RANK] Skipping rank update (casual match in room ${roomId})`);
+    return;
+  }
+
   const winner = room.players.find((p) => p.id === winnerId);
   const loser = room.players.find((p) => p.id === loserId);
 
   // Only process ranks if both players are authenticated
   if (!winner || !loser || winner.isGuest || loser.isGuest) {
-    console.log(`[RANK] Skipping rank update (guest players in room ${roomId})`);
+    console.log(
+      `[RANK] Skipping rank update (guest players in room ${roomId})`,
+    );
     return;
   }
 
@@ -152,7 +168,9 @@ export async function handlePlayerDisconnect(
   io: Server,
   userId: string,
   userName?: string,
-  reason: "opponent_disconnected" | "opponent_forfeited" = "opponent_disconnected",
+  reason:
+    | "opponent_disconnected"
+    | "opponent_forfeited" = "opponent_disconnected",
 ) {
   for (const roomId of socket.rooms) {
     if (roomId === socket.id) continue; // Skip default room
@@ -187,4 +205,3 @@ export async function handlePlayerDisconnect(
     }
   }
 }
-

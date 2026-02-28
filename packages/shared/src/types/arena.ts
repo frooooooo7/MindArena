@@ -1,6 +1,70 @@
 // Arena Types
 import { RankName } from "../game/mind-rank";
 
+// ============================================
+// MATCH TYPE & DUEL TYPES
+// ============================================
+
+export type MatchType = "queue" | "duel";
+
+export interface DuelInvitation {
+  id: string;
+  inviterId: string;
+  inviterName: string;
+  inviterAvatar?: string;
+  inviterRankName: string;
+  inviterRankPoints: number;
+  targetId: string;
+  gameType: string;
+  rated: boolean;
+  createdAt: string;
+  expiresAt: string;
+}
+
+export interface SendDuelInvitePayload {
+  targetUserId: string;
+  gameType: string;
+  rated: boolean;
+}
+
+export interface DuelAcceptPayload {
+  invitationId: string;
+}
+
+export interface DuelDeclinePayload {
+  invitationId: string;
+}
+
+export const DUEL_EVENTS = {
+  SEND_INVITE: "duel:send-invite",
+  INVITE_RECEIVED: "duel:invite-received",
+  INVITE_SENT: "duel:invite-sent",
+  ACCEPT: "duel:accept",
+  DECLINE: "duel:decline",
+  CANCELLED: "duel:cancelled",
+  EXPIRED: "duel:expired",
+  ERROR: "duel:error",
+} as const;
+
+export type DuelEventName = (typeof DUEL_EVENTS)[keyof typeof DUEL_EVENTS];
+
+// ============================================
+// PRESENCE EVENTS
+// ============================================
+
+export const PRESENCE_EVENTS = {
+  FRIENDS_ONLINE: "presence:friends-online",
+  FRIEND_ONLINE: "presence:friend-online",
+  FRIEND_OFFLINE: "presence:friend-offline",
+} as const;
+
+export type PresenceEventName =
+  (typeof PRESENCE_EVENTS)[keyof typeof PRESENCE_EVENTS];
+
+// ============================================
+// ARENA TYPES
+// ============================================
+
 export interface ArenaOpponent {
   id?: string;
   name: string;
@@ -60,7 +124,6 @@ export interface LiveGameInfo {
   updatedAt: string;
 }
 
-
 // ============================================
 // GAME TYPES FOR 1v1 MULTIPLAYER
 // ============================================
@@ -85,6 +148,8 @@ export interface GameRoom {
   gridSize: number;
   level: number;
   winnerId: string | null;
+  rated: boolean;
+  matchType: MatchType;
   createdAt: Date;
   updatedAt: Date;
 }
