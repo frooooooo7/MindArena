@@ -29,19 +29,36 @@ export function MatchmakingOverlay({
   // Search timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
+    let resetTimer: ReturnType<typeof setTimeout> | null = null;
+
     if (isSearching && !match) {
       interval = setInterval(() => setSeconds((s) => s + 1), 1000);
     } else if (!isSearching) {
-      setSeconds(0);
+      resetTimer = setTimeout(() => setSeconds(0), 0);
     }
-    return () => clearInterval(interval);
+
+    return () => {
+      clearInterval(interval);
+      if (resetTimer) {
+        clearTimeout(resetTimer);
+      }
+    };
   }, [isSearching, match]);
 
   // Match confirmation countdown
   useEffect(() => {
+    let resetTimer: ReturnType<typeof setTimeout> | null = null;
+
     if (!match || matchCancelled) {
-      setConfirmCountdown(MATCH_CONFIRM_TIMEOUT);
-      return;
+      resetTimer = setTimeout(
+        () => setConfirmCountdown(MATCH_CONFIRM_TIMEOUT),
+        0,
+      );
+      return () => {
+        if (resetTimer) {
+          clearTimeout(resetTimer);
+        }
+      };
     }
 
     const interval = setInterval(() => {

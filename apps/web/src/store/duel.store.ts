@@ -10,6 +10,7 @@ interface DuelState {
   onlineFriendIds: Set<string>;
   // Friend picker modal state
   isPickerOpen: boolean;
+  preselectedFriendId: string | null;
 
   // Actions
   addInvitation: (invitation: DuelInvitation) => void;
@@ -18,7 +19,7 @@ interface DuelState {
   setOnlineFriendIds: (ids: string[]) => void;
   addOnlineFriend: (friendId: string) => void;
   removeOnlineFriend: (friendId: string) => void;
-  setPickerOpen: (open: boolean) => void;
+  setPickerOpen: (open: boolean, preselectedFriendId?: string) => void;
   reset: () => void;
 }
 
@@ -27,6 +28,7 @@ export const useDuelStore = create<DuelState>((set) => ({
   sentInvitation: null,
   onlineFriendIds: new Set(),
   isPickerOpen: false,
+  preselectedFriendId: null,
 
   addInvitation: (invitation) =>
     set((state) => {
@@ -66,7 +68,11 @@ export const useDuelStore = create<DuelState>((set) => ({
       return { onlineFriendIds: updated };
     }),
 
-  setPickerOpen: (open) => set({ isPickerOpen: open }),
+  setPickerOpen: (open, preselectedFriendId) =>
+    set({
+      isPickerOpen: open,
+      preselectedFriendId: open ? (preselectedFriendId ?? null) : null,
+    }),
 
   reset: () =>
     set({
@@ -74,5 +80,6 @@ export const useDuelStore = create<DuelState>((set) => ({
       sentInvitation: null,
       onlineFriendIds: new Set(),
       isPickerOpen: false,
+      preselectedFriendId: null,
     }),
 }));

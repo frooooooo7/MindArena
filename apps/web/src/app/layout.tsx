@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/theme-provider";
 import { FriendRequestListener } from "@/components/friend-request-listener";
 import { DuelInvitationListener } from "@/components/duel-invitation-listener";
+import { DuelFriendPicker } from "@/components/arena/duel-friend-picker";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
@@ -42,6 +43,7 @@ export default function RootLayout({
           {children}
           <FriendRequestListener />
           <DuelInvitationListener />
+          <DuelFriendPicker />
           <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>

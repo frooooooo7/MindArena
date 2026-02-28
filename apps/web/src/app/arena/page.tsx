@@ -14,7 +14,6 @@ import {
   GameTypeSelector,
   GameTypeId,
 } from "@/components/arena";
-import { DuelFriendPicker } from "@/components/arena/duel-friend-picker";
 import { useArena } from "@/hooks/use-arena";
 import { useDuel } from "@/hooks/use-duel";
 
@@ -38,7 +37,7 @@ export default function ArenaPage() {
   };
 
   // Called when user selects a game type and confirms
-  const handleGameTypeSelect = (gameType: GameTypeId, arenaMode: string) => {
+  const handleGameTypeSelect = (gameType: GameTypeId) => {
     setSelectedGameType(gameType);
     setSelectorOpen(false);
     // Join queue with game type (e.g., "sequence", "chimp", "code")
@@ -62,7 +61,7 @@ export default function ArenaPage() {
 
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Column: Modes */}
-            <div className="flex-[2] space-y-8">
+            <div className="flex-2 space-y-8">
               <SectionHeader
                 title="Available Arenas"
                 description="Select your battlefield and start competing."
@@ -94,9 +93,6 @@ export default function ArenaPage() {
         onClose={leaveQueue}
         gameType={selectedGameType}
       />
-
-      {/* Duel Friend Picker Modal */}
-      <DuelFriendPicker />
     </div>
   );
 }

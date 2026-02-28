@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback } from "react";
 import { socket } from "@/lib/socket";
 import { useDuelStore } from "@/store/duel.store";
 import { useAuthStore } from "@/store/auth.store";
@@ -12,6 +12,87 @@ import {
 } from "@mindarena/shared";
 import { toast } from "sonner";
 
+let duelListenerSubscribers = 0;
+
+const handleInviteReceived = (invitation: DuelInvitation) => {
+  useDuelStore.getState().addInvitation(invitation);
+};
+
+const handleInviteSent = (invitation: DuelInvitation) => {
+  useDuelStore.getState().setSentInvitation(invitation);
+  toast.success("Challenge sent!");
+};
+
+const handleDeclined = (data: { invitationId: string }) => {
+  const store = useDuelStore.getState();
+  store.removeInvitation(data.invitationId);
+  store.setSentInvitation(null);
+  toast.info("Your challenge was declined.");
+};
+
+const handleCancelled = (data: { invitationId: string; reason: string }) => {
+  const store = useDuelStore.getState();
+  store.removeInvitation(data.invitationId);
+  if (store.sentInvitation?.id === data.invitationId) {
+    store.setSentInvitation(null);
+  }
+  if (data.reason === "inviter_offline") {
+    toast.info("Challenge cancelled — player went offline.");
+  } else if (data.reason === "target_offline") {
+    toast.info("Challenge cancelled — opponent went offline.");
+  }
+};
+
+const handleExpired = (data: { invitationId: string }) => {
+  const store = useDuelStore.getState();
+  store.removeInvitation(data.invitationId);
+  if (store.sentInvitation?.id === data.invitationId) {
+    store.setSentInvitation(null);
+    toast.info("Your challenge expired.");
+  }
+};
+
+const handleError = (data: { message: string }) => {
+  useDuelStore.getState().setSentInvitation(null);
+  toast.error(data.message);
+};
+
+const handleFriendsOnline = (data: { friendIds: string[] }) => {
+  useDuelStore.getState().setOnlineFriendIds(data.friendIds);
+};
+
+const handleFriendOnline = (data: { friendId: string }) => {
+  useDuelStore.getState().addOnlineFriend(data.friendId);
+};
+
+const handleFriendOffline = (data: { friendId: string }) => {
+  useDuelStore.getState().removeOnlineFriend(data.friendId);
+};
+
+function registerDuelSocketListeners() {
+  socket.on(DUEL_EVENTS.INVITE_RECEIVED, handleInviteReceived);
+  socket.on(DUEL_EVENTS.INVITE_SENT, handleInviteSent);
+  socket.on(DUEL_EVENTS.DECLINE, handleDeclined);
+  socket.on(DUEL_EVENTS.CANCELLED, handleCancelled);
+  socket.on(DUEL_EVENTS.EXPIRED, handleExpired);
+  socket.on(DUEL_EVENTS.ERROR, handleError);
+  socket.on(PRESENCE_EVENTS.FRIENDS_ONLINE, handleFriendsOnline);
+  socket.on(PRESENCE_EVENTS.FRIEND_ONLINE, handleFriendOnline);
+  socket.on(PRESENCE_EVENTS.FRIEND_OFFLINE, handleFriendOffline);
+}
+
+function unregisterDuelSocketListeners() {
+  socket.off(DUEL_EVENTS.INVITE_RECEIVED, handleInviteReceived);
+  socket.off(DUEL_EVENTS.INVITE_SENT, handleInviteSent);
+  socket.off(DUEL_EVENTS.DECLINE, handleDeclined);
+  socket.off(DUEL_EVENTS.CANCELLED, handleCancelled);
+  socket.off(DUEL_EVENTS.EXPIRED, handleExpired);
+  socket.off(DUEL_EVENTS.ERROR, handleError);
+  socket.off(PRESENCE_EVENTS.FRIENDS_ONLINE, handleFriendsOnline);
+  socket.off(PRESENCE_EVENTS.FRIEND_ONLINE, handleFriendOnline);
+  socket.off(PRESENCE_EVENTS.FRIEND_OFFLINE, handleFriendOffline);
+}
+
 export function useDuel() {
   const { isAuthenticated } = useAuthStore();
   const {
@@ -19,110 +100,26 @@ export function useDuel() {
     sentInvitation,
     onlineFriendIds,
     isPickerOpen,
-    addInvitation,
+    preselectedFriendId,
     removeInvitation,
-    setSentInvitation,
-    setOnlineFriendIds,
-    addOnlineFriend,
-    removeOnlineFriend,
     setPickerOpen,
   } = useDuelStore();
-
-  // Use a ref to access sentInvitation inside event handlers without
-  // re-registering all socket listeners whenever it changes.
-  const sentInvitationRef = useRef(sentInvitation);
-  sentInvitationRef.current = sentInvitation;
 
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // Duel events
-    const handleInviteReceived = (invitation: DuelInvitation) => {
-      addInvitation(invitation);
-    };
-
-    const handleInviteSent = (invitation: DuelInvitation) => {
-      setSentInvitation(invitation);
-      toast.success(`Challenge sent to ${invitation.targetId}!`);
-    };
-
-    const handleDeclined = (data: { invitationId: string }) => {
-      removeInvitation(data.invitationId);
-      setSentInvitation(null);
-      toast.info("Your challenge was declined.");
-    };
-
-    const handleCancelled = (data: {
-      invitationId: string;
-      reason: string;
-    }) => {
-      removeInvitation(data.invitationId);
-      if (sentInvitationRef.current?.id === data.invitationId) {
-        setSentInvitation(null);
-      }
-      if (data.reason === "inviter_offline") {
-        toast.info("Challenge cancelled — player went offline.");
-      } else if (data.reason === "target_offline") {
-        toast.info("Challenge cancelled — opponent went offline.");
-      }
-    };
-
-    const handleExpired = (data: { invitationId: string }) => {
-      removeInvitation(data.invitationId);
-      if (sentInvitationRef.current?.id === data.invitationId) {
-        setSentInvitation(null);
-        toast.info("Your challenge expired.");
-      }
-    };
-
-    const handleError = (data: { message: string }) => {
-      toast.error(data.message);
-    };
-
-    // Presence events
-    const handleFriendsOnline = (data: { friendIds: string[] }) => {
-      setOnlineFriendIds(data.friendIds);
-    };
-
-    const handleFriendOnline = (data: { friendId: string }) => {
-      addOnlineFriend(data.friendId);
-    };
-
-    const handleFriendOffline = (data: { friendId: string }) => {
-      removeOnlineFriend(data.friendId);
-    };
-
-    // Register listeners
-    socket.on(DUEL_EVENTS.INVITE_RECEIVED, handleInviteReceived);
-    socket.on(DUEL_EVENTS.INVITE_SENT, handleInviteSent);
-    socket.on(DUEL_EVENTS.DECLINE, handleDeclined);
-    socket.on(DUEL_EVENTS.CANCELLED, handleCancelled);
-    socket.on(DUEL_EVENTS.EXPIRED, handleExpired);
-    socket.on(DUEL_EVENTS.ERROR, handleError);
-    socket.on(PRESENCE_EVENTS.FRIENDS_ONLINE, handleFriendsOnline);
-    socket.on(PRESENCE_EVENTS.FRIEND_ONLINE, handleFriendOnline);
-    socket.on(PRESENCE_EVENTS.FRIEND_OFFLINE, handleFriendOffline);
+    duelListenerSubscribers += 1;
+    if (duelListenerSubscribers === 1) {
+      registerDuelSocketListeners();
+    }
 
     return () => {
-      socket.off(DUEL_EVENTS.INVITE_RECEIVED, handleInviteReceived);
-      socket.off(DUEL_EVENTS.INVITE_SENT, handleInviteSent);
-      socket.off(DUEL_EVENTS.DECLINE, handleDeclined);
-      socket.off(DUEL_EVENTS.CANCELLED, handleCancelled);
-      socket.off(DUEL_EVENTS.EXPIRED, handleExpired);
-      socket.off(DUEL_EVENTS.ERROR, handleError);
-      socket.off(PRESENCE_EVENTS.FRIENDS_ONLINE, handleFriendsOnline);
-      socket.off(PRESENCE_EVENTS.FRIEND_ONLINE, handleFriendOnline);
-      socket.off(PRESENCE_EVENTS.FRIEND_OFFLINE, handleFriendOffline);
+      duelListenerSubscribers = Math.max(duelListenerSubscribers - 1, 0);
+      if (duelListenerSubscribers === 0) {
+        unregisterDuelSocketListeners();
+      }
     };
-  }, [
-    isAuthenticated,
-    addInvitation,
-    removeInvitation,
-    setSentInvitation,
-    setOnlineFriendIds,
-    addOnlineFriend,
-    removeOnlineFriend,
-  ]);
+  }, [isAuthenticated]);
 
   const sendInvite = useCallback((payload: SendDuelInvitePayload) => {
     if (!socket.connected) {
@@ -166,6 +163,7 @@ export function useDuel() {
     sentInvitation,
     onlineFriendIds,
     isPickerOpen,
+    preselectedFriendId,
     sendInvite,
     acceptInvite,
     declineInvite,

@@ -34,7 +34,7 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
   const [gameMode, setGameMode] = useState<GameMode>("local");
   const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false);
   const { friends, pendingRequests, sendRequest } = useFriends();
-  const { isFriendOnline, setPickerOpen, sendInvite } = useDuel();
+  const { isFriendOnline, setPickerOpen } = useDuel();
 
   const ownerTabs = ["overview", "stats", "social", "achievements", "security"];
   const publicTabs = ["overview", "stats", "achievements"];
@@ -77,7 +77,7 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
 
   const handleChallenge = () => {
     // Open the duel picker modal (from arena) so user can select game type
-    setPickerOpen(true);
+    setPickerOpen(true, user.id);
   };
 
   const profileIsOnline = isFriendOnline(user.id);

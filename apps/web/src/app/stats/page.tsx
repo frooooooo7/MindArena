@@ -17,15 +17,23 @@ export default function StatsPage() {
           {/* Header Section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight">Arena Statistics</h1>
+              <h1 className="text-4xl font-bold tracking-tight">
+                Arena Statistics
+              </h1>
               <p className="text-muted-foreground mt-2 text-lg">
                 Performance metrics, global rankings, and cognitive analysis.
               </p>
             </div>
             <div className="flex items-center gap-2 bg-secondary/20 p-1 rounded-xl border border-border/40 w-fit">
-              <button className="px-4 py-1.5 rounded-lg bg-background text-xs font-bold shadow-sm">Global</button>
-              <button className="px-4 py-1.5 rounded-lg text-xs font-bold text-muted-foreground hover:bg-secondary/40">Friends</button>
-              <button className="px-4 py-1.5 rounded-lg text-xs font-bold text-muted-foreground hover:bg-secondary/40">Local</button>
+              <button className="px-4 py-1.5 rounded-lg bg-background text-xs font-bold shadow-sm">
+                Global
+              </button>
+              <button className="px-4 py-1.5 rounded-lg text-xs font-bold text-muted-foreground hover:bg-secondary/40">
+                Friends
+              </button>
+              <button className="px-4 py-1.5 rounded-lg text-xs font-bold text-muted-foreground hover:bg-secondary/40">
+                Local
+              </button>
             </div>
           </div>
 
@@ -40,7 +48,10 @@ export default function StatsPage() {
                 </div>
                 <div>
                   <h4 className="text-lg font-bold">Season Rewards</h4>
-                  <p className="text-sm text-muted-foreground">Current season ends in 4 days. Top 100 players unlock the "Stellar" badge.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Current season ends in 4 days. Top 100 players unlock the
+                    &quot;Stellar&quot; badge.
+                  </p>
                 </div>
               </div>
               <div className="p-8 rounded-3xl border border-border/40 bg-card/60 flex items-center gap-6">
@@ -49,7 +60,10 @@ export default function StatsPage() {
                 </div>
                 <div>
                   <h4 className="text-lg font-bold">Elite Club</h4>
-                  <p className="text-sm text-muted-foreground">You are in the top 10% of players globally. Keep it up to reach Diamond tier.</p>
+                  <p className="text-sm text-muted-foreground">
+                    You are in the top 10% of players globally. Keep it up to
+                    reach Diamond tier.
+                  </p>
                 </div>
               </div>
             </div>

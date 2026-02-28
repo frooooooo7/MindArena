@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useFriends } from "@/hooks/use-friends";
 import { useDuel } from "@/hooks/use-duel";
 import {
@@ -41,6 +41,7 @@ export function DuelFriendPicker({
     sendInvite,
     sentInvitation,
     isFriendOnline,
+    preselectedFriendId: storePreselectedFriendId,
   } = useDuel();
   const { friends, loadFriends, loading: friendsLoading } = useFriends();
 
@@ -48,8 +49,13 @@ export function DuelFriendPicker({
     DUEL_GAME_TYPES[0]?.id || "sequence",
   );
   const [rated, setRated] = useState(true);
-  const [sendingTo, setSendingTo] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<number | null>(null);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const effectivePreselectedFriendId =
+    preselectedFriendId ?? storePreselectedFriendId;
+
+  const tick = useCallback(() => {
+    setCurrentTime(Date.now());
+  }, []);
 
   // Load friends list when picker opens
   useEffect(() => {
@@ -58,42 +64,25 @@ export function DuelFriendPicker({
     }
   }, [isPickerOpen, loadFriends]);
 
-  // Reset local state when picker closes
+  // Keep a local clock ticking while invitation is pending
   useEffect(() => {
-    if (!isPickerOpen) {
-      setSendingTo(null);
-      setCountdown(null);
-    }
-  }, [isPickerOpen]);
+    if (!sentInvitation?.expiresAt) return;
 
-  // Countdown timer while waiting for response
-  useEffect(() => {
-    if (!sentInvitation?.expiresAt) {
-      setCountdown(null);
-      return;
-    }
-
-    const tick = () => {
-      const remaining = Math.max(
-        0,
-        Math.ceil(
-          (new Date(sentInvitation.expiresAt).getTime() - Date.now()) / 1000,
-        ),
-      );
-      setCountdown(remaining);
-      if (remaining <= 0) {
-        setSendingTo(null);
-      }
-    };
-
-    tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [sentInvitation]);
+  }, [sentInvitation?.expiresAt, tick]);
+
+  const remainingSeconds = sentInvitation?.expiresAt
+    ? Math.max(
+        0,
+        Math.ceil(
+          (new Date(sentInvitation.expiresAt).getTime() - currentTime) / 1000,
+        ),
+      )
+    : null;
 
   const handleSendInvite = useCallback(
     (targetUserId: string) => {
-      setSendingTo(targetUserId);
       sendInvite({
         targetUserId,
         gameType: selectedGameType,
@@ -104,16 +93,14 @@ export function DuelFriendPicker({
   );
 
   const handleCancel = useCallback(() => {
-    setSendingTo(null);
     setPickerOpen(false);
   }, [setPickerOpen]);
 
   // Resolve the name of the friend we're waiting on
-  const waitingFriendName = useMemo(() => {
-    if (!sendingTo) return null;
-    const f = friends.find((fr) => fr.friend?.id === sendingTo);
-    return f?.friend?.name ?? "opponent";
-  }, [sendingTo, friends]);
+  const waitingFriendName = sentInvitation?.targetId
+    ? (friends.find((fr) => fr.friend?.id === sentInvitation.targetId)?.friend
+        ?.name ?? "opponent")
+    : null;
 
   // Filter: only accepted friends
   const acceptedFriends = friends.filter((f) => f.status === "ACCEPTED");
@@ -121,9 +108,9 @@ export function DuelFriendPicker({
   // Sort: online first, preselected friend at top
   const sortedFriends = [...acceptedFriends].sort((a, b) => {
     // Preselected friend always first
-    if (preselectedFriendId) {
-      if (a.friend?.id === preselectedFriendId) return -1;
-      if (b.friend?.id === preselectedFriendId) return 1;
+    if (effectivePreselectedFriendId) {
+      if (a.friend?.id === effectivePreselectedFriendId) return -1;
+      if (b.friend?.id === effectivePreselectedFriendId) return 1;
     }
     const aOnline = isFriendOnline(a.friend?.id || "") ? 1 : 0;
     const bOnline = isFriendOnline(b.friend?.id || "") ? 1 : 0;
@@ -131,7 +118,7 @@ export function DuelFriendPicker({
   });
 
   // Whether we are in "waiting for response" state
-  const isWaiting = !!sendingTo && !!sentInvitation;
+  const isWaiting = !!sentInvitation;
 
   return (
     <Dialog open={isPickerOpen} onOpenChange={setPickerOpen}>
@@ -157,12 +144,12 @@ export function DuelFriendPicker({
               <span className="text-cyan-400">{waitingFriendName}</span> to
               accept...
             </p>
-            {countdown !== null && (
+            {remainingSeconds !== null && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
                 <span>
-                  Expires in {Math.floor(countdown / 60)}:
-                  {String(countdown % 60).padStart(2, "0")}
+                  Expires in {Math.floor(remainingSeconds / 60)}:
+                  {String(remainingSeconds % 60).padStart(2, "0")}
                 </span>
               </div>
             )}
@@ -251,8 +238,9 @@ export function DuelFriendPicker({
                     const friend = friendship.friend;
                     if (!friend) return null;
                     const isOnline = isFriendOnline(friend.id);
-                    const isSending = sendingTo === friend.id;
-                    const isPreselected = friend.id === preselectedFriendId;
+                    const isSending = false;
+                    const isPreselected =
+                      friend.id === effectivePreselectedFriendId;
 
                     return (
                       <div
@@ -292,7 +280,7 @@ export function DuelFriendPicker({
                         {/* Challenge Button */}
                         <Button
                           size="sm"
-                          disabled={!isOnline || !!sendingTo}
+                          disabled={!isOnline || isWaiting}
                           onClick={() => handleSendInvite(friend.id)}
                           className="h-8 px-3 text-xs rounded-lg bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white disabled:opacity-40"
                         >

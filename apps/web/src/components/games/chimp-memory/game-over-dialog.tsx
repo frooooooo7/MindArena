@@ -33,7 +33,7 @@ export function GameOverDialog({
       router.push("/games");
     }
   };
-  
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -42,7 +42,7 @@ export function GameOverDialog({
             Game Over!
           </DialogTitle>
           <DialogDescription className="text-center">
-            Great memory! Here's your summary.
+            Great memory! Here&apos;s your summary.
           </DialogDescription>
         </DialogHeader>
 
@@ -53,13 +53,13 @@ export function GameOverDialog({
             <span className="text-2xl font-bold">{level}</span>
             <span className="text-xs text-muted-foreground">Level</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <Hash className="h-6 w-6 text-emerald-500" />
             <span className="text-2xl font-bold">{numbersCount}</span>
             <span className="text-xs text-muted-foreground">Numbers</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-violet-500/10 border border-violet-500/20">
             <Trophy className="h-6 w-6 text-violet-500" />
             <span className="text-2xl font-bold">{score}</span>
