@@ -80,16 +80,38 @@ function createGameRoom(
     case "chimp":
       chimpMemory.createGameRoom(
         roomId,
-        { id: player1.odId, name: player1.name, socketId: player1.socketId, isGuest: !!player1.isGuest },
-        { id: player2.odId, name: player2.name, socketId: player2.socketId, isGuest: !!player2.isGuest },
+        {
+          id: player1.odId,
+          name: player1.name,
+          socketId: player1.socketId,
+          isGuest: !!player1.isGuest,
+        },
+        {
+          id: player2.odId,
+          name: player2.name,
+          socketId: player2.socketId,
+          isGuest: !!player2.isGuest,
+        },
+        { rated: true, matchType: "queue" },
       );
       break;
     case "sequence":
     default:
       sequenceMemory.createGameRoom(
         roomId,
-        { id: player1.odId, name: player1.name, socketId: player1.socketId, isGuest: !!player1.isGuest },
-        { id: player2.odId, name: player2.name, socketId: player2.socketId, isGuest: !!player2.isGuest },
+        {
+          id: player1.odId,
+          name: player1.name,
+          socketId: player1.socketId,
+          isGuest: !!player1.isGuest,
+        },
+        {
+          id: player2.odId,
+          name: player2.name,
+          socketId: player2.socketId,
+          isGuest: !!player2.isGuest,
+        },
+        { rated: true, matchType: "queue" },
       );
       break;
   }

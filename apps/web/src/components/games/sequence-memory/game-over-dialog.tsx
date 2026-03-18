@@ -43,7 +43,7 @@ export function GameOverDialog({
             Game Over!
           </DialogTitle>
           <DialogDescription className="text-center">
-            Great effort! Here's your game summary.
+            Great effort! Here&apos;s your game summary.
           </DialogDescription>
         </DialogHeader>
 
@@ -54,16 +54,18 @@ export function GameOverDialog({
             <span className="text-2xl font-bold">{level}</span>
             <span className="text-xs text-muted-foreground">Level</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <Trophy className="h-6 w-6 text-amber-500" />
             <span className="text-2xl font-bold">{score}</span>
             <span className="text-xs text-muted-foreground">Score</span>
           </div>
-          
+
           <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
             <Grid3X3 className="h-6 w-6 text-cyan-500" />
-            <span className="text-2xl font-bold">{gridSize}×{gridSize}</span>
+            <span className="text-2xl font-bold">
+              {gridSize}×{gridSize}
+            </span>
             <span className="text-xs text-muted-foreground">Max Grid</span>
           </div>
         </div>

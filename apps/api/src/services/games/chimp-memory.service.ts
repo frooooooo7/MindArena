@@ -1,5 +1,5 @@
 import * as roomService from "../room.service";
-import { GamePlayer, ChimpCell } from "@mindarena/shared";
+import { GamePlayer, ChimpCell, MatchType } from "@mindarena/shared";
 
 /**
  * Chimp Memory Game Logic
@@ -80,15 +80,23 @@ export function createGameRoom(
   roomId: string,
   player1: { id: string; name: string; socketId: string; isGuest?: boolean },
   player2: { id: string; name: string; socketId: string; isGuest?: boolean },
+  options?: { rated?: boolean; matchType?: MatchType },
 ) {
   const numbersCount = getNumbersCountForLevel(1);
   const cells = generateCells(numbersCount);
 
   // Create room with sequence/gridSize for compatibility (unused for chimp)
-  const room = roomService.createRoom(roomId, "Chimp", player1, player2, {
-    sequence: [],
-    gridSize: 0,
-  });
+  const room = roomService.createRoom(
+    roomId,
+    "Chimp",
+    player1,
+    player2,
+    {
+      sequence: [],
+      gridSize: 0,
+    },
+    options,
+  );
 
   // Store chimp-specific data
   chimpRoomData.set(roomId, {

@@ -17,7 +17,7 @@ export const useFriends = () => {
         try {
             setLoading(true);
             const { data } = await api.get("/friends");
-            setFriends(data);
+            setFriends(data ?? []);
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Failed to load friends");
         } finally {

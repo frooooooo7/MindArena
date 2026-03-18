@@ -16,6 +16,7 @@ import {
   UserCheck,
   Clock,
   Loader2,
+  Swords,
 } from "lucide-react";
 import { UserAvatar } from "../../components/ui/user-avatar";
 import { EditProfileDialog } from "./edit-profile-dialog";
@@ -29,6 +30,8 @@ interface ProfileHeaderProps {
   isFriend?: boolean;
   isFriendRequestSent?: boolean;
   hasPendingIncomingRequest?: boolean;
+  onChallenge?: () => void;
+  isFriendOnline?: boolean;
 }
 
 /** Color scheme per rank tier */
@@ -77,6 +80,8 @@ export function ProfileHeader({
   isFriend = false,
   isFriendRequestSent = false,
   hasPendingIncomingRequest = false,
+  onChallenge,
+  isFriendOnline = false,
 }: ProfileHeaderProps) {
   const rank = getRankForPoints(user.rankPoints);
   const progress = getRankProgress(user.rankPoints);
@@ -191,33 +196,48 @@ export function ProfileHeader({
         )}
 
         {!isOwner && onAddFriend && (
-          <button
-            onClick={onAddFriend}
-            disabled={
-              isAddingFriend ||
-              isFriend ||
-              isFriendRequestSent ||
-              hasPendingIncomingRequest
-            }
-            className="absolute bottom-0 right-0 md:relative md:bottom-auto md:right-auto md:self-end inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-linear-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-          >
-            {isAddingFriend ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : isFriend ? (
-              <UserCheck className="h-4 w-4" />
-            ) : hasPendingIncomingRequest ? (
-              <Clock className="h-4 w-4" />
-            ) : (
-              <UserPlus className="h-4 w-4" />
+          <div className="absolute bottom-0 right-0 md:relative md:bottom-auto md:right-auto md:self-end flex flex-col gap-2">
+            <button
+              onClick={onAddFriend}
+              disabled={
+                isAddingFriend ||
+                isFriend ||
+                isFriendRequestSent ||
+                hasPendingIncomingRequest
+              }
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-linear-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+            >
+              {isAddingFriend ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : isFriend ? (
+                <UserCheck className="h-4 w-4" />
+              ) : hasPendingIncomingRequest ? (
+                <Clock className="h-4 w-4" />
+              ) : (
+                <UserPlus className="h-4 w-4" />
+              )}
+              {isFriend
+                ? "Already friends"
+                : hasPendingIncomingRequest
+                  ? "Pending request"
+                  : isFriendRequestSent
+                    ? "Request sent"
+                    : "Add to friends"}
+            </button>
+            {isFriend && onChallenge && (
+              <button
+                onClick={onChallenge}
+                disabled={!isFriendOnline}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-linear-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                title={
+                  isFriendOnline ? "Challenge to a duel" : "Player is offline"
+                }
+              >
+                <Swords className="h-4 w-4" />
+                {isFriendOnline ? "Challenge" : "Offline"}
+              </button>
             )}
-            {isFriend
-              ? "Already friends"
-              : hasPendingIncomingRequest
-                ? "Pending request"
-                : isFriendRequestSent
-                  ? "Request sent"
-                  : "Add to friends"}
-          </button>
+          </div>
         )}
       </div>
 

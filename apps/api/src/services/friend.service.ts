@@ -1,12 +1,35 @@
 import { friendRepository } from "../repositories/friend.repository";
-import type { FriendshipDTO, FriendUserDTO, FriendStatus, SearchPlayersResponse } from "@mindarena/shared";
+import type {
+  FriendshipDTO,
+  FriendUserDTO,
+  FriendStatus,
+  SearchPlayersResponse,
+} from "@mindarena/shared";
 import { eventBus, EVENTS } from "../utils/event-bus";
 
 export class FriendService {
-  async searchUsers(query: string, userId: string, page: number, limit: number): Promise<SearchPlayersResponse> {
+  /**
+   * Check if two users are friends (accepted friendship exists)
+   */
+  async areFriends(userId1: string, userId2: string): Promise<boolean> {
+    const friendship = await friendRepository.getFriendship(userId1, userId2);
+    return !!friendship && friendship.status === "ACCEPTED";
+  }
+
+  async searchUsers(
+    query: string,
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<SearchPlayersResponse> {
     const skip = (page - 1) * limit;
-    const { users, totalCount } = await friendRepository.searchUsersByName(query, userId, skip, limit);
-    
+    const { users, totalCount } = await friendRepository.searchUsersByName(
+      query,
+      userId,
+      skip,
+      limit,
+    );
+
     return {
       users,
       page,
@@ -15,19 +38,28 @@ export class FriendService {
     };
   }
 
-  async sendRequest(requesterId: string, addresseeId: string): Promise<FriendshipDTO> {
+  async sendRequest(
+    requesterId: string,
+    addresseeId: string,
+  ): Promise<FriendshipDTO> {
     if (requesterId === addresseeId) {
       throw new Error("Cannot send friend request to yourself");
     }
 
-    const existing = await friendRepository.getFriendship(requesterId, addresseeId);
+    const existing = await friendRepository.getFriendship(
+      requesterId,
+      addresseeId,
+    );
     if (existing) {
       throw new Error("Friendship or request already exists");
     }
 
     let newFriendship;
     try {
-      newFriendship = await friendRepository.createRequest(requesterId, addresseeId);
+      newFriendship = await friendRepository.createRequest(
+        requesterId,
+        addresseeId,
+      );
     } catch (error: unknown) {
       if (
         error !== null &&
@@ -39,7 +71,7 @@ export class FriendService {
       }
       throw error;
     }
-    
+
     // Payload for the sender's UI (friend = the person they sent the request to)
     const senderPayload: FriendshipDTO = {
       id: newFriendship.id,
@@ -56,22 +88,28 @@ export class FriendService {
       friend: newFriendship.requester as FriendUserDTO,
     };
 
-    eventBus.emit(EVENTS.FRIEND_REQUEST_SENT, { 
-      targetUserId: addresseeId, 
-      request: receiverPayload 
+    eventBus.emit(EVENTS.FRIEND_REQUEST_SENT, {
+      targetUserId: addresseeId,
+      request: receiverPayload,
     });
 
     return senderPayload;
   }
 
-  async acceptRequest(userId: string, requestId: string): Promise<FriendshipDTO> {
-    const friendship = await friendRepository.findPendingRequestForUser(requestId, userId);
+  async acceptRequest(
+    userId: string,
+    requestId: string,
+  ): Promise<FriendshipDTO> {
+    const friendship = await friendRepository.findPendingRequestForUser(
+      requestId,
+      userId,
+    );
     if (!friendship) {
       throw new Error("Request not found or not authorized to accept");
     }
 
     const accepted = await friendRepository.updateStatus(requestId, "ACCEPTED");
-    
+
     const payload: FriendshipDTO = {
       id: accepted.id,
       requesterId: accepted.requesterId,
@@ -81,18 +119,23 @@ export class FriendService {
       friend: accepted.requester as FriendUserDTO,
     };
 
-    eventBus.emit(EVENTS.FRIEND_REQUEST_ACCEPTED, { 
+    eventBus.emit(EVENTS.FRIEND_REQUEST_ACCEPTED, {
       requesterId: accepted.requesterId,
-      addresseeId: accepted.addresseeId, 
-      request: payload 
+      addresseeId: accepted.addresseeId,
+      request: payload,
     });
 
     return payload;
   }
 
-  async declineOrCancelRequest(userId: string, requestId: string): Promise<void> {
-
-    const friendship = await friendRepository.findFriendshipByIdForUser(requestId, userId);
+  async declineOrCancelRequest(
+    userId: string,
+    requestId: string,
+  ): Promise<void> {
+    const friendship = await friendRepository.findFriendshipByIdForUser(
+      requestId,
+      userId,
+    );
     if (!friendship) {
       throw new Error("Request not found or not authorized");
     }
@@ -100,13 +143,14 @@ export class FriendService {
     await friendRepository.deleteFriendship(requestId);
 
     // Notify the other party so their UI updates in real-time
-    const targetUserId = friendship.requesterId === userId 
-      ? friendship.addresseeId 
-      : friendship.requesterId;
-    
-    eventBus.emit(EVENTS.FRIEND_REMOVED, { 
-      targetUserId, 
-      friendshipId: requestId 
+    const targetUserId =
+      friendship.requesterId === userId
+        ? friendship.addresseeId
+        : friendship.requesterId;
+
+    eventBus.emit(EVENTS.FRIEND_REMOVED, {
+      targetUserId,
+      friendshipId: requestId,
     });
   }
 
@@ -125,11 +169,13 @@ export class FriendService {
     });
   }
 
-  async getPendingRequests(userId: string): Promise<{ received: FriendshipDTO[], sent: FriendshipDTO[] }> {
+  async getPendingRequests(
+    userId: string,
+  ): Promise<{ received: FriendshipDTO[]; sent: FriendshipDTO[] }> {
     const pending = await friendRepository.getPendingRequests(userId);
     const sent = await friendRepository.getSentRequests(userId);
 
-    const mapReceived = (f: typeof pending[number]): FriendshipDTO => ({
+    const mapReceived = (f: (typeof pending)[number]): FriendshipDTO => ({
       id: f.id,
       requesterId: f.requesterId,
       addresseeId: f.addresseeId,
@@ -138,7 +184,7 @@ export class FriendService {
       friend: f.requester as FriendUserDTO,
     });
 
-    const mapSent = (f: typeof sent[number]): FriendshipDTO => ({
+    const mapSent = (f: (typeof sent)[number]): FriendshipDTO => ({
       id: f.id,
       requesterId: f.requesterId,
       addresseeId: f.addresseeId,

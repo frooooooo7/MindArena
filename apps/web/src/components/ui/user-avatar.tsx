@@ -31,10 +31,13 @@ const sizeMap = {
 export function UserAvatar({ name, avatarUrl, size = "md" }: UserAvatarProps) {
   const initial = name?.charAt(0).toUpperCase() ?? "?";
   const { classes, px } = sizeMap[size];
+  const isValidUrl = avatarUrl?.startsWith("http");
 
-  if (avatarUrl) {
+  if (avatarUrl && isValidUrl) {
     return (
-      <div className={`${classes} rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 p-[2px] shadow-lg shadow-violet-500/15 shrink-0`}>
+      <div
+        className={`${classes} rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 p-[2px] shadow-lg shadow-violet-500/15 shrink-0`}
+      >
         <Image
           src={avatarUrl}
           alt={name ?? "User avatar"}
@@ -47,7 +50,9 @@ export function UserAvatar({ name, avatarUrl, size = "md" }: UserAvatarProps) {
   }
 
   return (
-    <div className={`${classes} rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 p-[2px] shadow-lg shadow-violet-500/15 shrink-0`}>
+    <div
+      className={`${classes} rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 p-[2px] shadow-lg shadow-violet-500/15 shrink-0`}
+    >
       <div className="h-full w-full rounded-full bg-card flex items-center justify-center">
         <span className="font-bold bg-gradient-to-br from-violet-400 to-indigo-400 bg-clip-text text-transparent">
           {initial}

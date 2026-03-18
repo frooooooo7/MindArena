@@ -22,6 +22,7 @@ import {
 import { GameMode, type User as ProfileUser } from "@mindarena/shared";
 import { toast } from "sonner";
 import { useFriends } from "@/hooks/use-friends";
+import { useDuel } from "@/hooks/use-duel";
 
 interface AccountPageContentProps {
   user: ProfileUser;
@@ -33,6 +34,7 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
   const [gameMode, setGameMode] = useState<GameMode>("local");
   const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false);
   const { friends, pendingRequests, sendRequest } = useFriends();
+  const { isFriendOnline, setPickerOpen } = useDuel();
 
   const ownerTabs = ["overview", "stats", "social", "achievements", "security"];
   const publicTabs = ["overview", "stats", "achievements"];
@@ -73,6 +75,13 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
     }
   };
 
+  const handleChallenge = () => {
+    // Open the duel picker modal (from arena) so user can select game type
+    setPickerOpen(true, user.id);
+  };
+
+  const profileIsOnline = isFriendOnline(user.id);
+
   return (
     <div className="relative min-h-screen bg-background">
       <BackgroundGradients />
@@ -100,6 +109,8 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
               isFriend={isAlreadyFriend}
               isFriendRequestSent={isFriendRequestSent}
               hasPendingIncomingRequest={hasPendingIncomingRequest}
+              onChallenge={handleChallenge}
+              isFriendOnline={profileIsOnline}
             />
           </div>
 
