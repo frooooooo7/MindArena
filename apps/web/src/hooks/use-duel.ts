@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/auth.store";
 import {
   DuelInvitation,
   DUEL_EVENTS,
+  ARENA_EVENTS,
   PRESENCE_EVENTS,
   SendDuelInvitePayload,
 } from "@mindarena/shared";
@@ -57,6 +58,12 @@ const handleError = (data: { message: string }) => {
   toast.error(data.message);
 };
 
+const handleMatchFound = () => {
+  const store = useDuelStore.getState();
+  store.setSentInvitation(null);
+  store.setPickerOpen(false);
+};
+
 const handleFriendsOnline = (data: { friendIds: string[] }) => {
   useDuelStore.getState().setOnlineFriendIds(data.friendIds);
 };
@@ -76,6 +83,7 @@ function registerDuelSocketListeners() {
   socket.on(DUEL_EVENTS.CANCELLED, handleCancelled);
   socket.on(DUEL_EVENTS.EXPIRED, handleExpired);
   socket.on(DUEL_EVENTS.ERROR, handleError);
+  socket.on(ARENA_EVENTS.MATCH_FOUND, handleMatchFound);
   socket.on(PRESENCE_EVENTS.FRIENDS_ONLINE, handleFriendsOnline);
   socket.on(PRESENCE_EVENTS.FRIEND_ONLINE, handleFriendOnline);
   socket.on(PRESENCE_EVENTS.FRIEND_OFFLINE, handleFriendOffline);
@@ -88,6 +96,7 @@ function unregisterDuelSocketListeners() {
   socket.off(DUEL_EVENTS.CANCELLED, handleCancelled);
   socket.off(DUEL_EVENTS.EXPIRED, handleExpired);
   socket.off(DUEL_EVENTS.ERROR, handleError);
+  socket.off(ARENA_EVENTS.MATCH_FOUND, handleMatchFound);
   socket.off(PRESENCE_EVENTS.FRIENDS_ONLINE, handleFriendsOnline);
   socket.off(PRESENCE_EVENTS.FRIEND_ONLINE, handleFriendOnline);
   socket.off(PRESENCE_EVENTS.FRIEND_OFFLINE, handleFriendOffline);

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useFriends } from "@/hooks/use-friends";
 import { useDuel } from "@/hooks/use-duel";
+import { useDuelStore } from "@/store/duel.store";
 import {
   Dialog,
   DialogContent,
@@ -93,6 +94,7 @@ export function DuelFriendPicker({
   );
 
   const handleCancel = useCallback(() => {
+    useDuelStore.getState().setSentInvitation(null);
     setPickerOpen(false);
   }, [setPickerOpen]);
 
