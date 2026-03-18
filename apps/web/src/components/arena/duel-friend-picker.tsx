@@ -105,7 +105,7 @@ export function DuelFriendPicker({
     : null;
 
   // Filter: only accepted friends
-  const acceptedFriends = friends.filter((f) => f.status === "ACCEPTED");
+  const acceptedFriends = (friends ?? []).filter((f) => f.status === "ACCEPTED");
 
   // Sort: online first, preselected friend at top
   const sortedFriends = [...acceptedFriends].sort((a, b) => {
