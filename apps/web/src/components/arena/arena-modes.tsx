@@ -1,6 +1,6 @@
 "use client";
 
-import { Swords, Trophy, Users, Globe, Lock, Play } from "lucide-react";
+import { Trophy, Users, Globe, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const modes = [
@@ -14,15 +14,6 @@ const modes = [
     participants: "1,240 currently in queue"
   },
   {
-    title: "Blitz Tournament",
-    subtitle: "Speed is Everything",
-    description: "Join a 16-player bracket. Fast-paced memory challenges where only one survives.",
-    icon: Zap, // I'll use Swords as fallback or import Zap
-    color: "from-violet-500 to-indigo-600",
-    status: "Starts in 15m",
-    participants: "8/16 registered"
-  },
-  {
     title: "Private Duel",
     subtitle: "Challenge a Friend",
     description: "Create a custom room and invite your friends for a private cognitive battle.",
@@ -33,7 +24,7 @@ const modes = [
   }
 ];
 
-import { Zap } from "lucide-react";
+
 
 interface ArenaModesProps {
   onJoin: (gameType: string) => void;
@@ -41,7 +32,7 @@ interface ArenaModesProps {
 
 export function ArenaModes({ onJoin }: ArenaModesProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {modes.map((mode, i) => (
         <div key={i} className="group relative p-8 rounded-[2rem] border border-border/40 bg-card/50 overflow-hidden hover:border-violet-500/40 transition-colors duration-200 flex flex-col h-full shadow-lg">
           {/* Color splash - simplified */}
