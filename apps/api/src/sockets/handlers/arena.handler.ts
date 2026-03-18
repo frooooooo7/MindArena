@@ -5,6 +5,15 @@ import * as rateLimiter from "../../services/rate-limiter.service";
 import * as matchmaking from "../../services/matchmaking.service";
 import * as roomService from "../../services/room.service";
 
+/**
+ * Broadcast current total queue count to all connected clients
+ */
+function broadcastQueueCount(io: Server): void {
+    io.emit(ARENA_EVENTS.QUEUE_COUNT_UPDATE, {
+        total: queueService.getQueueSize(),
+    });
+}
+
 
 /**
  * Arena Handler
@@ -15,8 +24,11 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
     const odId = user?.id || socket.id;
     const userName = user?.name || `Player_${socket.id.slice(0, 4)}`;
     
-    // Send initial live games state
+    // Send initial live games state + queue count
     socket.emit(ARENA_EVENTS.LIVE_GAMES_UPDATE, roomService.getLiveGames());
+    socket.emit(ARENA_EVENTS.QUEUE_COUNT_UPDATE, {
+        total: queueService.getQueueSize(),
+    });
 
     // Handle on-demand live feed requests (e.g. when client navigates back to /arena)
     socket.on(ARENA_EVENTS.REQUEST_LIVE_GAMES, () => {
@@ -58,9 +70,13 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
         const queueSize = queueService.getQueueSize(gameType);
         emitQueueStatus(socket, queueSize, queueSize >= 2 ? "~5s" : "waiting for opponent");
 
+        // Broadcast updated queue count
+        broadcastQueueCount(io);
+
         // Try to match players
         if (matchmaking.attemptMatch(gameType, io)) {
             roomService.broadcastLiveGames(io);
+            broadcastQueueCount(io);
         }
     });
 
@@ -72,6 +88,7 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
         
         console.log(`[ARENA] ${userName} left queue`);
         handlePlayerLeaving(socket, io, odId);
+        broadcastQueueCount(io);
     });
 
     // ==========================================
@@ -80,6 +97,7 @@ export function registerArenaHandlers(socket: Socket, io: Server) {
     socket.on("disconnecting", () => {
         console.log(`[ARENA] ${userName} disconnecting from arena`);
         handlePlayerLeaving(socket, io, odId);
+        broadcastQueueCount(io);
     });
 }
 

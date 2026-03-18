@@ -92,6 +92,7 @@ export const ARENA_EVENTS = {
   LEAVE_QUEUE: "arena:leave-queue",
   MATCH_FOUND: "arena:match-found",
   QUEUE_STATUS: "arena:queue-status",
+  QUEUE_COUNT_UPDATE: "arena:queue-count-update",
   MATCH_CANCELLED: "arena:match-cancelled",
   RANK_UPDATED: "arena:rank-updated",
   LIVE_GAMES_UPDATE: "arena:live-games-update",
@@ -99,6 +100,12 @@ export const ARENA_EVENTS = {
 } as const;
 
 export type ArenaEventName = (typeof ARENA_EVENTS)[keyof typeof ARENA_EVENTS];
+
+// Queue count payload (broadcast to all clients in lobby)
+export interface QueueCountPayload {
+  /** Total number of players across all queues */
+  total: number;
+}
 
 // Rank Update Payload (sent after each match)
 export interface RankUpdatePayload {
