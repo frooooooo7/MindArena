@@ -24,7 +24,11 @@ export function LoginForm({ onSuccess, redirectTo }: LoginFormProps = {}) {
     return (
         <form onSubmit={onSubmit} className="space-y-4">
             {error && (
-                <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
+                <div
+                    role="alert"
+                    aria-live="polite"
+                    className="bg-destructive/15 text-destructive text-sm p-3 rounded-md"
+                >
                     {error}
                 </div>
             )}
@@ -104,6 +108,7 @@ export function LoginForm({ onSuccess, redirectTo }: LoginFormProps = {}) {
             <Button
                 type="submit"
                 disabled={isSubmitting}
+                aria-busy={isSubmitting}
                 className="w-full h-11 text-base font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all"
             >
                 {isSubmitting ? (

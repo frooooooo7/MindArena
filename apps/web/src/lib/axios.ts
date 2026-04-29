@@ -1,7 +1,24 @@
-import axios from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/store/auth.store";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const authPathsWithoutRefresh = ["/auth/login", "/auth/register", "/auth/refresh"];
+
+interface RetryRequestConfig extends InternalAxiosRequestConfig {
+    _retry?: boolean;
+}
+
+const getRequestPath = (url?: string): string => {
+    if (!url) {
+        return "";
+    }
+
+    try {
+        return new URL(url, baseURL).pathname;
+    } catch {
+        return url;
+    }
+};
 
 export const api = axios.create({
     baseURL,
@@ -24,10 +41,20 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
-        const originalRequest = error.config;
+        const originalRequest = error.config as RetryRequestConfig | undefined;
+
+        if (!originalRequest) {
+            return Promise.reject(error);
+        }
+
+        const requestPath = getRequestPath(originalRequest.url);
+        const shouldRefreshToken =
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            !authPathsWithoutRefresh.includes(requestPath);
 
         // If error is 401 and we haven't retried yet
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (shouldRefreshToken) {
             originalRequest._retry = true;
 
             try {
