@@ -8,12 +8,22 @@ import { ARENA_EVENTS, QueueCountPayload } from "@mindarena/shared";
 
 interface ArenaModesProps {
   onJoin: (gameType: string) => void;
+  queueCount?: number;
+  realtimeQueueCount?: boolean;
 }
 
-export function ArenaModes({ onJoin }: ArenaModesProps) {
+export function ArenaModes({
+  onJoin,
+  queueCount: queueCountOverride,
+  realtimeQueueCount = true,
+}: ArenaModesProps) {
   const [queueCount, setQueueCount] = useState(0);
 
   useEffect(() => {
+    if (!realtimeQueueCount) {
+      return;
+    }
+
     const handleQueueCountUpdate = (data: QueueCountPayload) => {
       setQueueCount(data.total);
     };
@@ -23,7 +33,9 @@ export function ArenaModes({ onJoin }: ArenaModesProps) {
     return () => {
       socket.off(ARENA_EVENTS.QUEUE_COUNT_UPDATE, handleQueueCountUpdate);
     };
-  }, []);
+  }, [realtimeQueueCount]);
+
+  const displayedQueueCount = queueCountOverride ?? queueCount;
 
   const modes = [
     {
@@ -34,7 +46,7 @@ export function ArenaModes({ onJoin }: ArenaModesProps) {
       icon: Trophy,
       color: "from-amber-500 to-orange-600",
       status: "Active",
-      participants: `${queueCount} currently in queue`,
+      participants: `${displayedQueueCount} currently in queue`,
     },
     {
       title: "Private Duel",

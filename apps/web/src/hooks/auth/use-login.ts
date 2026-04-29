@@ -7,19 +7,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "@mindarena/shared";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
+import { getAuthErrorMessage, getSafeRedirectPath } from "@/lib/auth-helpers";
 
-function getErrorMessage(error: unknown, fallback: string): string {
-  if (error && typeof error === "object" && "response" in error) {
-    const response = (error as { response?: { data?: { error?: string } } })
-      .response;
-    if (response?.data?.error) {
-      return response.data.error;
-    }
-  }
-  return fallback;
+interface UseLoginOptions {
+  onSuccess?: () => void;
+  redirectTo?: string | null;
 }
 
-export function useLogin() {
+export function useLogin({ onSuccess, redirectTo = "/" }: UseLoginOptions = {}) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -34,10 +29,14 @@ export function useLogin() {
       setError(null);
       const response = await authService.login(data);
       setAuth(response.user, response.accessToken);
-      router.push("/");
+      onSuccess?.();
+      const safeRedirectPath = getSafeRedirectPath(redirectTo);
+      if (safeRedirectPath) {
+        router.push(safeRedirectPath);
+      }
     } catch (err: unknown) {
       console.error("Login failed", err);
-      setError(getErrorMessage(err, "Invalid email or password"));
+      setError(getAuthErrorMessage(err, "Invalid email or password"));
     }
   };
 

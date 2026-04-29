@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
+import { ArenaAuthDialog } from "@/components/auth";
 import {
   ArenaHeader,
   ArenaModes,
   LiveFeed,
+  LiveFeedContent,
   MatchmakingOverlay,
   CombatRulesCard,
   RankSystemCard,
@@ -16,8 +18,9 @@ import {
 } from "@/components/arena";
 import { useArena } from "@/hooks/use-arena";
 import { useDuel } from "@/hooks/use-duel";
+import { useAuthStore } from "@/store/auth.store";
 
-export default function ArenaPage() {
+const ArenaPageContent = () => {
   // Game type selector state
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [selectedArenaMode, setSelectedArenaMode] = useState("");
@@ -51,10 +54,7 @@ export default function ArenaPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050505]">
-      <BackgroundGradients />
-      <Navbar />
-
+    <>
       <main className="container relative mx-auto px-4 py-8 md:px-8 max-w-7xl">
         <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <ArenaHeader />
@@ -93,6 +93,65 @@ export default function ArenaPage() {
         onClose={leaveQueue}
         gameType={selectedGameType}
       />
+    </>
+  );
+};
+
+const ArenaPagePreview = () => {
+  const handlePreviewJoin = () => undefined;
+
+  return (
+    <main className="container relative mx-auto px-4 py-8 md:px-8 max-w-7xl">
+      <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <ArenaHeader />
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex-2 space-y-8">
+            <SectionHeader
+              title="Available Arenas"
+              description="Select your battlefield and start competing."
+            />
+            <ArenaModes
+              onJoin={handlePreviewJoin}
+              queueCount={0}
+              realtimeQueueCount={false}
+            />
+            <CombatRulesCard />
+          </div>
+
+          <div className="lg:flex-1 space-y-8">
+            <LiveFeedContent liveGames={[]} />
+            <RankSystemCard />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default function ArenaPage() {
+  const { isAuthenticated, isHydrated } = useAuthStore();
+  const shouldShowAuthDialog = isHydrated && !isAuthenticated;
+  const shouldRenderArenaContent = isHydrated && isAuthenticated;
+  const shouldBlurArena = !shouldRenderArenaContent;
+
+  return (
+    <div className="relative min-h-screen bg-[#050505]">
+      <BackgroundGradients />
+      <Navbar />
+
+      <div
+        aria-hidden={shouldShowAuthDialog}
+        inert={shouldBlurArena ? true : undefined}
+        className={
+          shouldBlurArena
+            ? "pointer-events-none select-none blur-[2px] transition-all duration-300"
+            : "transition-all duration-300"
+        }
+      >
+        {shouldRenderArenaContent ? <ArenaPageContent /> : <ArenaPagePreview />}
+      </div>
+      <ArenaAuthDialog open={shouldShowAuthDialog} />
     </div>
   );
 }

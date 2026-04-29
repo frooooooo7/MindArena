@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useChimpGame1v1 } from "@/hooks/use-chimp-game-1v1";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
@@ -203,7 +205,7 @@ const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (id
     );
 }
 
-export default function ArenaChimpPage() {
+const ArenaChimpContent = () => {
   const { handleCellClick, handleBackToArena } = useChimpGame1v1();
   const match = useChimpStore((state) => state.match);
 
@@ -217,4 +219,21 @@ export default function ArenaChimpPage() {
       <GameTimer />
     </div>
   );
+};
+
+export default function ArenaChimpPage() {
+  const { isAuthenticated, isHydrated } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isHydrated && !isAuthenticated) {
+      router.replace("/arena");
+    }
+  }, [isAuthenticated, isHydrated, router]);
+
+  if (!isHydrated || !isAuthenticated) {
+    return null;
+  }
+
+  return <ArenaChimpContent />;
 }

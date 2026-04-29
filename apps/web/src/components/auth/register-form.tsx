@@ -6,7 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Mail, Lock, Eye, EyeOff, User, Loader2 } from "lucide-react";
 import { useRegister } from "@/hooks/auth/use-register";
 
-export function RegisterForm() {
+interface RegisterFormProps {
+    onSuccess?: () => void;
+    redirectTo?: string | null;
+}
+
+export function RegisterForm({ onSuccess, redirectTo }: RegisterFormProps = {}) {
     const {
         form: { register, formState: { errors } },
         error,
@@ -16,7 +21,7 @@ export function RegisterForm() {
         toggleConfirmPassword,
         isSubmitting,
         onSubmit
-    } = useRegister();
+    } = useRegister({ onSuccess, redirectTo });
 
     return (
         <form onSubmit={onSubmit} className="space-y-4">

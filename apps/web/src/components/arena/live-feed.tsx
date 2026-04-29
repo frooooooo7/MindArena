@@ -1,12 +1,15 @@
 "use client";
 
 import { Activity, Sword, Zap } from "lucide-react";
+import { LiveGameInfo } from "@mindarena/shared";
 
 import { useArena } from "@/hooks/use-arena";
 
-export function LiveFeed() {
-  const { liveGames } = useArena();
-  
+interface LiveFeedContentProps {
+  liveGames: LiveGameInfo[];
+}
+
+export function LiveFeedContent({ liveGames }: LiveFeedContentProps) {
   // Display only 4 latest games
   const displayedGames = liveGames.slice(0, 4);
 
@@ -82,4 +85,10 @@ export function LiveFeed() {
       </button>
     </div>
   );
+}
+
+export function LiveFeed() {
+  const { liveGames } = useArena();
+
+  return <LiveFeedContent liveGames={liveGames} />;
 }

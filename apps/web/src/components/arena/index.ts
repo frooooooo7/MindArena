@@ -1,7 +1,7 @@
 // Arena Page Components
 export { ArenaHeader } from "./arena-header";
 export { ArenaModes } from "./arena-modes";
-export { LiveFeed } from "./live-feed";
+export { LiveFeed, LiveFeedContent } from "./live-feed";
 export { MatchmakingOverlay } from "./matchmaking-overlay";
 export {
   CombatRulesCard,

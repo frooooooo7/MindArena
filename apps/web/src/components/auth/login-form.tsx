@@ -6,7 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useLogin } from "@/hooks/auth/use-login";
 
-export function LoginForm() {
+interface LoginFormProps {
+    onSuccess?: () => void;
+    redirectTo?: string | null;
+}
+
+export function LoginForm({ onSuccess, redirectTo }: LoginFormProps = {}) {
     const { 
         form: { register, formState: { errors } },
         error,
@@ -14,7 +19,7 @@ export function LoginForm() {
         togglePassword,
         isSubmitting,
         onSubmit 
-    } = useLogin();
+    } = useLogin({ onSuccess, redirectTo });
 
     return (
         <form onSubmit={onSubmit} className="space-y-4">

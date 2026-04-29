@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSequenceGame1v1 } from "@/hooks/use-sequence-game-1v1";
 import { Navbar } from "@/components/navbar";
 import { BackgroundGradients } from "@/components/home";
@@ -61,7 +63,6 @@ const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (id
     const gameStatus = useSequenceStore((state) => state.status);
     const matchCancelled = useSequenceStore((state) => state.matchCancelled);
     const match = useSequenceStore((state) => state.match);
-    const user = useAuthStore((state) => state.user);
     const countdown = useSequenceStore((state) => state.countdown);
     const level = useSequenceStore((state) => state.level);
     const gridSize = useSequenceStore((state) => state.gridSize);
@@ -168,7 +169,7 @@ const GameArea = ({ handleCellClick, handleBackToArena }: { handleCellClick: (id
   );
 }
 
-export default function Arena1v1Page() {
+const Arena1v1Content = () => {
   const { handleCellClick, handleBackToArena } = useSequenceGame1v1();
   const match = useSequenceStore((state) => state.match);
 
@@ -183,4 +184,21 @@ export default function Arena1v1Page() {
       <GameTimer />
     </div>
   );
+};
+
+export default function Arena1v1Page() {
+  const { isAuthenticated, isHydrated } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isHydrated && !isAuthenticated) {
+      router.replace("/arena");
+    }
+  }, [isAuthenticated, isHydrated, router]);
+
+  if (!isHydrated || !isAuthenticated) {
+    return null;
+  }
+
+  return <Arena1v1Content />;
 }
