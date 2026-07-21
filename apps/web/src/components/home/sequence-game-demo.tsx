@@ -70,30 +70,29 @@ export function SequenceGameDemo() {
     };
   }, [state.phase]);
 
-  useEffect(() => {
-    return () => {
-      if (pressTimerRef.current) {
-        clearTimeout(pressTimerRef.current);
-      }
-    };
-  }, []);
-
   const handleTilePress = (cell: number) => {
     if (state.phase !== "playing") {
       return;
     }
 
-    setPressedCell(cell);
+    const next = acceptSequenceInput(state, cell);
+
     if (pressTimerRef.current) {
       clearTimeout(pressTimerRef.current);
-    }
-    pressTimerRef.current = setTimeout(() => {
-      setPressedCell(null);
       pressTimerRef.current = null;
-    },
-      PRESS_FEEDBACK_MS,
-    );
-    setState((current) => acceptSequenceInput(current, cell));
+    }
+
+    if (next.phase !== "playing") {
+      setPressedCell(null);
+    } else {
+      setPressedCell(cell);
+      pressTimerRef.current = setTimeout(() => {
+        setPressedCell(null);
+        pressTimerRef.current = null;
+      }, PRESS_FEEDBACK_MS);
+    }
+
+    setState(next);
   };
 
   const statusText =
@@ -107,40 +106,22 @@ export function SequenceGameDemo() {
   const liveMessage =
     state.phase === "watching" && flashingCell !== null
       ? `Sequence tile ${flashingCell + 1}`
+      : state.phase === "playing" && state.inputIndex > 0
+        ? `Correct. ${state.inputIndex} of ${PREVIEW_SEQUENCE.length}`
       : statusText;
 
   return (
-    <section
-      aria-labelledby="sequence-preview-title"
-      className="rounded-[1.75rem] border border-[#7784b3]/50 bg-[linear-gradient(145deg,#252c4d,#12172c)] p-5 shadow-[0_24px_60px_rgb(0_0_0_/_0.35)] sm:p-7"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-portal-mint">
-            Interactive preview
-          </p>
-          <h3
-            id="sequence-preview-title"
-            className="mt-2 font-display text-3xl uppercase tracking-[-0.04em] text-white"
-          >
-            Sequence Memory
-          </h3>
-        </div>
-        <div className="text-right">
-          <p className="text-sm font-bold text-white">{statusText}</p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#aeb8d6]">
-            {state.phase === "playing"
-              ? `${state.inputIndex} / ${PREVIEW_SEQUENCE.length} selected`
-              : `${PREVIEW_SEQUENCE.length} tile pattern`}
-          </p>
-        </div>
+    <div className="w-full max-w-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <p className="text-sm font-bold text-white">{statusText}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#aeb8d6]">
+          {state.phase === "playing"
+            ? `${state.inputIndex} / ${PREVIEW_SEQUENCE.length} selected`
+            : `${PREVIEW_SEQUENCE.length} tile pattern`}
+        </p>
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-[#cbd1e2]">
-        Watch the lit tiles, then repeat the three-tile loop in order.
-      </p>
-
-      <div className="mt-6 grid grid-cols-3 gap-3" role="group" aria-label="Sequence memory board">
+      <div className="mt-4 grid grid-cols-3 gap-3" role="group" aria-label="Sequence memory board">
         {Array.from({ length: 9 }, (_, cell) => {
           const isFlashing = state.phase === "watching" && flashingCell === cell;
           const isPressed = state.phase === "playing" && pressedCell === cell;
@@ -177,16 +158,25 @@ export function SequenceGameDemo() {
         </p>
         <Link
           href="/games/sequence-memory"
-          className="group inline-flex min-h-11 items-center gap-2 rounded-full bg-portal-yellow px-4 text-sm font-extrabold text-[#191307] transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-portal-yellow"
+          className={cn(
+            "group inline-flex min-h-11 items-center gap-2 rounded-full bg-portal-yellow px-4 text-sm font-extrabold text-[#191307] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-portal-yellow",
+            !shouldReduceMotion && "transition-transform hover:-translate-y-0.5",
+          )}
         >
           Play full game
-          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+          <ArrowRight
+            className={cn(
+              "size-4",
+              !shouldReduceMotion && "transition-transform group-hover:translate-x-1",
+            )}
+            aria-hidden="true"
+          />
         </Link>
       </div>
 
       <p className="sr-only" aria-live="polite">
         {liveMessage}
       </p>
-    </section>
+    </div>
   );
 }

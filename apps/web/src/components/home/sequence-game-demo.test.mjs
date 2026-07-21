@@ -13,4 +13,20 @@ test("sequence preview exposes its required interactive source contract", async 
   assert.match(source, /disabled=\{state\.phase !== "playing"\}/);
   assert.match(source, /href="\/games\/sequence-memory"/);
   assert.match(source, /Array\.from\(\{ length: 9 \}/);
+  assert.doesNotMatch(source, /<section/);
+  assert.doesNotMatch(source, /sequence-preview-title/);
+  assert.match(
+    source,
+    /Correct\. \$\{state\.inputIndex\} of \$\{PREVIEW_SEQUENCE\.length\}/,
+  );
+  assert.match(source, /next\.phase !== "playing"/);
+  assert.match(source, /setPressedCell\(null\)/);
+  assert.match(
+    source,
+    /!shouldReduceMotion && "transition-transform hover:-translate-y-0\.5"/,
+  );
+  assert.match(
+    source,
+    /!shouldReduceMotion && "transition-transform group-hover:translate-x-1"/,
+  );
 });
