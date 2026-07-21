@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/navbar";
 import {
   ArenaPromo,
+  CognitiveDomains,
   FeaturesGrid,
   Footer,
   HeroSection,
@@ -16,6 +17,9 @@ export default function Home() {
         <HeroSection />
         <FeaturesGrid />
         <ScrollReveal>
+          <CognitiveDomains />
+        </ScrollReveal>
+        <ScrollReveal delay={0.02}>
           <PlayerProgress />
         </ScrollReveal>
         <ScrollReveal delay={0.04}>
@@ -26,3 +30,4 @@ export default function Home() {
     </div>
   );
 }
+
