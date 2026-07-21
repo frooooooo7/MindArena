@@ -31,23 +31,23 @@ interface HomeGame {
 const TONE_STYLES: Record<GameTone, string> = {
   violet:
     "border-[#8171d9]/45 bg-[radial-gradient(circle_at_78%_22%,rgb(117_92_255_/_0.42),transparent_38%),#17152f]",
-  mint:
-    "border-[#57bfa0]/35 bg-[radial-gradient(circle_at_88%_12%,rgb(112_245_193_/_0.2),transparent_42%),#102427]",
-  pink:
-    "border-[#bc527b]/35 bg-[radial-gradient(circle_at_88%_12%,rgb(255_94_148_/_0.2),transparent_42%),#291528]",
+  mint: "border-[#57bfa0]/35 bg-[radial-gradient(circle_at_88%_12%,rgb(112_245_193_/_0.2),transparent_42%),#102427]",
+  pink: "border-[#bc527b]/35 bg-[radial-gradient(circle_at_88%_12%,rgb(255_94_148_/_0.2),transparent_42%),#291528]",
   yellow:
     "border-[#ae8739]/40 bg-[radial-gradient(circle_at_88%_12%,rgb(255_213_74_/_0.2),transparent_42%),#2a2114]",
-  blue:
-    "border-[#427fb4]/40 bg-[radial-gradient(circle_at_88%_12%,rgb(75_168_255_/_0.2),transparent_42%),#11243a]",
+  blue: "border-[#427fb4]/40 bg-[radial-gradient(circle_at_88%_12%,rgb(75_168_255_/_0.2),transparent_42%),#11243a]",
 };
 
-const TONE_ACCENTS: Record<GameTone, string> = {
-  violet: "text-[#aa9cff]",
-  mint: "text-portal-mint",
-  pink: "text-portal-pink",
-  yellow: "text-portal-yellow",
-  blue: "text-portal-blue",
+const CATEGORY_BADGE_STYLES: Record<GameTone, string> = {
+  violet: "border-[#aa9cff]/55 bg-[rgb(18_15_41_/_0.9)] text-[#e2ddff]",
+  mint: "border-portal-mint/50 bg-[rgb(8_29_26_/_0.9)] text-[#c9ffec]",
+  pink: "border-portal-pink/50 bg-[rgb(38_16_27_/_0.9)] text-[#ffc8da]",
+  yellow: "border-portal-yellow/50 bg-[rgb(38_31_12_/_0.9)] text-[#ffeda8]",
+  blue: "border-portal-blue/50 bg-[rgb(11_29_49_/_0.9)] text-[#c9e8ff]",
 };
+
+const CATEGORY_BADGE_BASE =
+  "inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-[0.7rem] font-black uppercase tracking-[0.14em] shadow-[0_6px_18px_rgb(0_0_0_/_0.24)] backdrop-blur-sm";
 
 const CARD_VARIANTS: Variants = {
   hidden: { opacity: 0, y: 18 },
@@ -167,10 +167,7 @@ function SequenceGameCard({
 
       <div className="shrink-0">
         <span
-          className={cn(
-            "text-[0.65rem] font-black uppercase tracking-[0.19em]",
-            TONE_ACCENTS[game.tone],
-          )}
+          className={cn(CATEGORY_BADGE_BASE, CATEGORY_BADGE_STYLES[game.tone])}
         >
           {game.category}
         </span>
@@ -258,8 +255,8 @@ function PhotoGameCard({
         <div className="relative z-10 flex items-start justify-between gap-4">
           <span
             className={cn(
-              "text-[0.65rem] font-black uppercase tracking-[0.19em]",
-              TONE_ACCENTS[game.tone],
+              CATEGORY_BADGE_BASE,
+              CATEGORY_BADGE_STYLES[game.tone],
             )}
           >
             {game.category}
@@ -294,7 +291,10 @@ export function FeaturesGrid() {
   const reduceMotion = Boolean(useReducedMotion());
 
   return (
-    <section id="games" className="scroll-mt-20 bg-portal-surface py-20 sm:py-28">
+    <section
+      id="games"
+      className="scroll-mt-20 bg-portal-surface py-20 sm:py-28"
+    >
       <div className="portal-section">
         <div className="mb-9 grid gap-5 lg:grid-cols-[1fr_0.72fr] lg:items-end">
           <div>
@@ -343,7 +343,8 @@ export function FeaturesGrid() {
               aria-hidden="true"
               className={cn(
                 "size-4",
-                !reduceMotion && "transition-transform group-hover:translate-x-1",
+                !reduceMotion &&
+                  "transition-transform group-hover:translate-x-1",
               )}
             />
           </Link>

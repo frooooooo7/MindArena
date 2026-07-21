@@ -1,22 +1,21 @@
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
 import type { ComponentProps } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PREVIEW_SEQUENCE } from "./sequence-demo-engine";
 
-type ViewportProps = ComponentProps<"div"> & {
-  onViewportEnter?: () => void;
-  onViewportLeave?: () => void;
-  viewport?: unknown;
-};
 type MotionButtonProps = ComponentProps<"button"> & {
   whileTap?: unknown;
   transition?: unknown;
 };
 
 const motionControl = vi.hoisted(() => ({
-  enter: undefined as undefined | (() => void),
-  leave: undefined as undefined | (() => void),
   reduced: false,
 }));
 
@@ -25,12 +24,6 @@ vi.mock("framer-motion", async () => {
 
   return {
     motion: {
-      div: ({ onViewportEnter, onViewportLeave, viewport, ...props }: ViewportProps) => {
-        void viewport;
-        motionControl.enter = onViewportEnter;
-        motionControl.leave = onViewportLeave;
-        return React.createElement("div", props);
-      },
       button: ({ whileTap, transition, ...props }: MotionButtonProps) => {
         void transition;
         return React.createElement("button", {
@@ -44,27 +37,21 @@ vi.mock("framer-motion", async () => {
 });
 
 vi.mock("next/link", () => ({
-  default: ({ children, ...props }: ComponentProps<"a">) => <a {...props}>{children}</a>,
+  default: ({ children, ...props }: ComponentProps<"a">) => (
+    <a {...props}>{children}</a>
+  ),
 }));
 
 const { SequenceGameDemo } = await import("./sequence-game-demo");
-
-function enterViewport() {
-  expect(motionControl.enter).toBeTypeOf("function");
-  act(() => motionControl.enter?.());
-}
-
-function leaveViewport() {
-  expect(motionControl.leave).toBeTypeOf("function");
-  act(() => motionControl.leave?.());
-}
 
 function advanceToPlayerTurn() {
   act(() => vi.advanceTimersByTime(PREVIEW_SEQUENCE.length * 520));
 }
 
 function boardButtons() {
-  return screen.getAllByRole("button", { name: /sequence tile/i }) as HTMLButtonElement[];
+  return screen.getAllByRole("button", {
+    name: /sequence tile/i,
+  }) as HTMLButtonElement[];
 }
 
 function expectVisibleStatus(status: string) {
@@ -78,8 +65,6 @@ function expectVisibleStatus(status: string) {
 describe("SequenceGameDemo", () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    motionControl.enter = undefined;
-    motionControl.leave = undefined;
     motionControl.reduced = false;
   });
 
@@ -89,22 +74,29 @@ describe("SequenceGameDemo", () => {
     vi.useRealTimers();
   });
 
-  it("does not start or enable input before the preview enters the viewport", () => {
+  it("stays idle until the user explicitly starts the preview", () => {
     render(<SequenceGameDemo />);
 
     act(() => vi.advanceTimersByTime(5000));
 
     expect(boardButtons()).toHaveLength(9);
     expect(boardButtons().every((button) => button.disabled)).toBe(true);
-    expectVisibleStatus("Watch the pattern");
+    expectVisibleStatus("Ready when you are");
+    expect(
+      screen.getByRole("button", { name: "Start sequence" }),
+    ).toBeEnabled();
+    expect(vi.getTimerCount()).toBe(0);
   });
 
-  it("starts on viewport entry and enables the full board after the pattern", () => {
+  it("starts after clicking the action and enables the full board after the pattern", () => {
     render(<SequenceGameDemo />);
 
-    enterViewport();
+    fireEvent.click(screen.getByRole("button", { name: "Start sequence" }));
     expectVisibleStatus("Watch the pattern");
     expect(boardButtons().every((button) => button.disabled)).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "Sequence running" }),
+    ).toBeDisabled();
 
     advanceToPlayerTurn();
 
@@ -114,7 +106,7 @@ describe("SequenceGameDemo", () => {
 
   it("keeps the tile announcement after visual flash clears and announces correct progress", () => {
     render(<SequenceGameDemo />);
-    enterViewport();
+    fireEvent.click(screen.getByRole("button", { name: "Start sequence" }));
 
     act(() => vi.advanceTimersByTime(0));
     expect(screen.getByText("Sequence tile 5")).toBeInTheDocument();
@@ -128,45 +120,38 @@ describe("SequenceGameDemo", () => {
     expect(screen.getByText("Correct. 1 of 3")).toBeInTheDocument();
   });
 
-  it("replays after a failed input and after a completed sequence", () => {
+  it("waits for an explicit replay after both failure and success", () => {
     render(<SequenceGameDemo />);
-    enterViewport();
+    fireEvent.click(screen.getByRole("button", { name: "Start sequence" }));
     advanceToPlayerTurn();
 
     fireEvent.click(screen.getByRole("button", { name: "Sequence tile 1" }));
-    expectVisibleStatus("That was not the pattern. Replaying shortly.");
-
-    act(() => vi.advanceTimersByTime(1300));
-    expectVisibleStatus("Watch the pattern");
-
-    advanceToPlayerTurn();
-    for (const cell of PREVIEW_SEQUENCE) {
-      fireEvent.click(screen.getByRole("button", { name: `Sequence tile ${cell + 1}` }));
-    }
-    expectVisibleStatus("Perfect sequence! Replaying shortly.");
-
-    act(() => vi.advanceTimersByTime(2800));
-    expectVisibleStatus("Watch the pattern");
-  });
-
-  it("resets when leaving and starts a fresh pattern when re-entering", () => {
-    render(<SequenceGameDemo />);
-    enterViewport();
-    advanceToPlayerTurn();
-
-    leaveViewport();
-    act(() => vi.advanceTimersByTime(5000));
-    expectVisibleStatus("Watch the pattern");
+    expectVisibleStatus("Pattern missed. Try again.");
+    expect(screen.getByRole("button", { name: "Play again" })).toBeEnabled();
     expect(boardButtons().every((button) => button.disabled)).toBe(true);
 
-    enterViewport();
-    act(() => vi.advanceTimersByTime(0));
-    expect(screen.getByText("Sequence tile 5")).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(5000));
+    expectVisibleStatus("Pattern missed. Try again.");
+    expect(vi.getTimerCount()).toBe(0);
+
+    fireEvent.click(screen.getByRole("button", { name: "Play again" }));
+    advanceToPlayerTurn();
+    for (const cell of PREVIEW_SEQUENCE) {
+      fireEvent.click(
+        screen.getByRole("button", { name: `Sequence tile ${cell + 1}` }),
+      );
+    }
+    expectVisibleStatus("Perfect sequence!");
+    expect(screen.getByRole("button", { name: "Play again" })).toBeEnabled();
+
+    act(() => vi.advanceTimersByTime(5000));
+    expectVisibleStatus("Perfect sequence!");
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it("clears pending timers on unmount", () => {
     const { unmount } = render(<SequenceGameDemo />);
-    enterViewport();
+    fireEvent.click(screen.getByRole("button", { name: "Start sequence" }));
 
     expect(vi.getTimerCount()).toBeGreaterThan(0);
     unmount();
@@ -176,19 +161,20 @@ describe("SequenceGameDemo", () => {
   it("keeps timed highlights but removes motion transforms when reduced motion is requested", () => {
     motionControl.reduced = true;
     render(<SequenceGameDemo />);
-    enterViewport();
+    fireEvent.click(screen.getByRole("button", { name: "Start sequence" }));
 
     act(() => vi.advanceTimersByTime(0));
 
-    expect(screen.getByRole("button", { name: "Sequence tile 5" })).toHaveAttribute(
-      "data-motion-while-tap",
-      "none",
-    );
-    expect(screen.getByRole("button", { name: "Sequence tile 5" }).className).toContain(
-      "bg-portal-mint",
-    );
+    expect(
+      screen.getByRole("button", { name: "Sequence tile 5" }),
+    ).toHaveAttribute("data-motion-while-tap", "none");
+    expect(
+      screen.getByRole("button", { name: "Sequence tile 5" }).className,
+    ).toContain("bg-portal-mint");
     const fullGameLink = screen.getByRole("link", { name: "Play full game" });
     expect(fullGameLink.className).not.toContain("translate");
-    expect(fullGameLink.querySelector("svg")?.className.baseVal).not.toContain("translate");
+    expect(fullGameLink.querySelector("svg")?.className.baseVal).not.toContain(
+      "translate",
+    );
   });
 });
