@@ -17,6 +17,9 @@
     "href": "/games/chimp-memory",
     "motif": "numbers",
     "tone": "mint",
+    "image": "/game_photos/chimp.png",
+    "imageFit": "cover",
+    "imagePosition": "center 45%",
     "featured": false
   },
   {
@@ -27,6 +30,9 @@
     "href": "/games/code-memory",
     "motif": "code",
     "tone": "pink",
+    "image": "/game_photos/code_memory.png",
+    "imageFit": "contain",
+    "imagePosition": "center",
     "featured": false
   },
   {
@@ -37,6 +43,9 @@
     "href": "/games/color-word",
     "motif": "color",
     "tone": "yellow",
+    "image": "/game_photos/colours.png",
+    "imageFit": "cover",
+    "imagePosition": "center 45%",
     "featured": false
   },
   {
@@ -47,6 +56,9 @@
     "href": "/games/schulte-table",
     "motif": "grid",
     "tone": "blue",
+    "image": "/game_photos/schulte.png",
+    "imageFit": "cover",
+    "imagePosition": "center 38%",
     "featured": false
   }
 ]

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 const file = new URL("./home-games.json", import.meta.url);
@@ -37,4 +37,30 @@ test("adding another game does not depend on a fixed total", async () => {
   const extended = [...games, extra];
 
   assert.equal(extended.length, games.length + 1);
+});
+
+test("game artwork has complete metadata and public files", async () => {
+  const games = await readGames();
+  const expectedArtwork = {
+    "chimp-memory": "/game_photos/chimp.png",
+    "code-memory": "/game_photos/code_memory.png",
+    "color-word": "/game_photos/colours.png",
+    "schulte-table": "/game_photos/schulte.png",
+  };
+
+  for (const [id, image] of Object.entries(expectedArtwork)) {
+    const game = games.find((entry) => entry.id === id);
+
+    assert.ok(game, `${id} should exist`);
+    assert.equal(game.image, image);
+    assert.ok(["cover", "contain"].includes(game.imageFit));
+    assert.equal(typeof game.imagePosition, "string");
+
+    const artwork = new URL(`../../../public${image}`, import.meta.url);
+    assert.ok((await stat(artwork)).isFile());
+  }
+
+  const sequenceMemory = games.find((game) => game.id === "sequence-memory");
+  assert.ok(sequenceMemory, "sequence-memory should exist");
+  assert.equal(sequenceMemory.image, undefined);
 });
