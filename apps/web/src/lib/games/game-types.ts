@@ -1,6 +1,6 @@
 "use client";
 
-import { Brain, Grid3X3, Binary, LayoutGrid, LucideIcon } from "lucide-react";
+import { Brain, Grid3X3, Binary, LayoutGrid, Palette, LucideIcon } from "lucide-react";
 
 /**
  * Shared game type definitions used across the application.
@@ -74,6 +74,18 @@ export const GAME_TYPES: GameTypeDefinition[] = [
         href: "/games/schulte-table",
         difficulty: "Medium",
         averageTime: "1-3 min"
+    },
+    {
+        id: "color-word",
+        name: "Color Word Challenge",
+        shortName: "Color Word",
+        description: "Identify the font color of the word, not what the word says! Tests focus and Stroop reaction time.",
+        icon: Palette,
+        color: "from-rose-500 via-purple-500 to-indigo-600",
+        shadow: "shadow-rose-500/30",
+        href: "/games/color-word",
+        difficulty: "Hard",
+        averageTime: "1-2 min"
     }
 ] as const;
 
