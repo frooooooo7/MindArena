@@ -32,15 +32,15 @@ export function AuthTabs({ children, defaultTab = "login" }: AuthTabsProps) {
     <TabContext.Provider value={{ activeTab, setActiveTab }}>
       <div className="w-full">
         {/* Tab buttons */}
-        <div className="flex mb-6 p-1 bg-muted/50 rounded-lg">
+        <div className="mb-6 flex rounded-2xl border border-white/10 bg-white/[0.03] p-1.5 backdrop-blur-md">
           <button
             type="button"
             onClick={() => setActiveTab("login")}
             className={cn(
-              "flex-1 py-2.5 text-sm font-medium rounded-md transition-all duration-200",
+              "flex-1 rounded-xl py-2.5 text-xs font-bold transition-all duration-300",
               activeTab === "login"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-portal-mint text-[#07150f] shadow-[0_0_15px_rgba(112,245,193,0.3)]"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             Sign In
@@ -49,13 +49,13 @@ export function AuthTabs({ children, defaultTab = "login" }: AuthTabsProps) {
             type="button"
             onClick={() => setActiveTab("register")}
             className={cn(
-              "flex-1 py-2.5 text-sm font-medium rounded-md transition-all duration-200",
+              "flex-1 rounded-xl py-2.5 text-xs font-bold transition-all duration-300",
               activeTab === "register"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-portal-mint text-[#07150f] shadow-[0_0_15px_rgba(112,245,193,0.3)]"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
-            Sign Up
+            Create Account
           </button>
         </div>
 
