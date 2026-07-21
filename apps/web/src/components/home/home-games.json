@@ -1,0 +1,52 @@
+[
+  {
+    "id": "sequence-memory",
+    "title": "Sequence Memory",
+    "description": "Follow the flashes and rebuild an ever-growing sequence.",
+    "category": "Memory",
+    "href": "/games/sequence-memory",
+    "motif": "sequence",
+    "tone": "violet",
+    "featured": true
+  },
+  {
+    "id": "chimp-memory",
+    "title": "Chimp Memory",
+    "description": "Lock in every number before the board disappears.",
+    "category": "Speed",
+    "href": "/games/chimp-memory",
+    "motif": "numbers",
+    "tone": "mint",
+    "featured": false
+  },
+  {
+    "id": "code-memory",
+    "title": "Code Memory",
+    "description": "Hold the pattern in your head and rebuild the code.",
+    "category": "Focus",
+    "href": "/games/code-memory",
+    "motif": "code",
+    "tone": "pink",
+    "featured": false
+  },
+  {
+    "id": "color-word",
+    "title": "Color Word",
+    "description": "React to the color, ignore the word, and stay sharp.",
+    "category": "Reaction",
+    "href": "/games/color-word",
+    "motif": "color",
+    "tone": "yellow",
+    "featured": false
+  },
+  {
+    "id": "schulte-table",
+    "title": "Schulte Table",
+    "description": "Scan the grid and find the next number faster.",
+    "category": "Attention",
+    "href": "/games/schulte-table",
+    "motif": "grid",
+    "tone": "blue",
+    "featured": false
+  }
+]
