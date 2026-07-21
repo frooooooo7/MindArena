@@ -1,6 +1,6 @@
 # MindArena Game Portal homepage redesign
 
-Date: 2026-07-21  
+Date: 2026-07-21
 Status: approved visual direction
 
 ## Objective

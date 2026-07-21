@@ -70,7 +70,7 @@ test("adding another game does not depend on a fixed total", async () => {
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `node --test apps/web/src/components/home/home-games.test.mjs`  
+Run: `node --test apps/web/src/components/home/home-games.test.mjs`
 Expected: FAIL with `ENOENT` for `home-games.json`.
 
 - [ ] **Step 3: Add current featured-game metadata**
@@ -134,7 +134,7 @@ Create `home-games.json` with objects using this exact shape:
 
 - [ ] **Step 4: Run the metadata test**
 
-Run: `node --test apps/web/src/components/home/home-games.test.mjs`  
+Run: `node --test apps/web/src/components/home/home-games.test.mjs`
 Expected: 2 tests PASS.
 
 - [ ] **Step 5: Commit**
@@ -152,7 +152,7 @@ git commit -m "test(home): define extensible featured game catalog"
 
 - [ ] **Step 1: Record the pre-change build state**
 
-Run: `npm.cmd run build --workspace=@mindarena/web`  
+Run: `npm.cmd run build --workspace=@mindarena/web`
 Expected: PASS on the existing branch; record any pre-existing warnings.
 
 - [ ] **Step 2: Load display typography and default to dark**
@@ -165,7 +165,7 @@ In `globals.css`, map semantic variables for canvas, elevated surfaces, mint, ul
 
 - [ ] **Step 4: Verify type and CSS compilation**
 
-Run: `npm.cmd run build --workspace=@mindarena/web`  
+Run: `npm.cmd run build --workspace=@mindarena/web`
 Expected: PASS with generated `/` route and no CSS parser errors.
 
 - [ ] **Step 5: Commit**
@@ -195,7 +195,7 @@ Ensure the preview simplifies under 640 px, reserves its dimensions to prevent l
 
 - [ ] **Step 4: Run lint**
 
-Run: `npm.cmd run lint --workspace=@mindarena/web`  
+Run: `npm.cmd run lint --workspace=@mindarena/web`
 Expected: PASS with no accessibility or React warnings.
 
 - [ ] **Step 5: Commit**
@@ -226,9 +226,9 @@ Update `home/index.ts` to export `PlayerProgress` alongside `HeroSection`, `Feat
 
 - [ ] **Step 4: Run the metadata test and lint**
 
-Run: `node --test apps/web/src/components/home/home-games.test.mjs`  
-Expected: 2 tests PASS.  
-Run: `npm.cmd run lint --workspace=@mindarena/web`  
+Run: `node --test apps/web/src/components/home/home-games.test.mjs`
+Expected: 2 tests PASS.
+Run: `npm.cmd run lint --workspace=@mindarena/web`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -266,9 +266,9 @@ Replace the fixed-viewport layout in `page.tsx` with `Navbar`, `HeroSection`, `F
 
 - [ ] **Step 5: Run lint and build**
 
-Run: `npm.cmd run lint --workspace=@mindarena/web`  
-Expected: PASS.  
-Run: `npm.cmd run build --workspace=@mindarena/web`  
+Run: `npm.cmd run lint --workspace=@mindarena/web`
+Expected: PASS.
+Run: `npm.cmd run build --workspace=@mindarena/web`
 Expected: PASS and `/` prerendered successfully.
 
 - [ ] **Step 6: Commit**
@@ -285,7 +285,7 @@ git commit -m "feat(home): compose Game Portal landing page"
 
 - [ ] **Step 1: Start the web app**
 
-Run: `npm.cmd run dev --workspace=@mindarena/web`  
+Run: `npm.cmd run dev --workspace=@mindarena/web`
 Expected: Next.js prints a local URL and keeps running.
 
 - [ ] **Step 2: Verify desktop and mobile layouts**
@@ -302,11 +302,11 @@ Enable reduced motion and confirm hero loops stop. Temporarily duplicate one met
 
 - [ ] **Step 5: Run final checks**
 
-Run: `node --test apps/web/src/components/home/home-games.test.mjs`  
-Expected: 2 tests PASS.  
-Run: `npm.cmd run lint --workspace=@mindarena/web`  
-Expected: PASS.  
-Run: `npm.cmd run build --workspace=@mindarena/web`  
+Run: `node --test apps/web/src/components/home/home-games.test.mjs`
+Expected: 2 tests PASS.
+Run: `npm.cmd run lint --workspace=@mindarena/web`
+Expected: PASS.
+Run: `npm.cmd run build --workspace=@mindarena/web`
 Expected: PASS.
 
 - [ ] **Step 6: Commit verification fixes**
