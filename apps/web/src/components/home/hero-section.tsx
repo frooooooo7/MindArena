@@ -1,41 +1,47 @@
-import { Button } from "@/components/ui/button";
-import { Brain, Sparkles, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { ArrowDown, ArrowRight } from "lucide-react";
+import { GamePortalPreview } from "./game-portal-preview";
 
 export function HeroSection() {
   return (
-    <section className="flex flex-1 flex-col items-center justify-center text-center gap-6">
-      {/* Badge */}
-      <div className="inline-flex items-center rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-sm font-medium text-violet-600 dark:text-violet-400 animate-in fade-in slide-in-from-top-4 duration-700">
-        <Sparkles className="mr-2 h-4 w-4" />
-        Train your mind every day
-      </div>
-      
-      {/* Main heading */}
-      <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-        Enter the{" "}
-        <span className="bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">
-          MindArena
-        </span>
-        <br />
-        and become a memory master
-      </h1>
-      
-      {/* Description */}
-      <p className="max-w-[42rem] leading-relaxed text-muted-foreground sm:text-xl sm:leading-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-        Compete with other players in exciting memory games. 
-        Develop your cognitive abilities and climb the rankings!
-      </p>
+    <section className="relative isolate overflow-hidden border-b border-white/8 pt-20 sm:pt-24 lg:pt-28">
+      <div className="portal-dot-grid absolute inset-0 -z-20 opacity-70 [mask-image:linear-gradient(to_bottom,transparent_0%,black_24%,black_78%,transparent_100%)]" />
+      <div className="absolute left-1/2 top-52 -z-10 h-[32rem] w-[48rem] -translate-x-1/2 rounded-full bg-portal-violet/20 blur-[120px]" />
 
-      {/* CTA Buttons */}
-      <div className="flex flex-wrap items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-        <Button size="lg" className="h-12 px-8 text-base font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all">
-          <Brain className="mr-2 h-5 w-5" />
-          Start Playing
-        </Button>
-        <Button size="lg" variant="outline" className="h-12 px-8 text-base font-semibold group">
-          How it works
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </Button>
+      <div className="portal-section text-center">
+        <div className="mb-5 inline-flex items-center gap-2 text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-portal-mint sm:text-xs">
+          <span className="size-1.5 rounded-full bg-portal-mint shadow-[0_0_14px_var(--portal-mint)]" />
+          Growing game library · instant score
+        </div>
+
+        <h1 className="font-display mx-auto max-w-5xl text-balance text-[clamp(3.25rem,10vw,7.5rem)] font-bold uppercase leading-[0.84] tracking-[-0.075em]">
+          Enter. Play.
+          <span className="mt-2 block text-portal-mint">Beat your score.</span>
+        </h1>
+
+        <p className="mx-auto mt-7 max-w-xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
+          Fast memory and focus games built for one more run. Pick a
+          challenge, learn the pattern, and chase a better result.
+        </p>
+
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="/games"
+            className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-portal-violet px-6 text-sm font-extrabold text-white shadow-[0_14px_40px_rgb(117_92_255_/_0.38)] transition-[transform,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:bg-[#836dff] hover:shadow-[0_18px_48px_rgb(117_92_255_/_0.48)]"
+          >
+            Choose your first game
+            <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+          </Link>
+          <Link
+            href="#games"
+            className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Explore challenges
+            <ArrowDown className="size-4 transition-transform duration-200 group-hover:translate-y-1" />
+          </Link>
+        </div>
+
+        <GamePortalPreview />
       </div>
     </section>
   );
