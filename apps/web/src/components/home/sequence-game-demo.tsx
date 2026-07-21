@@ -22,9 +22,11 @@ const SUCCESS_RESET_MS = 2800;
 const PRESS_FEEDBACK_MS = 160;
 
 export function SequenceGameDemo() {
+  const [isActive, setIsActive] = useState(false);
   const [state, setState] = useState(createSequenceDemoState);
   const [flashingCell, setFlashingCell] = useState<number | null>(null);
   const [pressedCell, setPressedCell] = useState<number | null>(null);
+  const [announcement, setAnnouncement] = useState("Watch the pattern");
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const pressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shouldReduceMotion = useReducedMotion();
@@ -41,24 +43,42 @@ export function SequenceGameDemo() {
 
     clearPhaseTimers();
 
+    if (!isActive) {
+      return clearPhaseTimers;
+    }
+
     if (state.phase === "watching") {
       PREVIEW_SEQUENCE.forEach((cell, index) => {
         const startAt = index * FLASH_STEP_MS;
 
-        schedule(() => setFlashingCell(cell), startAt);
+        schedule(() => {
+          setFlashingCell(cell);
+          setAnnouncement(`Sequence tile ${cell + 1}`);
+        }, startAt);
         schedule(() => setFlashingCell(null), startAt + FLASH_VISIBLE_MS);
       });
       schedule(() => {
         setState((current) => beginPlayerTurn(current));
+        setAnnouncement("Your turn");
       }, PREVIEW_SEQUENCE.length * FLASH_STEP_MS);
     }
 
     if (state.phase === "failure") {
-      schedule(() => setState(resetSequenceDemo), FAILURE_RESET_MS);
+      schedule(() => {
+        setFlashingCell(null);
+        setPressedCell(null);
+        setState(resetSequenceDemo);
+        setAnnouncement("Watch the pattern");
+      }, FAILURE_RESET_MS);
     }
 
     if (state.phase === "success") {
-      schedule(() => setState(resetSequenceDemo), SUCCESS_RESET_MS);
+      schedule(() => {
+        setFlashingCell(null);
+        setPressedCell(null);
+        setState(resetSequenceDemo);
+        setAnnouncement("Watch the pattern");
+      }, SUCCESS_RESET_MS);
     }
 
     return () => {
@@ -68,7 +88,30 @@ export function SequenceGameDemo() {
         pressTimerRef.current = null;
       }
     };
-  }, [state.phase]);
+  }, [isActive, state.phase]);
+
+  const resetPreview = () => {
+    timersRef.current.forEach((timer) => clearTimeout(timer));
+    timersRef.current = [];
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+    setState(resetSequenceDemo());
+    setFlashingCell(null);
+    setPressedCell(null);
+    setAnnouncement("Watch the pattern");
+  };
+
+  const handleViewportEnter = () => {
+    resetPreview();
+    setIsActive(true);
+  };
+
+  const handleViewportLeave = () => {
+    setIsActive(false);
+    resetPreview();
+  };
 
   const handleTilePress = (cell: number) => {
     if (state.phase !== "playing") {
@@ -84,12 +127,18 @@ export function SequenceGameDemo() {
 
     if (next.phase !== "playing") {
       setPressedCell(null);
+      setAnnouncement(
+        next.phase === "success"
+          ? "Perfect sequence! Replaying shortly."
+          : "That was not the pattern. Replaying shortly.",
+      );
     } else {
       setPressedCell(cell);
       pressTimerRef.current = setTimeout(() => {
         setPressedCell(null);
         pressTimerRef.current = null;
       }, PRESS_FEEDBACK_MS);
+      setAnnouncement(`Correct. ${next.inputIndex} of ${PREVIEW_SEQUENCE.length}`);
     }
 
     setState(next);
@@ -103,15 +152,13 @@ export function SequenceGameDemo() {
         : state.phase === "success"
           ? "Perfect sequence! Replaying shortly."
           : "That was not the pattern. Replaying shortly.";
-  const liveMessage =
-    state.phase === "watching" && flashingCell !== null
-      ? `Sequence tile ${flashingCell + 1}`
-      : state.phase === "playing" && state.inputIndex > 0
-        ? `Correct. ${state.inputIndex} of ${PREVIEW_SEQUENCE.length}`
-      : statusText;
-
   return (
-    <div className="w-full max-w-sm">
+    <motion.div
+      className="w-full max-w-sm"
+      onViewportEnter={handleViewportEnter}
+      onViewportLeave={handleViewportLeave}
+      viewport={{ amount: 0.3 }}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p className="text-sm font-bold text-white">{statusText}</p>
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#aeb8d6]">
@@ -175,8 +222,8 @@ export function SequenceGameDemo() {
       </div>
 
       <p className="sr-only" aria-live="polite">
-        {liveMessage}
+        {announcement}
       </p>
-    </div>
+    </motion.div>
   );
 }

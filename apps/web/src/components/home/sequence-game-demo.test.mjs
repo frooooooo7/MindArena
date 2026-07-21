@@ -17,7 +17,7 @@ test("sequence preview exposes its required interactive source contract", async 
   assert.doesNotMatch(source, /sequence-preview-title/);
   assert.match(
     source,
-    /Correct\. \$\{state\.inputIndex\} of \$\{PREVIEW_SEQUENCE\.length\}/,
+    /Correct\. \$\{next\.inputIndex\} of \$\{PREVIEW_SEQUENCE\.length\}/,
   );
   assert.match(source, /next\.phase !== "playing"/);
   assert.match(source, /setPressedCell\(null\)/);
