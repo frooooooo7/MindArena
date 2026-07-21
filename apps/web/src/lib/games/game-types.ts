@@ -1,6 +1,6 @@
 "use client";
 
-import { Brain, Grid3X3, Binary, LucideIcon } from "lucide-react";
+import { Brain, Grid3X3, Binary, LayoutGrid, LucideIcon } from "lucide-react";
 
 /**
  * Shared game type definitions used across the application.
@@ -62,6 +62,18 @@ export const GAME_TYPES: GameTypeDefinition[] = [
         href: "/games/code-memory",
         difficulty: "Medium",
         averageTime: "3-5 min"
+    },
+    {
+        id: "schulte",
+        name: "Schulte Table",
+        shortName: "Schulte",
+        description: "Find and click numbers in sequence as fast as possible. Custom size, counting direction, and timer.",
+        icon: LayoutGrid,
+        color: "from-amber-500 to-orange-600",
+        shadow: "shadow-amber-500/30",
+        href: "/games/schulte-table",
+        difficulty: "Medium",
+        averageTime: "1-3 min"
     }
 ] as const;
 
