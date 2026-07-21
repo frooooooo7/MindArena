@@ -37,13 +37,16 @@ export function ColorWordDisplay({
 
       if (question.isTrueFalse) {
         if (key === "1" || key === "t" || key === "y" || key === "arrowleft") {
+          e.preventDefault();
           onAnswer(true);
         } else if (key === "2" || key === "n" || key === "f" || key === "arrowright") {
+          e.preventDefault();
           onAnswer(false);
         }
       } else {
         const keyIndex = parseInt(key, 10) - 1;
         if (!isNaN(keyIndex) && keyIndex >= 0 && keyIndex < question.options.length) {
+          e.preventDefault();
           onAnswer(question.options[keyIndex].id);
         }
       }

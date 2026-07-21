@@ -136,6 +136,7 @@ export function useColorWord() {
   const maxStreakRef = useRef<number>(0);
   const correctCountRef = useRef<number>(0);
   const wrongCountRef = useRef<number>(0);
+  const timeLeftRef = useRef<number>(30);
   const reactionTimesRef = useRef<number[]>([]);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -153,7 +154,8 @@ export function useColorWord() {
     maxStreakRef.current = maxStreak;
     correctCountRef.current = correctCount;
     wrongCountRef.current = wrongCount;
-  }, [score, streak, maxStreak, correctCount, wrongCount]);
+    timeLeftRef.current = timeLeft;
+  }, [score, streak, maxStreak, correctCount, wrongCount, timeLeft]);
 
   // Load best score from localStorage
   useEffect(() => {
@@ -250,6 +252,7 @@ export function useColorWord() {
 
     const initialTime = gameMode === "fever" ? 15 : 30;
     setTimeLeft(initialTime);
+    timeLeftRef.current = initialTime;
     setRoundsLeft(20);
 
     let count = 3;
@@ -264,18 +267,15 @@ export function useColorWord() {
         questionStartTimeRef.current = Date.now();
 
         if (gameMode === "blitz" || gameMode === "fever" || gameMode === "true_false") {
-          let time = initialTime;
           timerRef.current = setInterval(() => {
-            time -= 1;
-            setTimeLeft((prev) => {
-              const nextTime = prev - 1;
-              if (nextTime <= 0) {
-                if (timerRef.current) clearInterval(timerRef.current);
-                finishGame();
-                return 0;
-              }
-              return nextTime;
-            });
+            const nextTime = timeLeftRef.current - 1;
+            timeLeftRef.current = nextTime;
+            setTimeLeft(nextTime);
+
+            if (nextTime <= 0) {
+              if (timerRef.current) clearInterval(timerRef.current);
+              finishGame();
+            }
           }, 1000);
         }
       }
@@ -328,7 +328,9 @@ export function useColorWord() {
 
         // Fever mode time bonus (+2s for every 3 streak)
         if (gameMode === "fever" && newStreak % 3 === 0) {
-          setTimeLeft((prev) => prev + 2);
+          const bonusTime = timeLeftRef.current + 2;
+          timeLeftRef.current = bonusTime;
+          setTimeLeft(bonusTime);
           setFeverActive(true);
         } else if (newStreak >= 5) {
           setFeverActive(true);
@@ -361,7 +363,14 @@ export function useColorWord() {
         });
 
         if (gameMode === "blitz" || gameMode === "true_false") {
-          setTimeLeft((prev) => Math.max(0, prev - 2)); // -2s penalty
+          const penalizedTime = Math.max(0, timeLeftRef.current - 2);
+          timeLeftRef.current = penalizedTime;
+          setTimeLeft(penalizedTime);
+
+          if (penalizedTime <= 0) {
+            finishGame();
+            return;
+          }
         }
 
         // Fever Mode ends on 3 mistakes
