@@ -39,7 +39,7 @@ export function SchulteGrid({
   const isPlaying = gameState === "playing";
 
   return (
-    <div className="relative w-full max-w-xl aspect-square p-3 md:p-4 rounded-2xl bg-card/60 backdrop-blur-md border border-border/80 shadow-2xl overflow-hidden flex items-center justify-center">
+    <div className="relative w-full max-w-xl aspect-square p-3 md:p-4 rounded-3xl bg-white/[0.03] backdrop-blur-2xl border border-white/10 shadow-2xl overflow-hidden flex items-center justify-center">
       {/* Grid Container */}
       <div
         className={cn(
@@ -84,7 +84,7 @@ export function SchulteGrid({
             {countdown}
           </span>
           <p className="text-sm font-semibold text-muted-foreground mt-4 tracking-wider uppercase">
-            Przygotuj wzrok...
+            Get Ready...
           </p>
         </div>
       )}
@@ -95,9 +95,9 @@ export function SchulteGrid({
           <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 mb-4 shadow-xl">
             <Play className="w-12 h-12 text-amber-400 translate-x-0.5" />
           </div>
-          <h3 className="text-2xl font-bold tracking-tight mb-2">Tablica Schulte</h3>
+          <h3 className="text-2xl font-bold tracking-tight mb-2">Schulte Table</h3>
           <p className="text-sm text-muted-foreground max-w-xs mb-6">
-            Klikaj liczby po kolei najszybciej jak potrafisz. Trenuj koncentrację i widzenie obwodowe!
+            Click numbers in order as fast as possible. Train peripheral vision & focus!
           </p>
           <Button
             size="lg"
@@ -105,7 +105,7 @@ export function SchulteGrid({
             className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-black font-extrabold px-8 shadow-lg shadow-amber-500/25 transition-transform hover:scale-105"
           >
             <Play className="w-5 h-5 mr-2 fill-current" />
-            Rozpocznij Grę
+            Start Game
           </Button>
         </div>
       )}

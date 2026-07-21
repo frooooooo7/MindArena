@@ -92,17 +92,17 @@ export function ColorWordDisplay({
             {question.isTrueFalse ? (
               <>
                 <HelpCircle className="w-6 h-6 stroke-[3]" />
-                <span>PRAWDA CZY FAŁSZ?</span>
+                <span>TRUE OR FALSE?</span>
               </>
             ) : isColorTarget ? (
               <>
                 <Palette className="w-6 h-6 stroke-[2.5]" />
-                <span>KOLOR CZCIONKI</span>
+                <span>FONT COLOR</span>
               </>
             ) : (
               <>
                 <Type className="w-6 h-6 stroke-[2.5]" />
-                <span>TREŚĆ SŁOWA</span>
+                <span>WORD TEXT</span>
               </>
             )}
           </div>
@@ -125,16 +125,16 @@ export function ColorWordDisplay({
               )}
               style={{ color: question.colorInk.hex }}
             >
-              {question.textWord.namePl}
+              {question.textWord.nameEn || question.textWord.namePl}
             </h2>
 
             {/* Sub-label Hint */}
             <p className="mt-3 text-sm md:text-base font-bold text-muted-foreground bg-background/50 backdrop-blur px-4 py-1 rounded-full border border-border/40">
               {question.isTrueFalse
-                ? "Wybierz TAK jeśli czcionka i treść to ten sam kolor"
+                ? "Select YES if font ink and word text match"
                 : isColorTarget
-                ? "Zaznacz barwę jaką widać czcionkę"
-                : "Zaznacz co oznacza napis"}
+                ? "Select the font ink color you see"
+                : "Select what the written text says"}
             </p>
           </div>
         ) : (
@@ -150,7 +150,7 @@ export function ColorWordDisplay({
               {countdown}
             </span>
             <p className="text-sm font-bold text-muted-foreground mt-4 tracking-widest uppercase">
-              Patrz na górny nagłówek zasady!
+              Watch the rule header at the top!
             </p>
           </div>
         )}
@@ -163,7 +163,7 @@ export function ColorWordDisplay({
             </div>
             <h3 className="text-2xl font-extrabold tracking-tight mb-2">Color Word Challenge</h3>
             <p className="text-sm text-muted-foreground max-w-sm mb-6">
-              Patrz na nagłówek u góry: KOLOR CZCIONKI lub TREŚĆ SŁOWA!
+              Watch top header rule: FONT COLOR or WORD TEXT!
             </p>
             <Button
               size="lg"
@@ -171,7 +171,7 @@ export function ColorWordDisplay({
               className="bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 hover:from-rose-600 hover:to-indigo-700 text-white font-extrabold px-8 shadow-lg shadow-rose-500/25 transition-transform hover:scale-105"
             >
               <Play className="w-5 h-5 mr-2 fill-current" />
-              Rozpocznij Grę
+              Start Game
             </Button>
           </div>
         )}
@@ -188,7 +188,7 @@ export function ColorWordDisplay({
             className="h-16 text-xl font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-transform"
           >
             <Check className="w-6 h-6 mr-2 stroke-[3]" />
-            TAK (Prawda) <span className="text-xs font-mono opacity-80 ml-2">[1]</span>
+            YES (True) <span className="text-xs font-mono opacity-80 ml-2">[1]</span>
           </Button>
 
           <Button
@@ -198,7 +198,7 @@ export function ColorWordDisplay({
             className="h-16 text-xl font-extrabold bg-rose-600 hover:bg-rose-700 text-white rounded-2xl shadow-lg shadow-rose-500/20 active:scale-95 transition-transform"
           >
             <X className="w-6 h-6 mr-2 stroke-[3]" />
-            NIE (Fałsz) <span className="text-xs font-mono opacity-80 ml-2">[2]</span>
+            NO (False) <span className="text-xs font-mono opacity-80 ml-2">[2]</span>
           </Button>
         </div>
       ) : (
@@ -211,9 +211,9 @@ export function ColorWordDisplay({
               disabled={!isPlaying}
               onClick={() => onAnswer(option.id)}
               className={cn(
-                "relative group flex items-center justify-between p-4 rounded-2xl bg-card/60 backdrop-blur border border-border/60 shadow-md transition-all duration-150 select-none touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 active:scale-95",
+                "relative group flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-md transition-all duration-150 select-none touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-portal-pink active:scale-95",
                 isPlaying
-                  ? "hover:border-rose-500/50 hover:bg-rose-500/10 hover:shadow-lg hover:-translate-y-0.5"
+                  ? "hover:border-portal-pink/50 hover:bg-portal-pink/10 hover:shadow-lg hover:-translate-y-0.5"
                   : "opacity-60 cursor-not-allowed"
               )}
             >
@@ -223,7 +223,7 @@ export function ColorWordDisplay({
                   style={{ backgroundColor: option.hex }}
                 />
                 <span className="text-base md:text-lg font-extrabold tracking-wide text-foreground">
-                  {option.namePl}
+                  {option.nameEn || option.namePl}
                 </span>
               </div>
 

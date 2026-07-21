@@ -44,24 +44,24 @@ export function GameOverDialog({
           )}
 
           <DialogTitle className="text-2xl font-extrabold tracking-tight">
-            {stats.isNewRecord ? "Nowy Rekord!" : "Koniec Gry!"}
+            {stats.isNewRecord ? "New High Score!" : "Game Over!"}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-sm">
-            Wyzwanie Color Word Challenge (
+            Color Word Challenge (
             {gameMode === "blitz"
-              ? "Tryb Blitz 30s"
+              ? "Blitz 30s Mode"
               : gameMode === "fever"
-              ? "Tryb Fever Combo 🔥"
+              ? "Fever Combo Mode 🔥"
               : gameMode === "true_false"
-              ? "Tryb Prawda / Fałsz ⚡"
-              : "20 Rund"})
+              ? "True / False Mode ⚡"
+              : "20 Rounds"})
           </DialogDescription>
         </DialogHeader>
 
         {/* Main Score Display */}
         <div className="flex flex-col items-center justify-center p-4 my-2 rounded-2xl bg-gradient-to-r from-rose-500/10 via-purple-500/10 to-indigo-500/10 border border-rose-500/20">
           <span className="text-xs font-semibold uppercase tracking-wider text-rose-400">
-            Wynik Końcowy
+            Final Score
           </span>
           <span className="text-4xl font-extrabold text-rose-300 mt-1">
             {stats.score}
@@ -73,7 +73,7 @@ export function GameOverDialog({
           {/* Reaction Time */}
           <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
             <div className="flex items-center gap-1 text-xs font-semibold text-cyan-400 uppercase tracking-wider">
-              <Zap className="w-3.5 h-3.5" /> Reakcja
+              <Zap className="w-3.5 h-3.5" /> Avg Reaction
             </div>
             <span className="text-2xl font-mono font-bold text-cyan-300 mt-1">
               {stats.avgReactionTimeMs} <span className="text-xs font-normal">ms</span>
@@ -83,7 +83,7 @@ export function GameOverDialog({
           {/* Accuracy */}
           <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <div className="flex items-center gap-1 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-              <Target className="w-3.5 h-3.5" /> Celność
+              <Target className="w-3.5 h-3.5" /> Accuracy
             </div>
             <span className="text-2xl font-mono font-bold text-emerald-300 mt-1">
               {stats.accuracy}%
@@ -93,7 +93,7 @@ export function GameOverDialog({
           {/* Max Streak */}
           <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <div className="flex items-center gap-1 text-xs font-semibold text-amber-400 uppercase tracking-wider">
-              <Flame className="w-3.5 h-3.5" /> Max Seria
+              <Flame className="w-3.5 h-3.5" /> Max Streak
             </div>
             <span className="text-2xl font-mono font-bold text-amber-300 mt-1">
               {stats.maxStreak}
@@ -103,7 +103,7 @@ export function GameOverDialog({
           {/* Correct / Wrong ratio */}
           <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
             <span className="text-xs font-semibold text-purple-400 uppercase tracking-wider">
-              Poprawne / Błędy
+              Correct / Wrong
             </span>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-lg font-bold text-emerald-400 flex items-center gap-0.5">
@@ -124,7 +124,7 @@ export function GameOverDialog({
             className="w-full bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white font-extrabold shadow-lg shadow-rose-500/20"
           >
             <RotateCcw className="w-5 h-5 mr-2" />
-            Zagraj Ponownie
+            Play Again
           </Button>
         </DialogFooter>
       </DialogContent>

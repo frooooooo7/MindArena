@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { GridSize, OrderDirection, GameState } from "@/lib/games/schulte-table/types";
 import { ArrowUp, ArrowDown, LayoutGrid } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface GameSettingsProps {
   gridSize: GridSize;
@@ -15,7 +16,7 @@ interface GameSettingsProps {
 const GRID_OPTIONS: { size: GridSize; label: string; count: string }[] = [
   { size: 3, label: "3x3", count: "1-9" },
   { size: 4, label: "4x4", count: "1-16" },
-  { size: 5, label: "5x5", count: "1-25 (Klasyczna)" },
+  { size: 5, label: "5x5", count: "1-25 (Classic)" },
   { size: 6, label: "6x6", count: "1-36" },
 ];
 
@@ -29,70 +30,68 @@ export function GameSettings({
   const isPlaying = gameState === "playing" || gameState === "countdown";
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full max-w-2xl bg-card/40 backdrop-blur border border-border/50 rounded-xl p-4 shadow-sm">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5 shadow-2xl">
       {/* Grid Size Selection */}
-      <div className="flex flex-col gap-1.5 w-full sm:w-auto">
-        <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
-          <LayoutGrid className="w-3.5 h-3.5 text-amber-500" /> Rozmiar siatki
+      <div className="flex flex-col gap-2 w-full sm:w-auto">
+        <span className="text-xs font-bold text-muted-foreground flex items-center gap-1.5 uppercase tracking-wider">
+          <LayoutGrid className="size-3.5 text-amber-400" /> Grid Size
         </span>
         <div className="flex items-center gap-1.5 flex-wrap">
           {GRID_OPTIONS.map((opt) => (
-            <Button
+            <button
               key={opt.size}
               type="button"
-              variant={gridSize === opt.size ? "default" : "outline"}
-              size="sm"
               disabled={isPlaying}
               onClick={() => onGridSizeChange(opt.size)}
-              className={
+              className={cn(
+                "rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200",
                 gridSize === opt.size
-                  ? "bg-amber-500 hover:bg-amber-600 text-black font-bold shadow-md shadow-amber-500/20"
-                  : "hover:border-amber-500/40"
-              }
+                  ? "bg-amber-400 text-black font-extrabold shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+                  : "border border-white/10 bg-white/5 text-muted-foreground hover:border-amber-400/40 hover:text-foreground",
+              )}
             >
               {opt.label}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
       {/* Direction Selection */}
-      <div className="flex flex-col gap-1.5 w-full sm:w-auto">
-        <span className="text-xs font-semibold text-muted-foreground">Kierunek liczenia</span>
+      <div className="flex flex-col gap-2 w-full sm:w-auto">
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Order Direction</span>
         <div className="flex items-center gap-2">
-          <Button
+          <button
             type="button"
-            variant={orderDirection === "asc" ? "default" : "outline"}
-            size="sm"
             disabled={isPlaying}
             onClick={() => onOrderDirectionChange("asc")}
-            className={
+            className={cn(
+              "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200",
               orderDirection === "asc"
-                ? "bg-violet-600 hover:bg-violet-700 text-white font-semibold shadow-md shadow-violet-500/20"
-                : "hover:border-violet-500/40"
-            }
+                ? "bg-portal-violet text-white shadow-[0_0_15px_rgba(117,92,255,0.3)]"
+                : "border border-white/10 bg-white/5 text-muted-foreground hover:border-portal-violet/40 hover:text-foreground",
+            )}
           >
-            <ArrowUp className="w-3.5 h-3.5 mr-1" />
-            Do góry (1 → N)
-          </Button>
+            <ArrowUp className="size-3.5 mr-1" />
+            Ascending (1 → N)
+          </button>
 
-          <Button
+          <button
             type="button"
-            variant={orderDirection === "desc" ? "default" : "outline"}
-            size="sm"
             disabled={isPlaying}
             onClick={() => onOrderDirectionChange("desc")}
-            className={
+            className={cn(
+              "inline-flex items-center rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200",
               orderDirection === "desc"
-                ? "bg-cyan-600 hover:bg-cyan-700 text-white font-semibold shadow-md shadow-cyan-500/20"
-                : "hover:border-cyan-500/40"
-            }
+                ? "bg-portal-blue text-[#07150f] font-extrabold shadow-[0_0_15px_rgba(75,168,255,0.3)]"
+                : "border border-white/10 bg-white/5 text-muted-foreground hover:border-portal-blue/40 hover:text-foreground",
+            )}
           >
-            <ArrowDown className="w-3.5 h-3.5 mr-1" />
-            W dół (N → 1)
-          </Button>
+            <ArrowDown className="size-3.5 mr-1" />
+            Descending (N → 1)
+          </button>
         </div>
       </div>
     </div>
   );
 }
+

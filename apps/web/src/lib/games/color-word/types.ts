@@ -7,6 +7,7 @@ export type GameState = "idle" | "countdown" | "playing" | "completed";
 export interface ColorItem {
   id: string;
   namePl: string;
+  nameEn: string;
   hex: string;
   textColorClass: string;
   bgColorClass: string;

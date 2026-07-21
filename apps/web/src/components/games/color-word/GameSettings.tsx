@@ -1,9 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { GameMode, RuleMode, Difficulty, GameState } from "@/lib/games/color-word/types";
 import { Zap, Target, Flame, CheckSquare, Palette, FileText, Shuffle, ShieldAlert } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface GameSettingsProps {
   gameMode: GameMode;
@@ -16,22 +15,22 @@ interface GameSettingsProps {
 }
 
 const GAME_MODE_OPTIONS: { mode: GameMode; label: string; icon: any; colorClass: string }[] = [
-  { mode: "blitz", label: "Blitz 30s", icon: Zap, colorClass: "from-rose-500 to-purple-600" },
-  { mode: "rounds", label: "20 Rund", icon: Target, colorClass: "from-purple-600 to-indigo-600" },
-  { mode: "fever", label: "Fever Combo", icon: Flame, colorClass: "from-amber-500 to-red-600" },
-  { mode: "true_false", label: "Prawda/Fałsz", icon: CheckSquare, colorClass: "from-cyan-500 to-blue-600" },
+  { mode: "blitz", label: "Blitz 30s", icon: Zap, colorClass: "bg-portal-pink text-white" },
+  { mode: "rounds", label: "20 Rounds", icon: Target, colorClass: "bg-portal-violet text-white" },
+  { mode: "fever", label: "Fever Combo", icon: Flame, colorClass: "bg-portal-yellow text-[#07150f]" },
+  { mode: "true_false", label: "True / False", icon: CheckSquare, colorClass: "bg-portal-blue text-[#07150f]" },
 ];
 
 const RULE_MODE_OPTIONS: { rule: RuleMode; label: string; icon: any }[] = [
-  { rule: "color", label: "Kolor Czcionki 🎨", icon: Palette },
-  { rule: "text", label: "Treść Słowa 📝", icon: FileText },
-  { rule: "mixed", label: "Zmienna Reguła 🔀", icon: Shuffle },
+  { rule: "color", label: "Font Color 🎨", icon: Palette },
+  { rule: "text", label: "Word Text 📝", icon: FileText },
+  { rule: "mixed", label: "Dynamic Rule 🔀", icon: Shuffle },
 ];
 
 const DIFFICULTY_OPTIONS: { diff: Difficulty; label: string }[] = [
-  { diff: "easy", label: "Łatwy (4 kolory)" },
-  { diff: "medium", label: "Średni (7 kolorów)" },
-  { diff: "expert", label: "Ekspert (Tło Zwodnicze 🎭)" },
+  { diff: "easy", label: "Easy (4 Colors)" },
+  { diff: "medium", label: "Medium (7 Colors)" },
+  { diff: "expert", label: "Expert (Distracting BG 🎭)" },
 ];
 
 export function GameSettings({
@@ -46,33 +45,32 @@ export function GameSettings({
   const isPlaying = gameState === "playing" || gameState === "countdown";
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-2xl bg-card/40 backdrop-blur border border-border/50 rounded-2xl p-4 md:p-5 shadow-md">
+    <div className="flex flex-col gap-4 w-full bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-5 shadow-2xl">
       {/* Game Mode Selection */}
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <Zap className="w-3.5 h-3.5 text-rose-400" /> Tryb Rozgrywki
+      <div className="flex flex-col gap-2">
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+          <Zap className="size-3.5 text-portal-pink" /> Game Mode
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {GAME_MODE_OPTIONS.map((opt) => {
             const Icon = opt.icon;
             const isSelected = gameMode === opt.mode;
             return (
-              <Button
+              <button
                 key={opt.mode}
                 type="button"
-                variant={isSelected ? "default" : "outline"}
-                size="sm"
                 disabled={isPlaying}
                 onClick={() => onGameModeChange(opt.mode)}
-                className={
+                className={cn(
+                  "inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-extrabold transition-all duration-200",
                   isSelected
-                    ? `bg-gradient-to-r ${opt.colorClass} text-white font-extrabold shadow-md shadow-rose-500/20`
-                    : "hover:border-rose-500/40"
-                }
+                    ? `${opt.colorClass} shadow-lg`
+                    : "border border-white/10 bg-white/5 text-muted-foreground hover:border-portal-pink/40 hover:text-foreground",
+                )}
               >
-                <Icon className="w-3.5 h-3.5 mr-1.5" />
-                {opt.label}
-              </Button>
+                <Icon className="size-3.5" />
+                <span>{opt.label}</span>
+              </button>
             );
           })}
         </div>
@@ -80,58 +78,56 @@ export function GameSettings({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Rule Mode Selection */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <Shuffle className="w-3.5 h-3.5 text-purple-400" /> Reguła Pytania
+        <div className="flex flex-col gap-2">
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+            <Shuffle className="size-3.5 text-portal-violet" /> Question Rule
           </span>
           <div className="flex items-center gap-1.5 flex-wrap">
             {RULE_MODE_OPTIONS.map((opt) => {
               const isSelected = ruleMode === opt.rule;
               return (
-                <Button
+                <button
                   key={opt.rule}
                   type="button"
-                  variant={isSelected ? "default" : "outline"}
-                  size="sm"
                   disabled={isPlaying}
                   onClick={() => onRuleModeChange(opt.rule)}
-                  className={
+                  className={cn(
+                    "rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200",
                     isSelected
-                      ? "bg-purple-600 text-white font-bold shadow-md shadow-purple-500/20"
-                      : "hover:border-purple-500/40 text-xs"
-                  }
+                      ? "bg-portal-violet text-white shadow-[0_0_15px_rgba(117,92,255,0.3)]"
+                      : "border border-white/10 bg-white/5 text-muted-foreground hover:border-portal-violet/40 hover:text-foreground",
+                  )}
                 >
                   {opt.label}
-                </Button>
+                </button>
               );
             })}
           </div>
         </div>
 
         {/* Difficulty Selection */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <ShieldAlert className="w-3.5 h-3.5 text-amber-400" /> Trudność
+        <div className="flex flex-col gap-2">
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+            <ShieldAlert className="size-3.5 text-portal-yellow" /> Difficulty Mode
           </span>
           <div className="flex items-center gap-1.5 flex-wrap">
             {DIFFICULTY_OPTIONS.map((opt) => {
               const isSelected = difficulty === opt.diff;
               return (
-                <Button
+                <button
                   key={opt.diff}
                   type="button"
-                  variant={isSelected ? "default" : "outline"}
-                  size="sm"
                   disabled={isPlaying}
                   onClick={() => onDifficultyChange(opt.diff)}
-                  className={
+                  className={cn(
+                    "rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200",
                     isSelected
-                      ? "bg-amber-500 text-black font-extrabold shadow-md shadow-amber-500/20"
-                      : "hover:border-amber-500/40 text-xs"
-                  }
+                      ? "bg-portal-yellow text-[#07150f] font-extrabold shadow-[0_0_15px_rgba(255,213,74,0.3)]"
+                      : "border border-white/10 bg-white/5 text-muted-foreground hover:border-portal-yellow/40 hover:text-foreground",
+                  )}
                 >
                   {opt.label}
-                </Button>
+                </button>
               );
             })}
           </div>
@@ -140,3 +136,4 @@ export function GameSettings({
     </div>
   );
 }
+

@@ -15,13 +15,13 @@ import { gameResultApi } from "@/lib/game-result-api";
 import { useAuthStore } from "@/store/auth.store";
 
 export const COLOR_ITEMS: ColorItem[] = [
-  { id: "red", namePl: "CZERWONY", hex: "#EF4444", textColorClass: "text-red-500", bgColorClass: "bg-red-500", borderColorClass: "border-red-500" },
-  { id: "blue", namePl: "NIEBIESKI", hex: "#3B82F6", textColorClass: "text-blue-500", bgColorClass: "bg-blue-500", borderColorClass: "border-blue-500" },
-  { id: "green", namePl: "ZIELONY", hex: "#22C55E", textColorClass: "text-green-500", bgColorClass: "bg-green-500", borderColorClass: "border-green-500" },
-  { id: "yellow", namePl: "ŻÓŁTY", hex: "#EAB308", textColorClass: "text-yellow-400", bgColorClass: "bg-yellow-400", borderColorClass: "border-yellow-400" },
-  { id: "purple", namePl: "FIOLETOWY", hex: "#A855F7", textColorClass: "text-purple-500", bgColorClass: "bg-purple-500", borderColorClass: "border-purple-500" },
-  { id: "orange", namePl: "POMARAŃCZOWY", hex: "#F97316", textColorClass: "text-orange-500", bgColorClass: "bg-orange-500", borderColorClass: "border-orange-500" },
-  { id: "pink", namePl: "RÓŻOWY", hex: "#EC4899", textColorClass: "text-pink-500", bgColorClass: "bg-pink-500", borderColorClass: "border-pink-500" },
+  { id: "red", namePl: "CZERWONY", nameEn: "RED", hex: "#EF4444", textColorClass: "text-red-500", bgColorClass: "bg-red-500", borderColorClass: "border-red-500" },
+  { id: "blue", namePl: "NIEBIESKI", nameEn: "BLUE", hex: "#3B82F6", textColorClass: "text-blue-500", bgColorClass: "bg-blue-500", borderColorClass: "border-blue-500" },
+  { id: "green", namePl: "ZIELONY", nameEn: "GREEN", hex: "#22C55E", textColorClass: "text-green-500", bgColorClass: "bg-green-500", borderColorClass: "border-green-500" },
+  { id: "yellow", namePl: "ŻÓŁTY", nameEn: "YELLOW", hex: "#EAB308", textColorClass: "text-yellow-400", bgColorClass: "bg-yellow-400", borderColorClass: "border-yellow-400" },
+  { id: "purple", namePl: "FIOLETOWY", nameEn: "PURPLE", hex: "#A855F7", textColorClass: "text-purple-500", bgColorClass: "bg-purple-500", borderColorClass: "border-purple-500" },
+  { id: "orange", namePl: "POMARAŃCZOWY", nameEn: "ORANGE", hex: "#F97316", textColorClass: "text-orange-500", bgColorClass: "bg-orange-500", borderColorClass: "border-orange-500" },
+  { id: "pink", namePl: "RÓŻOWY", nameEn: "PINK", hex: "#EC4899", textColorClass: "text-pink-500", bgColorClass: "bg-pink-500", borderColorClass: "border-pink-500" },
 ];
 
 function getRandomItem<T>(array: T[]): T {

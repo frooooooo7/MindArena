@@ -28,7 +28,7 @@ export function GameControls({
           className="border-rose-500/30 hover:border-rose-500/60 hover:bg-rose-500/10 text-foreground font-semibold shadow-sm"
         >
           <RotateCcw className="w-4 h-4 mr-2" />
-          Restartuj Grę
+          Restart Game
         </Button>
       ) : (
         <Button
@@ -36,7 +36,7 @@ export function GameControls({
           className="bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white font-extrabold shadow-md shadow-rose-500/20"
         >
           <Play className="w-4 h-4 mr-2 fill-current" />
-          Zagraj Ponownie
+          Play Again
         </Button>
       )}
     </div>

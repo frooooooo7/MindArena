@@ -48,10 +48,10 @@ export function GameOverDialog({
           )}
 
           <DialogTitle className="text-2xl font-extrabold tracking-tight">
-            {stats.isNewRecord ? "Nowy Rekord!" : "Ukończono Grę!"}
+            {stats.isNewRecord ? "New High Score!" : "Game Complete!"}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-sm">
-            Wykonałeś wyzwanie Schulte Table {gridSize}x{gridSize} (
+            Completed Schulte Table {gridSize}x{gridSize} (
             {orderDirection === "asc" ? "1 → N" : "N → 1"})
           </DialogDescription>
         </DialogHeader>
@@ -61,7 +61,7 @@ export function GameOverDialog({
           {/* Time */}
           <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <span className="text-xs font-semibold text-amber-500 uppercase tracking-wider">
-              Czas
+              Time
             </span>
             <span className="text-2xl font-mono font-bold text-amber-400 mt-1">
               {formatTime(stats.elapsedMs)}
@@ -74,14 +74,14 @@ export function GameOverDialog({
               <Zap className="w-3.5 h-3.5" /> Speed
             </div>
             <span className="text-2xl font-mono font-bold text-cyan-300 mt-1">
-              {stats.clicksPerSecond} <span className="text-xs font-normal">klik/s</span>
+              {stats.clicksPerSecond} <span className="text-xs font-normal">clicks/s</span>
             </span>
           </div>
 
           {/* Accuracy */}
           <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
             <div className="flex items-center gap-1 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-              <Target className="w-3.5 h-3.5" /> Celność
+              <Target className="w-3.5 h-3.5" /> Accuracy
             </div>
             <span className="text-2xl font-mono font-bold text-emerald-300 mt-1">
               {stats.accuracy}%
@@ -91,7 +91,7 @@ export function GameOverDialog({
           {/* Mistakes */}
           <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
             <div className="flex items-center gap-1 text-xs font-semibold text-rose-400 uppercase tracking-wider">
-              <AlertTriangle className="w-3.5 h-3.5" /> Błędy
+              <AlertTriangle className="w-3.5 h-3.5" /> Mistakes
             </div>
             <span className="text-2xl font-mono font-bold text-rose-300 mt-1">
               {stats.mistakes}
@@ -106,7 +106,7 @@ export function GameOverDialog({
             className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-black font-extrabold shadow-lg shadow-amber-500/20"
           >
             <RotateCcw className="w-5 h-5 mr-2" />
-            Zagraj Ponownie
+            Play Again
           </Button>
         </DialogFooter>
       </DialogContent>
