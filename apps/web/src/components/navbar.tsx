@@ -1,33 +1,45 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Brain, Swords, Gamepad2, Trophy, BarChart3, User, Users, Menu, X, LogOut, Settings, Sun, Moon } from "lucide-react";
+import {
+  BarChart3,
+  Gamepad2,
+  LogOut,
+  Menu,
+  Moon,
+  Settings,
+  Sun,
+  Swords,
+  User,
+  Users,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth.store";
-import { authService } from "@/services/auth.service";
-import { useTheme } from "next-themes";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { authService } from "@/services/auth.service";
+import { useAuthStore } from "@/store/auth.store";
+import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 const navItems = [
-  { name: "Arena", href: "/arena", icon: Swords },
   { name: "Games", href: "/games", icon: Gamepad2 },
-  { name: "Challenges", href: "/challenges", icon: Trophy },
-  { name: "Stats", href: "/stats", icon: BarChart3 },
+  { name: "Arena", href: "/arena", icon: Swords },
+  { name: "Ranking", href: "/stats", icon: BarChart3 },
 ];
 
 export function Navbar() {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated, user, clearAuth } = useAuthStore();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -37,142 +49,184 @@ export function Navbar() {
     }
   };
 
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
+
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/25 transition-all group-hover:shadow-violet-500/40 group-hover:scale-105">
-              <Brain className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              MindArena
-            </span>
+    <nav className="sticky top-0 z-50 w-full border-b border-white/8 bg-background/82 backdrop-blur-xl supports-[backdrop-filter]:bg-background/72">
+      <div className="portal-section">
+        <div className="flex h-[4.5rem] items-center justify-between">
+          <Link
+            href="/"
+            className="font-display inline-flex min-h-11 items-center text-xl font-bold tracking-[-0.06em]"
+            aria-label="MindArena home"
+          >
+            MIND<span className="text-portal-mint">ARENA</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="group relative flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <item.icon className="h-4 w-4 transition-colors group-hover:text-violet-500" />
-                <span>{item.name}</span>
-                <span className="absolute inset-x-2 -bottom-px h-px bg-gradient-to-r from-violet-500/0 via-violet-500/70 to-violet-500/0 opacity-0 transition-opacity group-hover:opacity-100" />
-              </Link>
-            ))}
+          <div className="hidden items-center gap-1 md:flex">
+            {navItems.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold transition-colors ${
+                    active
+                      ? "bg-white/8 text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <item.icon
+                    className={`size-4 ${active ? "text-portal-mint" : ""}`}
+                  />
+                  {item.name}
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Right side */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-3 bg-secondary/30 pl-1 pr-4 py-1 rounded-full border border-border/40 hover:bg-secondary/50 transition-colors cursor-pointer group/user">
-                    <div className="group-hover/user:scale-105 transition-transform">
-                      <UserAvatar name={user?.name || "User"} avatarUrl={user?.avatarUrl} size="sm" />
-                    </div>
-                    <span className="hidden sm:inline text-sm font-semibold tracking-tight text-foreground">
+                  <button
+                    type="button"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-1.5 pr-3 text-sm font-bold transition-colors hover:bg-white/10"
+                    aria-label={`Open account menu for ${user?.name ?? "user"}`}
+                  >
+                    <UserAvatar
+                      name={user?.name || "User"}
+                      avatarUrl={user?.avatarUrl}
+                      size="sm"
+                    />
+                    <span className="hidden max-w-28 truncate sm:inline">
                       {user?.name}
                     </span>
-                  </div>
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <Link href="/account?tab=overview">
-                    <DropdownMenuItem className="gap-2 cursor-pointer font-semibold">
-                      <User className="h-4 w-4 text-violet-500" />
-                      <span>My Account</span>
+                    <DropdownMenuItem className="cursor-pointer gap-2 font-semibold">
+                      <User className="size-4 text-portal-mint" />
+                      My Account
                     </DropdownMenuItem>
                   </Link>
                   <Link href="/account?tab=social">
-                    <DropdownMenuItem className="gap-2 cursor-pointer">
-                      <Users className="h-4 w-4 text-violet-500" />
-                      <span>Friends</span>
+                    <DropdownMenuItem className="cursor-pointer gap-2">
+                      <Users className="size-4 text-portal-mint" />
+                      Friends
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuSeparator />
                   <Link href="/account">
-                    <DropdownMenuItem className="gap-2 cursor-pointer">
-                      <Settings className="h-4 w-4" />
-                      <span>Settings</span>
+                    <DropdownMenuItem className="cursor-pointer gap-2">
+                      <Settings className="size-4" />
+                      Settings
                     </DropdownMenuItem>
                   </Link>
-                  <DropdownMenuItem 
-                    className="gap-2 cursor-pointer"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2"
+                    onClick={() =>
+                      setTheme(resolvedTheme === "dark" ? "light" : "dark")
+                    }
                   >
-                    {theme === "dark" ? (
-                      <>
-                        <Sun className="h-4 w-4" />
-                        <span>Light Mode</span>
-                      </>
+                    {resolvedTheme === "dark" ? (
+                      <Sun className="size-4" />
                     ) : (
-                      <>
-                        <Moon className="h-4 w-4" />
-                        <span>Dark Mode</span>
-                      </>
+                      <Moon className="size-4" />
                     )}
+                    {resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    className="gap-2 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
+                  <DropdownMenuItem
+                    className="cursor-pointer gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
                     onClick={handleLogout}
                   >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
+                    <LogOut className="size-4" />
+                    Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-3">
-                <Link href="/auth">
-                  <Button
-                    size="sm"
-                    className="hidden sm:flex h-9 px-4 font-medium bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all"
-                  >
-                    Sign In
-                  </Button>
+              <div className="hidden items-center gap-1 sm:flex">
+                <Link
+                  href="/auth"
+                  className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/games"
+                  className="inline-flex min-h-11 items-center rounded-full bg-portal-mint px-4 text-sm font-extrabold text-[#07150f] transition-transform hover:-translate-y-0.5"
+                >
+                  Quick play
                 </Link>
               </div>
             )}
 
-            {/* Mobile menu button */}
-
-            {/* Mobile menu button */}
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="size-11 rounded-full md:hidden"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
+              aria-label={mobileMenuOpen ? "Close navigation" : "Open navigation"}
             >
               {mobileMenuOpen ? (
-                <X className="h-5 w-5" />
+                <X className="size-5" />
               ) : (
-                <Menu className="h-5 w-5" />
+                <Menu className="size-5" />
               )}
-              <span className="sr-only">Toggle menu</span>
             </Button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border/40 py-4 animate-in slide-in-from-top-2 duration-200">
+          <div
+            id="mobile-navigation"
+            className="border-t border-white/8 py-3 md:hidden"
+          >
             <div className="flex flex-col gap-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                >
-                  <item.icon className="h-5 w-5 text-violet-500" />
-                  <span>{item.name}</span>
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex min-h-12 items-center gap-3 rounded-xl px-3 text-sm font-bold ${
+                      active
+                        ? "bg-white/8 text-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    <item.icon className="size-5 text-portal-mint" />
+                    {item.name}
+                  </Link>
+                );
+              })}
+              {!isAuthenticated && (
+                <div className="mt-2 grid grid-cols-2 gap-2 border-t border-white/8 pt-3">
+                  <Link
+                    href="/auth"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/10 text-sm font-bold"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/games"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl bg-portal-mint text-sm font-extrabold text-[#07150f]"
+                  >
+                    Quick play
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}
