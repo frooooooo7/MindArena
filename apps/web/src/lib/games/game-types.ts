@@ -1,6 +1,6 @@
 "use client";
 
-import { Brain, Grid3X3, Binary, LayoutGrid, Palette, LucideIcon } from "lucide-react";
+import { Brain, Grid3X3, Binary, LayoutGrid, Palette, Calculator, LucideIcon } from "lucide-react";
 
 /**
  * Shared game type definitions used across the application.
@@ -109,6 +109,21 @@ export const GAME_TYPES: GameTypeDefinition[] = [
         skills: ["Stroop Interference", "Reaction Velocity", "Cognitive Control"],
         playsCount: "16.9k",
         image: "/game_photos/colours.png",
+    },
+    {
+        id: "fast-math",
+        name: "Fast Math Challenge",
+        shortName: "Fast Math",
+        description: "Solve rapid mental arithmetic equations under customizable time limits and range levels. Sharpen calculation speed and numerical focus.",
+        icon: Calculator,
+        color: "from-emerald-400 via-cyan-500 to-blue-600",
+        shadow: "shadow-cyan-500/30",
+        href: "/games/fast-math",
+        difficulty: "Medium",
+        averageTime: "1-3 min",
+        category: "Speed & Reaction",
+        skills: ["Mental Arithmetic", "Calculation Velocity", "Numerical Focus"],
+        playsCount: "12.4k",
     }
 ] as const;
 

@@ -107,7 +107,7 @@ export default function GamesPage() {
               <div className="mt-8 flex flex-wrap items-center justify-center gap-6 border-t border-white/10 pt-6 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Layers className="size-4 text-portal-mint" />
-                  <span className="font-semibold text-foreground">5 Core Games</span>
+                  <span className="font-semibold text-foreground">6 Core Games</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="size-4 text-portal-yellow" />

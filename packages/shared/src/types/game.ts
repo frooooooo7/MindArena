@@ -3,7 +3,7 @@
  */
 
 // Game Types
-export const GAME_TYPE_IDS = ["sequence", "chimp", "code", "schulte", "color-word"] as const;
+export const GAME_TYPE_IDS = ["sequence", "chimp", "code", "schulte", "color-word", "fast-math"] as const;
 export type GameTypeId = (typeof GAME_TYPE_IDS)[number];
 
 // Game Modes
