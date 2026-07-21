@@ -12,7 +12,7 @@ export function Footer() {
       <div className="portal-section flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/"
-          className="font-display text-lg font-bold tracking-[-0.055em]"
+          className="font-display inline-flex min-h-11 items-center text-lg font-bold tracking-[-0.055em]"
           aria-label="MindArena home"
         >
           MIND<span className="text-portal-mint">ARENA</span>
@@ -23,7 +23,7 @@ export function Footer() {
             <Link
               key={item.href}
               href={item.href}
-              className="inline-flex min-h-11 items-center text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center px-1 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
               {item.label}
             </Link>
