@@ -5,6 +5,7 @@ import {
   Footer,
   HeroSection,
   PlayerProgress,
+  ScrollReveal,
 } from "@/components/home";
 
 export default function Home() {
@@ -14,8 +15,12 @@ export default function Home() {
       <main>
         <HeroSection />
         <FeaturesGrid />
-        <PlayerProgress />
-        <ArenaPromo />
+        <ScrollReveal>
+          <PlayerProgress />
+        </ScrollReveal>
+        <ScrollReveal delay={0.04}>
+          <ArenaPromo />
+        </ScrollReveal>
       </main>
       <Footer />
     </div>

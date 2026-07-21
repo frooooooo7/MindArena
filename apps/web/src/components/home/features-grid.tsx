@@ -1,9 +1,18 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
+import { motion, type Variants, useReducedMotion } from "framer-motion";
 import { ArrowRight, Layers3 } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
 import homeGames from "./home-games.json";
+import { SequenceGameDemo } from "./sequence-game-demo";
 
 type GameMotif = "sequence" | "numbers" | "code" | "color" | "grid";
 type GameTone = "violet" | "mint" | "pink" | "yellow" | "blue";
+type GameImageFit = "cover" | "contain";
 
 interface HomeGame {
   id: string;
@@ -14,6 +23,9 @@ interface HomeGame {
   motif: GameMotif;
   tone: GameTone;
   featured: boolean;
+  image?: string;
+  imageFit?: GameImageFit;
+  imagePosition?: string;
 }
 
 const TONE_STYLES: Record<GameTone, string> = {
@@ -37,7 +49,34 @@ const TONE_ACCENTS: Record<GameTone, string> = {
   blue: "text-portal-blue",
 };
 
-function GameMotif({ motif, featured }: { motif: GameMotif; featured: boolean }) {
+const CARD_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: index * 0.04,
+      duration: 0.32,
+      ease: "easeOut",
+    },
+  }),
+  hover: {
+    opacity: 1,
+    y: -4,
+    transition: { duration: 0.2, ease: "easeOut" },
+  },
+};
+
+const SCREENSHOT_VARIANTS: Variants = {
+  hidden: { scale: 1 },
+  visible: { scale: 1 },
+  hover: {
+    scale: 1.03,
+    transition: { duration: 0.28, ease: "easeOut" },
+  },
+};
+
+function GameMotif({ motif }: { motif: GameMotif }) {
   if (motif === "numbers") {
     return (
       <div className="flex gap-2">
@@ -87,25 +126,172 @@ function GameMotif({ motif, featured }: { motif: GameMotif; featured: boolean })
   }
 
   return (
-    <div
-      className={`grid grid-cols-3 gap-2 ${featured ? "w-full max-w-xs" : "w-28"}`}
-    >
-      {Array.from({ length: featured ? 9 : 6 }, (_, index) => (
+    <div className="grid w-28 grid-cols-3 gap-2">
+      {Array.from({ length: 6 }, (_, index) => (
         <span
           key={index}
-          className={`aspect-square rounded-lg border border-white/10 ${
-            index === 4
-              ? "bg-portal-mint shadow-[0_0_24px_rgb(112_245_193_/_0.48)]"
-              : "bg-white/8"
-          }`}
+          className={cn(
+            "aspect-square rounded-lg border border-white/10 bg-white/8",
+            index === 4 &&
+              "bg-portal-mint shadow-[0_0_24px_rgb(112_245_193_/_0.48)]",
+          )}
         />
       ))}
     </div>
   );
 }
 
+function SequenceGameCard({
+  game,
+  index,
+  reduceMotion,
+}: {
+  game: HomeGame;
+  index: number;
+  reduceMotion: boolean;
+}) {
+  return (
+    <motion.article
+      aria-labelledby={`${game.id}-title`}
+      custom={index}
+      initial={reduceMotion ? false : "hidden"}
+      whileInView={reduceMotion ? undefined : "visible"}
+      viewport={{ once: true, amount: 0.16 }}
+      variants={CARD_VARIANTS}
+      className={cn(
+        "relative isolate row-span-2 flex min-w-0 flex-col overflow-hidden rounded-[1.4rem] border p-5 sm:p-6 md:col-span-2 lg:col-span-6",
+        TONE_STYLES[game.tone],
+      )}
+    >
+      <div className="portal-dot-grid absolute inset-0 -z-10 opacity-25 [mask-image:linear-gradient(150deg,black,transparent_78%)]" />
+
+      <div className="shrink-0">
+        <span
+          className={cn(
+            "text-[0.65rem] font-black uppercase tracking-[0.19em]",
+            TONE_ACCENTS[game.tone],
+          )}
+        >
+          {game.category}
+        </span>
+        <h3
+          id={`${game.id}-title`}
+          className="font-display mt-3 text-3xl font-bold tracking-[-0.035em] sm:text-4xl"
+        >
+          {game.title}
+        </h3>
+        <p className="mt-2 max-w-sm text-sm leading-5 text-white/58">
+          {game.description}
+        </p>
+      </div>
+
+      <div className="mt-5 flex min-h-0 flex-1 items-end">
+        <div className="w-full max-w-[20rem]">
+          <SequenceGameDemo />
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function PhotoGameCard({
+  game,
+  index,
+  reduceMotion,
+}: {
+  game: HomeGame;
+  index: number;
+  reduceMotion: boolean;
+}) {
+  return (
+    <motion.article
+      custom={index}
+      initial={reduceMotion ? false : "hidden"}
+      whileInView={reduceMotion ? undefined : "visible"}
+      whileHover={reduceMotion ? undefined : "hover"}
+      viewport={{ once: true, amount: 0.16 }}
+      variants={CARD_VARIANTS}
+      className={cn(
+        "group relative isolate min-w-0 overflow-hidden rounded-[1.4rem] border transition-[border-color,box-shadow] duration-200 hover:border-white/35 hover:shadow-[0_24px_60px_rgb(0_0_0_/_0.28)] focus-within:z-10 focus-within:border-white/40 lg:col-span-3",
+        TONE_STYLES[game.tone],
+      )}
+    >
+      <Link
+        href={game.href}
+        aria-label={`Play ${game.title}`}
+        className="relative flex h-full min-h-11 min-w-0 flex-col justify-between overflow-hidden rounded-[inherit] p-5 focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white sm:p-6"
+      >
+        {game.image ? (
+          <>
+            {game.imageFit === "contain" && (
+              <div className="absolute inset-0 bg-[#080b14]" />
+            )}
+            <motion.div
+              aria-hidden="true"
+              variants={SCREENSHOT_VARIANTS}
+              className="absolute inset-0"
+            >
+              <Image
+                src={game.image}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                className={cn(game.imageFit === "contain" && "p-5 sm:p-7")}
+                style={{
+                  objectFit: game.imageFit ?? "cover",
+                  objectPosition: game.imagePosition ?? "center",
+                }}
+              />
+            </motion.div>
+          </>
+        ) : (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 grid place-items-center opacity-85"
+          >
+            <GameMotif motif={game.motif} />
+          </div>
+        )}
+
+        <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgb(4_7_15_/_0.38)_0%,rgb(4_7_15_/_0.52)_38%,rgb(4_7_15_/_0.96)_100%)]" />
+
+        <div className="relative z-10 flex items-start justify-between gap-4">
+          <span
+            className={cn(
+              "text-[0.65rem] font-black uppercase tracking-[0.19em]",
+              TONE_ACCENTS[game.tone],
+            )}
+          >
+            {game.category}
+          </span>
+          <ArrowRight
+            aria-hidden="true"
+            className={cn(
+              "size-4 shrink-0 text-white/70 group-hover:text-white",
+              !reduceMotion && "transition-transform group-hover:translate-x-1",
+            )}
+          />
+        </div>
+
+        <div className="relative z-10">
+          <h3 className="font-display text-xl font-bold tracking-[-0.035em]">
+            {game.title}
+          </h3>
+          <p className="mt-2 max-w-sm text-xs leading-5 text-white/75">
+            {game.description}
+          </p>
+          <span className="mt-3 inline-flex min-h-11 items-center text-xs font-extrabold uppercase tracking-[0.12em] text-white">
+            Play now
+          </span>
+        </div>
+      </Link>
+    </motion.article>
+  );
+}
+
 export function FeaturesGrid() {
   const games = homeGames as HomeGame[];
+  const reduceMotion = Boolean(useReducedMotion());
 
   return (
     <section id="games" className="scroll-mt-20 bg-portal-surface py-20 sm:py-28">
@@ -126,56 +312,24 @@ export function FeaturesGrid() {
           </p>
         </div>
 
-        <div className="grid auto-rows-[15.5rem] gap-3 md:grid-cols-2 lg:grid-cols-12">
-          {games.map((game) => (
-            <Link
-              key={game.id}
-              href={game.href}
-              className={`group relative isolate flex overflow-hidden rounded-[1.4rem] border p-5 transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-1 hover:border-white/35 hover:shadow-[0_24px_60px_rgb(0_0_0_/_0.28)] focus-visible:z-10 sm:p-6 ${TONE_STYLES[game.tone]} ${
-                game.featured
-                  ? "row-span-2 md:col-span-2 lg:col-span-6"
-                  : "lg:col-span-3"
-              }`}
-            >
-              <article className="flex min-w-0 flex-1 flex-col justify-between">
-                <div className="flex items-start justify-between gap-4">
-                  <span
-                    className={`text-[0.65rem] font-black uppercase tracking-[0.19em] ${TONE_ACCENTS[game.tone]}`}
-                  >
-                    {game.category}
-                  </span>
-                  <ArrowRight className="size-4 text-white/45 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-white" />
-                </div>
-
-                <div
-                  aria-hidden="true"
-                  className={`${game.featured ? "my-8" : "my-5"}`}
-                >
-                  <GameMotif motif={game.motif} featured={game.featured} />
-                </div>
-
-                <div>
-                  <h3
-                    className={`font-display font-bold tracking-[-0.035em] ${
-                      game.featured ? "text-3xl sm:text-4xl" : "text-xl"
-                    }`}
-                  >
-                    {game.title}
-                  </h3>
-                  <p
-                    className={`mt-2 max-w-sm leading-5 text-white/58 ${
-                      game.featured ? "text-sm" : "text-xs"
-                    }`}
-                  >
-                    {game.description}
-                  </p>
-                  <span className="mt-4 inline-flex min-h-11 items-center text-xs font-extrabold uppercase tracking-[0.12em] text-white">
-                    Play now
-                  </span>
-                </div>
-              </article>
-            </Link>
-          ))}
+        <div className="grid auto-rows-[20rem] gap-3 md:grid-cols-2 lg:grid-cols-12">
+          {games.map((game, index) =>
+            game.featured ? (
+              <SequenceGameCard
+                key={game.id}
+                game={game}
+                index={index}
+                reduceMotion={reduceMotion}
+              />
+            ) : (
+              <PhotoGameCard
+                key={game.id}
+                game={game}
+                index={index}
+                reduceMotion={reduceMotion}
+              />
+            ),
+          )}
         </div>
 
         <div className="mt-5 flex justify-center sm:justify-end">
@@ -183,9 +337,15 @@ export function FeaturesGrid() {
             href="/games"
             className="group inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground"
           >
-            <Layers3 className="size-4 text-portal-mint" />
+            <Layers3 className="size-4 text-portal-mint" aria-hidden="true" />
             Explore all games
-            <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+            <ArrowRight
+              aria-hidden="true"
+              className={cn(
+                "size-4",
+                !reduceMotion && "transition-transform group-hover:translate-x-1",
+              )}
+            />
           </Link>
         </div>
       </div>
