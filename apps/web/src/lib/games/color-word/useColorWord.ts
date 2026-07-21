@@ -71,13 +71,15 @@ export function generateQuestion(
 
   const correctAnswer = target === "color" ? colorInk : textWord;
 
-  // True/False Mode
+  // True/False Mode: Tests if font color matches word text meaning
   if (gameMode === "true_false") {
     const tfIsCorrect = Math.random() < 0.5;
-    let tfTargetColor = correctAnswer;
+    const textWord = getRandomItem(availableColors);
+    let colorInk = textWord;
+
     if (!tfIsCorrect) {
-      const wrongPool = availableColors.filter((c) => c.id !== correctAnswer.id);
-      tfTargetColor = getRandomItem(wrongPool);
+      const wrongInkPool = availableColors.filter((c) => c.id !== textWord.id);
+      colorInk = getRandomItem(wrongInkPool);
     }
 
     return {
@@ -85,10 +87,10 @@ export function generateQuestion(
       textWord,
       colorInk,
       bgDistraction,
-      target,
+      target: "color",
       options: [],
       isTrueFalse: true,
-      tfTargetColor,
+      tfTargetColor: colorInk,
       tfIsCorrect,
     };
   }

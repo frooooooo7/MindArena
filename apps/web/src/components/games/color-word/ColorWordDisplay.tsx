@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { Question, GameState, ColorItem } from "@/lib/games/color-word/types";
+import { Question, GameState } from "@/lib/games/color-word/types";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Play, Sparkles, AlertCircle, Check, X, Flame } from "lucide-react";
+import { Play, Sparkles, Check, X, Flame, Palette, Type, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ColorWordDisplayProps {
@@ -56,53 +55,72 @@ export function ColorWordDisplay({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isPlaying, question, onAnswer]);
 
+  const isColorTarget = question?.target === "color" && !question.isTrueFalse;
+  const isTextTarget = question?.target === "text" && !question.isTrueFalse;
+
   return (
     <div className="relative w-full max-w-xl flex flex-col items-center gap-6">
       {/* Main Question Display Card */}
       <div
         className={cn(
-          "relative w-full h-60 md:h-68 rounded-3xl bg-card/60 backdrop-blur-xl border border-border/80 shadow-2xl flex flex-col items-center justify-center p-6 text-center transition-all duration-200 overflow-hidden select-none",
-          feverActive && "ring-4 ring-amber-500/50 shadow-amber-500/30 scale-[1.01]",
-          feedback === "correct" && "border-2 border-emerald-500 bg-emerald-500/10 shadow-emerald-500/20 scale-[1.02]",
-          feedback === "wrong" && "border-2 border-rose-500 bg-rose-500/10 shadow-rose-500/20 animate-shake"
+          "relative w-full h-72 md:h-80 rounded-3xl backdrop-blur-xl border-2 shadow-2xl flex flex-col items-center justify-between p-0 overflow-hidden select-none transition-all duration-200",
+          isColorTarget && "bg-purple-950/20 border-purple-500/60 shadow-purple-500/20",
+          isTextTarget && "bg-cyan-950/20 border-cyan-500/60 shadow-cyan-500/20",
+          question?.isTrueFalse && "bg-amber-950/20 border-amber-500/60 shadow-amber-500/20",
+          feverActive && "ring-4 ring-amber-500/70 shadow-amber-500/40 scale-[1.01]",
+          feedback === "correct" && "border-4 border-emerald-500 bg-emerald-500/20 shadow-emerald-500/30 scale-[1.02]",
+          feedback === "wrong" && "border-4 border-rose-500 bg-rose-500/20 shadow-rose-500/30 animate-shake"
         )}
         style={
           question?.bgDistraction
-            ? { backgroundColor: `${question.bgDistraction.hex}15` }
+            ? { backgroundColor: `${question.bgDistraction.hex}20` }
             : undefined
         }
       >
-        {/* Dynamic Rule Prompt Badge */}
+        {/* Clean Single Icon Rule Header Bar */}
         {question && (
-          <Badge
-            variant="outline"
+          <div
             className={cn(
-              "mb-4 font-extrabold uppercase tracking-wider px-3.5 py-1 text-xs md:text-sm flex items-center gap-1.5 shadow-sm transition-colors",
-              question.target === "color"
-                ? "bg-rose-500/15 border-rose-500/40 text-rose-300"
-                : "bg-cyan-500/15 border-cyan-500/40 text-cyan-300"
+              "w-full py-3 px-4 flex items-center justify-center gap-2.5 font-black uppercase tracking-wider text-lg md:text-xl shadow-md transition-all duration-150 animate-in fade-in slide-in-from-top-2",
+              question.isTrueFalse
+                ? "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-black"
+                : isColorTarget
+                ? "bg-gradient-to-r from-purple-600 via-rose-600 to-pink-600 text-white"
+                : "bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 text-white"
             )}
           >
-            <AlertCircle className="w-4 h-4" />
-            {question.target === "color"
-              ? "🎨 Zaznacz KOLOR CZCIONKI (nie treść!)"
-              : "📝 Zaznacz TREŚĆ NAPISU (nie kolor!)"}
-          </Badge>
+            {question.isTrueFalse ? (
+              <>
+                <HelpCircle className="w-6 h-6 stroke-[3]" />
+                <span>PRAWDA CZY FAŁSZ?</span>
+              </>
+            ) : isColorTarget ? (
+              <>
+                <Palette className="w-6 h-6 stroke-[2.5]" />
+                <span>KOLOR CZCIONKI</span>
+              </>
+            ) : (
+              <>
+                <Type className="w-6 h-6 stroke-[2.5]" />
+                <span>TREŚĆ SŁOWA</span>
+              </>
+            )}
+          </div>
         )}
 
         {/* Fever Indicator Banner */}
         {feverActive && (
-          <div className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500 text-black text-xs font-black uppercase tracking-wider animate-pulse shadow-lg">
-            <Flame className="w-3.5 h-3.5 fill-current" /> FEVER x2
+          <div className="absolute top-14 right-3 flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500 text-black text-xs font-black uppercase tracking-wider animate-pulse shadow-lg z-10">
+            <Flame className="w-4 h-4 fill-current" /> FEVER x2
           </div>
         )}
 
-        {/* True/False Statement or Word Display */}
+        {/* Central Word Display */}
         {question ? (
-          <div className="flex flex-col items-center">
+          <div className="flex-1 flex flex-col items-center justify-center px-6 text-center py-4">
             <h2
               className={cn(
-                "text-5xl md:text-7xl font-black tracking-wider transition-all duration-150 transform active:scale-95 drop-shadow-md",
+                "text-3xl sm:text-5xl md:text-6xl font-black tracking-wider transition-all duration-150 transform active:scale-95 drop-shadow-lg max-w-full px-2 leading-none",
                 question.colorInk.textColorClass
               )}
               style={{ color: question.colorInk.hex }}
@@ -110,21 +128,19 @@ export function ColorWordDisplay({
               {question.textWord.namePl}
             </h2>
 
-            {question.isTrueFalse && question.tfTargetColor && (
-              <p className="mt-4 text-base md:text-lg font-semibold text-foreground bg-background/60 backdrop-blur px-4 py-1.5 rounded-xl border border-border/60">
-                Czy {question.target === "color" ? "czcionka ma kolor" : "treść napisu to"}{" "}
-                <span
-                  className="font-extrabold uppercase tracking-wide underline underline-offset-4"
-                  style={{ color: question.tfTargetColor.hex }}
-                >
-                  {question.tfTargetColor.namePl}
-                </span>
-                ?
-              </p>
-            )}
+            {/* Sub-label Hint */}
+            <p className="mt-3 text-sm md:text-base font-bold text-muted-foreground bg-background/50 backdrop-blur px-4 py-1 rounded-full border border-border/40">
+              {question.isTrueFalse
+                ? "Wybierz TAK jeśli czcionka i treść to ten sam kolor"
+                : isColorTarget
+                ? "Zaznacz barwę jaką widać czcionkę"
+                : "Zaznacz co oznacza napis"}
+            </p>
           </div>
         ) : (
-          <span className="text-muted-foreground text-xl">...</span>
+          <div className="flex-1 flex items-center justify-center">
+            <span className="text-muted-foreground text-xl">...</span>
+          </div>
         )}
 
         {/* Countdown Overlay */}
@@ -134,7 +150,7 @@ export function ColorWordDisplay({
               {countdown}
             </span>
             <p className="text-sm font-bold text-muted-foreground mt-4 tracking-widest uppercase">
-              Bądź czujny i skup wzrok...
+              Patrz na górny nagłówek zasady!
             </p>
           </div>
         )}
@@ -147,7 +163,7 @@ export function ColorWordDisplay({
             </div>
             <h3 className="text-2xl font-extrabold tracking-tight mb-2">Color Word Challenge</h3>
             <p className="text-sm text-muted-foreground max-w-sm mb-6">
-              Ignoruj treść lub czcionkę zależnie od reguły! Trenuj hamowanie reakcji (Efekt Stroopa) oraz refleks.
+              Patrz na nagłówek u góry: KOLOR CZCIONKI lub TREŚĆ SŁOWA!
             </p>
             <Button
               size="lg"
@@ -211,12 +227,9 @@ export function ColorWordDisplay({
                 </span>
               </div>
 
-              <Badge
-                variant="outline"
-                className="text-[10px] font-mono border-border/80 bg-background/50 text-muted-foreground px-1.5 py-0.5"
-              >
+              <div className="text-[10px] font-mono border border-border/80 bg-background/50 text-muted-foreground px-1.5 py-0.5 rounded">
                 [{index + 1}]
-              </Badge>
+              </div>
             </button>
           ))}
         </div>

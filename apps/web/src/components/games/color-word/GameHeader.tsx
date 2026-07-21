@@ -22,6 +22,8 @@ export function GameHeader({
   gameMode,
   bestScore,
 }: GameHeaderProps) {
+  const isTimedMode = gameMode !== "rounds";
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full max-w-2xl">
       {/* Score */}
@@ -56,7 +58,7 @@ export function GameHeader({
       {/* Timer / Rounds Left */}
       <Card className="p-4 flex flex-col items-center justify-center bg-card/60 backdrop-blur border-cyan-500/20 shadow-lg shadow-cyan-500/5">
         <div className="flex items-center gap-1.5 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-1">
-          {gameMode === "blitz" ? (
+          {isTimedMode ? (
             <>
               <Clock className="w-3.5 h-3.5" />
               <span>Pozostały Czas</span>
@@ -69,7 +71,7 @@ export function GameHeader({
           )}
         </div>
         <span className="text-2xl md:text-3xl font-mono font-bold text-foreground tracking-tight">
-          {gameMode === "blitz" ? `${timeLeft}s` : `${roundsLeft} / 20`}
+          {isTimedMode ? `${timeLeft}s` : `${roundsLeft} / 20`}
         </span>
       </Card>
 
