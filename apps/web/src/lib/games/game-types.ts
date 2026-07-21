@@ -20,6 +20,10 @@ export interface GameTypeDefinition {
     href?: string; // Optional route for direct game link
     difficulty: "Easy" | "Medium" | "Hard";
     averageTime: string;
+    category: "Memory" | "Speed & Reaction" | "Focus & Attention";
+    skills?: string[];
+    playsCount?: string;
+    image?: string;
 }
 
 /**
@@ -31,61 +35,80 @@ export const GAME_TYPES: GameTypeDefinition[] = [
         id: "sequence",
         name: "Sequence Memory",
         shortName: "Sequence",
-        description: "Remember and repeat the sequence of highlighted tiles. The sequence grows longer each level.",
+        description: "Remember and repeat an ever-growing sequence of highlighted grid tiles. Test your visual-spatial recall and pattern indexing.",
         icon: Grid3X3,
         color: "from-violet-500 to-purple-600",
         shadow: "shadow-violet-500/30",
         href: "/games/sequence-memory",
         difficulty: "Medium",
-        averageTime: "3-5 min"
+        averageTime: "3-5 min",
+        category: "Memory",
+        skills: ["Spatial Indexing", "Pattern Recall", "Working Memory"],
+        playsCount: "24.8k",
     },
     {
         id: "chimp",
         name: "Chimp Memory",
         shortName: "Chimp",
-        description: "Memorize the position of numbers and tap them in order before they disappear.",
+        description: "Memorize the position of numbered tiles in a flash and click them in order after they are hidden. Inspired by primate memory experiments.",
         icon: Brain,
         color: "from-emerald-500 to-teal-600",
         shadow: "shadow-emerald-500/30",
         href: "/games/chimp-memory",
         difficulty: "Hard",
-        averageTime: "2-4 min"
+        averageTime: "2-4 min",
+        category: "Speed & Reaction",
+        skills: ["Photographic Recall", "Flash Ingestion", "Spatial Mapping"],
+        playsCount: "18.2k",
+        image: "/game_photos/chimp.png",
     },
     {
         id: "code",
         name: "Code Memory",
         shortName: "Code",
-        description: "Remember the binary code pattern and reproduce it accurately. Tests pattern recognition.",
+        description: "Observe binary grid patterns, hold the layout in mind, and reconstruct the exact code matrix. Pushes working memory capacity to its limits.",
         icon: Binary,
         color: "from-cyan-500 to-blue-600",
         shadow: "shadow-cyan-500/30",
         href: "/games/code-memory",
         difficulty: "Medium",
-        averageTime: "3-5 min"
+        averageTime: "3-5 min",
+        category: "Memory",
+        skills: ["Binary Decoding", "Matrix Recall", "Pattern Recognition"],
+        playsCount: "14.1k",
+        image: "/game_photos/code_memory.png",
     },
     {
         id: "schulte",
         name: "Schulte Table",
         shortName: "Schulte",
-        description: "Find and click numbers in sequence as fast as possible. Custom size, counting direction, and timer.",
+        description: "Scan the randomized numerical grid and click numbers in ascending order as fast as possible. Enhances peripheral vision and focus scanning.",
         icon: LayoutGrid,
         color: "from-amber-500 to-orange-600",
         shadow: "shadow-amber-500/30",
         href: "/games/schulte-table",
         difficulty: "Medium",
-        averageTime: "1-3 min"
+        averageTime: "1-3 min",
+        category: "Focus & Attention",
+        skills: ["Peripheral Scanning", "Visual Ingestion", "Attention Speed"],
+        playsCount: "21.5k",
+        image: "/game_photos/schulte.png",
     },
     {
         id: "color-word",
         name: "Color Word Challenge",
         shortName: "Color Word",
-        description: "Identify the font color of the word, not what the word says! Tests focus and Stroop reaction time.",
+        description: "Identify the font color of the word while overriding what the word text spells out. Classic Stroop test measuring mental interference filter.",
         icon: Palette,
         color: "from-rose-500 via-purple-500 to-indigo-600",
         shadow: "shadow-rose-500/30",
         href: "/games/color-word",
         difficulty: "Hard",
-        averageTime: "1-2 min"
+        averageTime: "1-2 min",
+        category: "Speed & Reaction",
+        skills: ["Stroop Interference", "Reaction Velocity", "Cognitive Control"],
+        playsCount: "16.9k",
+        image: "/game_photos/colours.png",
     }
 ] as const;
 
