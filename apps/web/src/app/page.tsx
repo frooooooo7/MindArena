@@ -5,7 +5,6 @@ import {
   FeaturesGrid,
   Footer,
   HeroSection,
-  PlayerProgress,
   ScrollReveal,
 } from "@/components/home";
 
@@ -19,9 +18,6 @@ export default function Home() {
         <ScrollReveal>
           <CognitiveDomains />
         </ScrollReveal>
-        <ScrollReveal delay={0.02}>
-          <PlayerProgress />
-        </ScrollReveal>
         <ScrollReveal delay={0.04}>
           <FriendsDuelPromo />
         </ScrollReveal>
@@ -30,4 +26,3 @@ export default function Home() {
     </div>
   );
 }
-
