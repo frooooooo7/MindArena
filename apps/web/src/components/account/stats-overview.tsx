@@ -1,6 +1,6 @@
 "use client";
 
-import { Brain, Gamepad2, Zap, Activity } from "lucide-react";
+import { Brain, Gamepad2, Zap, Trophy } from "lucide-react";
 import { GameStats } from "@/lib/game-result-api";
 
 interface StatsOverviewProps {
@@ -8,52 +8,67 @@ interface StatsOverviewProps {
 }
 
 export function StatsOverview({ stats }: StatsOverviewProps) {
-  // Use user-requested streamlined stats: Total Score and Games Played only
-  // (Original Average Score and Highest Level were removed per user request)
+  const totalScore = stats?.totalScore ?? 0;
+  const totalGames = stats?.totalGames ?? 0;
+  const avgScore = stats?.averageScore ? Math.round(stats.averageScore) : 0;
+  const maxLevel = stats?.highestLevel ?? 0;
+
   const statCards = [
     {
-      label: "Total Score",
-      value: stats?.totalScore.toLocaleString() ?? "0",
-      change: `${stats?.totalGames ?? 0} games`,
+      label: "Total Score Accumulator",
+      value: totalScore.toLocaleString(),
+      subtext: "Across all practice sessions",
       icon: Brain,
-      color: "text-violet-500",
-      bg: "bg-violet-500/10",
     },
     {
-      label: "Games Played",
-      value: stats?.totalGames.toString() ?? "0",
-      change: "Local mode",
+      label: "Total Games Played",
+      value: totalGames.toLocaleString(),
+      subtext: "Completed practice rounds",
       icon: Gamepad2,
-      color: "text-blue-500",
-      bg: "bg-blue-500/10",
     },
-    // Previously removed: Average Score, Highest Level
+    {
+      label: "Average Round Score",
+      value: avgScore.toLocaleString(),
+      subtext: "Mean performance score",
+      icon: Zap,
+    },
+    {
+      label: "Highest Level Reached",
+      value: maxLevel > 0 ? `Level ${maxLevel}` : "Level 0",
+      subtext: "Peak game difficulty",
+      icon: Trophy,
+    },
   ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {statCards.map((stat, i) => (
-        <div
-          key={i}
-          className="p-6 rounded-2xl border border-border/40 bg-card/60 hover:border-border transition-colors duration-200"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className={`p-2 rounded-xl ${stat.bg} ${stat.color}`}>
-              <stat.icon className="h-5 w-5" />
+      {statCards.map((stat, i) => {
+        const Icon = stat.icon;
+        return (
+          <div
+            key={i}
+            className="p-5 rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-xl hover:border-portal-mint/40 transition-all duration-300 group flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-2.5 rounded-2xl border border-portal-mint/30 bg-portal-mint/15 text-portal-mint group-hover:scale-105 transition-transform">
+                  <Icon className="h-5 w-5" />
+                </div>
+              </div>
+              <p className="text-xs font-semibold text-muted-foreground">
+                {stat.label}
+              </p>
+              <h3 className="font-display text-3xl font-black tracking-tight text-foreground mt-1">
+                {stat.value}
+              </h3>
             </div>
-            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">
-              Local
-            </span>
+
+            <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-muted-foreground font-medium">
+              {stat.subtext}
+            </div>
           </div>
-          <div className="space-y-1">
-            <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
-            <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
-          </div>
-          <div className="mt-4 pt-4 border-t border-border/20">
-            <span className={`text-[10px] font-bold ${stat.color}`}>{stat.change}</span>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

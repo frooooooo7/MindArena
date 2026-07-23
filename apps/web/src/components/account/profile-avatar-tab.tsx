@@ -23,7 +23,6 @@ export function ProfileAvatarTab({ user }: ProfileAvatarTabProps) {
 
   const displayAvatar = preview || user.avatarUrl || null;
 
-  // Cleanup ObjectURL on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
@@ -91,11 +90,11 @@ export function ProfileAvatarTab({ user }: ProfileAvatarTabProps) {
       <div className="relative group">
         <UserAvatar name={user.name} avatarUrl={displayAvatar} size="lg" />
         <div 
-          className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer"
+          className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
         >
-          <Upload className="w-5 h-5 text-white mb-1" />
-          <span className="text-[10px] font-medium text-white">Change</span>
+          <Upload className="w-5 h-5 text-portal-mint mb-1" />
+          <span className="text-[10px] font-bold text-portal-mint">Change</span>
         </div>
       </div>
 
@@ -108,18 +107,20 @@ export function ProfileAvatarTab({ user }: ProfileAvatarTabProps) {
           onChange={handleFileSelect}
         />
         <button 
+          type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-xl text-sm font-semibold transition-colors border border-border/50"
+          className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-foreground rounded-xl text-xs font-bold transition-colors border border-white/10"
         >
-          <ImageIcon className="w-4 h-4" />
+          <ImageIcon className="w-4 h-4 text-portal-mint" />
           {file ? "Change File" : "Choose Image"}
         </button>
         
         {user.avatarUrl && !file && (
           <button 
+            type="button"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="flex items-center gap-2 px-4 py-2 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-xl text-sm font-semibold transition-colors border border-destructive/20"
+            className="flex items-center gap-2 px-4 py-2 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-xl text-xs font-bold transition-colors border border-destructive/20"
           >
             {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
             Remove
@@ -129,9 +130,10 @@ export function ProfileAvatarTab({ user }: ProfileAvatarTabProps) {
 
       {file && (
         <button 
+          type="button"
           disabled={isUploading}
           onClick={handleUpload}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:opacity-90 disabled:opacity-40 text-white rounded-xl text-sm font-bold shadow-lg shadow-violet-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="flex items-center gap-2 px-5 py-2.5 bg-portal-mint hover:bg-portal-mint/90 disabled:opacity-40 text-[#07150f] rounded-xl text-xs font-extrabold shadow-[0_0_18px_rgba(112,245,193,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           {isUploading && <Loader2 className="w-4 h-4 animate-spin" />}
           Save Picture

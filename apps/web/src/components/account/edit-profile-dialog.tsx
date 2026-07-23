@@ -16,7 +16,6 @@ interface EditProfileDialogProps {
 }
 
 export function EditProfileDialog({ open, onOpenChange, user }: EditProfileDialogProps) {
-  // Increment key on close to force child components to remount and reset their state
   const [resetKey, setResetKey] = useState(0);
 
   const handleOpenChange = (val: boolean) => {
@@ -26,29 +25,38 @@ export function EditProfileDialog({ open, onOpenChange, user }: EditProfileDialo
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg bg-card/90 backdrop-blur-xl border-violet-500/20 shadow-2xl overflow-hidden">
+      <DialogContent className="sm:max-w-lg bg-card/95 backdrop-blur-xl border border-portal-mint/30 shadow-2xl overflow-hidden rounded-3xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-            Edit Profile
+          <DialogTitle className="font-display text-2xl font-bold uppercase tracking-tight text-foreground">
+            Edit <span className="text-portal-mint">Profile</span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs text-muted-foreground">
             Manage your account settings and profile picture.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-muted/50">
-            <TabsTrigger value="general" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600/15 data-[state=active]:to-indigo-600/15">
+        <Tabs defaultValue="general" className="w-full space-y-4">
+          <TabsList className="grid w-full grid-cols-3 bg-white/[0.03] border border-white/10 rounded-2xl p-1">
+            <TabsTrigger
+              value="general"
+              className="gap-1.5 text-xs font-bold rounded-xl data-[state=active]:bg-portal-mint data-[state=active]:text-[#07150f] data-[state=active]:shadow-[0_0_12px_rgba(112,245,193,0.3)] transition-all"
+            >
               <UserCircle className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">General</span>
+              <span>General</span>
             </TabsTrigger>
-            <TabsTrigger value="avatar" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600/15 data-[state=active]:to-indigo-600/15">
+            <TabsTrigger
+              value="avatar"
+              className="gap-1.5 text-xs font-bold rounded-xl data-[state=active]:bg-portal-mint data-[state=active]:text-[#07150f] data-[state=active]:shadow-[0_0_12px_rgba(112,245,193,0.3)] transition-all"
+            >
               <Camera className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Avatar</span>
+              <span>Avatar</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600/15 data-[state=active]:to-indigo-600/15">
+            <TabsTrigger
+              value="security"
+              className="gap-1.5 text-xs font-bold rounded-xl data-[state=active]:bg-portal-mint data-[state=active]:text-[#07150f] data-[state=active]:shadow-[0_0_12px_rgba(112,245,193,0.3)] transition-all"
+            >
               <Shield className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Security</span>
+              <span>Security</span>
             </TabsTrigger>
           </TabsList>
 
@@ -68,4 +76,3 @@ export function EditProfileDialog({ open, onOpenChange, user }: EditProfileDialo
     </Dialog>
   );
 }
-

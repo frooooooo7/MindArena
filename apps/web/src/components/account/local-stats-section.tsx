@@ -3,6 +3,7 @@
 import { GameResult, GameStats, gameResultApi } from "@/lib/game-result-api";
 import { Gamepad2 } from "lucide-react";
 import { StatsOverview } from "./stats-overview";
+import { TopDisciplineCard } from "./top-discipline-card";
 import { GameHistoryList } from "./game-history-list";
 import { AccountPlaceholder } from "./account-placeholder";
 import { useAuthenticatedQuery } from "@/hooks/use-authenticated-query";
@@ -57,13 +58,14 @@ export function LocalStatsSection({
 
   if (error) {
     return (
-      <div className="p-8 text-center rounded-2xl border border-red-500/20 bg-red-500/5">
-        <p className="text-sm text-red-500 font-medium mb-3">
+      <div className="p-8 text-center rounded-3xl border border-red-500/20 bg-red-500/5">
+        <p className="text-xs text-red-400 font-medium mb-3">
           Failed to load statistics
         </p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
-          className="text-xs font-semibold px-4 py-2 bg-secondary/50 hover:bg-secondary rounded-lg transition-colors"
+          className="text-xs font-bold px-4 py-2 bg-secondary/50 hover:bg-secondary rounded-xl transition-colors text-white"
         >
           Try Again
         </button>
@@ -78,7 +80,7 @@ export function LocalStatsSection({
           {[...Array(2)].map((_, i) => (
             <div
               key={i}
-              className="p-6 rounded-2xl border border-border/40 bg-card/60 h-36"
+              className="p-6 rounded-3xl border border-white/10 bg-white/[0.02] h-36"
             />
           ))}
         </div>
@@ -89,6 +91,7 @@ export function LocalStatsSection({
   return (
     <div className="space-y-6">
       <StatsOverview stats={stats} />
+      <TopDisciplineCard isAuthenticated={isAuthenticated} profileName={profileName} />
       <GameHistoryList history={history} />
     </div>
   );

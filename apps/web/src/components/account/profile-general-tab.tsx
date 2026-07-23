@@ -52,17 +52,17 @@ export function ProfileGeneralTab({ user, onClose }: ProfileGeneralTabProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-2">
       {/* Nickname */}
       <div className="space-y-2">
-        <Label htmlFor="edit-nickname" className="text-sm font-semibold text-foreground/80">
+        <Label htmlFor="edit-nickname" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
           Nickname
         </Label>
         <Input
           id="edit-nickname"
           type="text"
           placeholder="Your display name"
-          className="bg-background/50 border-border/50 focus-visible:border-violet-500/50 focus-visible:ring-violet-500/20"
+          className="bg-white/[0.03] border-white/10 focus-visible:border-portal-mint focus-visible:ring-portal-mint/20 text-xs font-medium"
           {...register("name")}
         />
         {errors.name && (
@@ -74,17 +74,17 @@ export function ProfileGeneralTab({ user, onClose }: ProfileGeneralTabProps) {
 
       {/* Email (disabled) */}
       <div className="space-y-2">
-        <Label htmlFor="edit-email" className="text-sm font-semibold text-foreground/80">
-          Email
+        <Label htmlFor="edit-email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Email Address
         </Label>
         <Input
           id="edit-email"
           type="email"
           value={user.email}
           disabled
-          className="bg-background/30 border-border/30 opacity-60 cursor-not-allowed"
+          className="bg-white/[0.01] border-white/5 opacity-50 cursor-not-allowed text-xs font-medium"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-[11px] text-muted-foreground">
           Email change is not available yet.
         </p>
       </div>
@@ -94,7 +94,7 @@ export function ProfileGeneralTab({ user, onClose }: ProfileGeneralTabProps) {
         <button
           type="submit"
           disabled={isSubmitting || !isDirty}
-          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:opacity-90 disabled:opacity-40 text-white rounded-xl text-sm font-bold shadow-lg shadow-violet-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          className="flex items-center gap-2 px-5 py-2.5 bg-portal-mint hover:bg-portal-mint/90 disabled:opacity-40 text-[#07150f] rounded-xl text-xs font-extrabold shadow-[0_0_18px_rgba(112,245,193,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
           Save Changes
