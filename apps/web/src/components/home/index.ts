@@ -6,5 +6,6 @@ export { FriendsDuelPromo } from "./friends-promo";
 export { Footer } from "./footer";
 export { BackgroundGradients } from "./background-gradients";
 export { ScrollReveal } from "./scroll-reveal";
+export { SectionAtmosphere } from "./section-atmosphere";
 
 

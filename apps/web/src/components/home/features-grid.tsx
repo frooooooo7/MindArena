@@ -6,7 +6,7 @@ import { motion, type Variants, useReducedMotion } from "framer-motion";
 import { ArrowRight, Layers3 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-
+import { SectionAtmosphere } from "./section-atmosphere";
 import homeGames from "./home-games.json";
 import { SequenceGameDemo } from "./sequence-game-demo";
 
@@ -293,9 +293,10 @@ export function FeaturesGrid() {
   return (
     <section
       id="games"
-      className="scroll-mt-20 bg-portal-surface py-20 sm:py-28"
+      className="relative isolate overflow-hidden scroll-mt-20 border-t border-white/5 bg-background py-20 sm:py-28"
     >
-      <div className="portal-section">
+      <SectionAtmosphere variant="aurora" tone="violet" />
+      <div className="portal-section relative z-10">
         <div className="mb-9 grid gap-5 lg:grid-cols-[1fr_0.72fr] lg:items-end">
           <div>
             <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.2em] text-portal-mint">

@@ -9,6 +9,7 @@ import {
   COGNITIVE_DOMAINS,
   DIFFICULTY_STYLES,
 } from "./cognitive-domains-data";
+import { SectionAtmosphere } from "./section-atmosphere";
 
 export function CognitiveDomainsSpotlight() {
   const [activeId, setActiveId] = useState(COGNITIVE_DOMAINS[0].id);
@@ -21,9 +22,10 @@ export function CognitiveDomainsSpotlight() {
   return (
     <section
       aria-labelledby="domains-spotlight-title"
-      className="scroll-mt-20 bg-portal-surface py-20 sm:py-28 border-t border-white/5"
+      className="relative isolate overflow-hidden scroll-mt-20 border-t border-white/5 bg-background py-20 sm:py-28"
     >
-      <div className="portal-section">
+      <SectionAtmosphere variant="aurora" tone="mint" />
+      <div className="portal-section relative z-10">
         <div className="mb-9 max-w-2xl">
           <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.2em] text-portal-mint">
             Choose a skill

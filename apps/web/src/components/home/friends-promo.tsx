@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,6 +12,7 @@ import {
   Sparkles,
   Gamepad2,
 } from "lucide-react";
+import { SectionAtmosphere } from "./section-atmosphere";
 
 const FRIENDS_DUEL_FEATURES = [
   {
@@ -31,8 +34,12 @@ const FRIENDS_DUEL_FEATURES = [
 
 export function FriendsDuelPromo() {
   return (
-    <section className="py-20 sm:py-28" aria-labelledby="friends-promo-title">
-      <div className="portal-section">
+    <section
+      className="relative isolate overflow-hidden border-t border-white/5 py-20 sm:py-28"
+      aria-labelledby="friends-promo-title"
+    >
+      <SectionAtmosphere variant="neural" tone="cyan" />
+      <div className="portal-section relative z-10">
         <div className="relative isolate grid min-h-[24rem] overflow-hidden rounded-[1.75rem] border border-cyan-500/40 bg-[radial-gradient(circle_at_78%_45%,rgb(14_116_144_/_0.5),transparent_35%),linear-gradient(120deg,#0a192f,#0d1117)] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.5)] sm:p-10 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:p-14">
           <div className="portal-dot-grid absolute inset-0 -z-10 opacity-35 [mask-image:linear-gradient(90deg,black,transparent_78%)]" />
 
