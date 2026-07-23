@@ -37,13 +37,14 @@ describe('Stats Controller', () => {
   });
 
   describe('getLeaderboard', () => {
-    it('should return 401 if userId is missing', async () => {
+    it('should allow unauthenticated access to leaderboard', async () => {
       mockReq.userId = undefined;
+      mockGetLeaderboard.mockResolvedValueOnce([]);
 
       await statsController.getLeaderboard(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      expect(mockRes.status).toHaveBeenCalledWith(401);
-      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Unauthorized' });
+      expect(mockGetLeaderboard).toHaveBeenCalledWith(100);
+      expect(mockRes.json).toHaveBeenCalledWith([]);
     });
 
     it('should default limit to 100 if not provided', async () => {
@@ -95,13 +96,21 @@ describe('Stats Controller', () => {
   });
 
   describe('getOverview', () => {
-    it('should return 401 if userId is missing', async () => {
+    it('should allow unauthenticated access to overview', async () => {
       mockReq.userId = undefined;
+      const overviewData = {
+        globalRank: 0,
+        totalActivePlayers: 500,
+        totalPlayers: 1000,
+        highestLevel: 10,
+        averageScore: 1200
+      };
+      mockGetOverview.mockResolvedValueOnce(overviewData);
 
       await statsController.getOverview(mockReq as AuthRequest, mockRes as Response, mockNext);
 
-      expect(mockRes.status).toHaveBeenCalledWith(401);
-      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Unauthorized' });
+      expect(mockGetOverview).toHaveBeenCalledWith(undefined);
+      expect(mockRes.json).toHaveBeenCalledWith(overviewData);
     });
 
     it('should return 200 with overview data', async () => {

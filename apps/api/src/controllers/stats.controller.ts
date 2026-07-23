@@ -10,10 +10,6 @@ const querySchema = z.object({
 export const statsController = {
   async getLeaderboard(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      if (!req.userId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
       const parseResult = querySchema.safeParse(req.query);
       if (!parseResult.success) {
         return res.status(400).json({ error: "Invalid query parameters" });
@@ -29,10 +25,6 @@ export const statsController = {
 
   async getOverview(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      if (!req.userId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
       const overview = await statsService.getOverview(req.userId);
 
       return res.json(overview);

@@ -15,9 +15,9 @@ export const statsService = {
     }));
   },
 
-  async getOverview(userId: string): Promise<StatsOverview> {
+  async getOverview(userId?: string): Promise<StatsOverview> {
     const [globalRank, totalActivePlayers, totalPlayers, globalStats] = await Promise.all([
-      userRepository.getPlayerRank(userId),
+      userId ? userRepository.getPlayerRank(userId) : Promise.resolve(0),
       userRepository.getTotalActivePlayers(),
       userRepository.getTotalPlayers(),
       gameResultRepository.getGlobalStats(),

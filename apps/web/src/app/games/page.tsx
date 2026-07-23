@@ -90,12 +90,7 @@ export default function GamesPage() {
 
           <div className="portal-section relative z-10">
             <div className="mx-auto max-w-3xl text-center">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-portal-mint/30 bg-portal-mint/10 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-portal-mint">
-                <Sparkles className="size-3.5" />
-                <span>Cognitive Library</span>
-              </div>
-
-              <h1 className="font-display mt-4 text-4xl font-extrabold uppercase tracking-tight text-foreground sm:text-6xl">
+              <h1 className="font-display text-4xl font-extrabold uppercase tracking-tight text-foreground sm:text-6xl">
                 Explore <span className="text-portal-mint">Brain Games</span>
               </h1>
 
