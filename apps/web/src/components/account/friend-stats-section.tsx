@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { GameResult, GameStats, gameResultApi } from "@/lib/game-result-api";
 import { GAME_TYPES } from "@/lib/games/game-types";
-import { Swords, Trophy, XCircle, TrendingUp, Gamepad2, Clock, CheckCircle2 } from "lucide-react";
+import { Swords, Trophy, XCircle, TrendingUp, Gamepad2, Clock } from "lucide-react";
 import { AccountPlaceholder } from "./account-placeholder";
 import { useAuthenticatedQuery } from "@/hooks/use-authenticated-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -58,7 +58,7 @@ export function FriendStatsSection({
     return {
       name: found ? found.name : typeId,
       icon: found ? found.icon : Gamepad2,
-      color: found ? found.color : "from-cyan-500 to-blue-500",
+      color: found ? found.color : "from-portal-mint to-teal-500",
     };
   };
 
@@ -74,13 +74,14 @@ export function FriendStatsSection({
 
   if (error) {
     return (
-      <div className="p-8 text-center rounded-2xl border border-red-500/20 bg-red-500/5">
-        <p className="text-sm text-red-500 font-medium mb-3">
+      <div className="p-8 text-center rounded-3xl border border-red-500/20 bg-red-500/5">
+        <p className="text-xs text-red-400 font-medium mb-3">
           Failed to load friend duel statistics
         </p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
-          className="text-xs font-semibold px-4 py-2 bg-secondary/50 hover:bg-secondary rounded-lg transition-colors"
+          className="text-xs font-bold px-4 py-2 bg-secondary/50 hover:bg-secondary rounded-xl transition-colors text-white"
         >
           Try Again
         </button>
@@ -93,10 +94,10 @@ export function FriendStatsSection({
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-2xl" />
+            <Skeleton key={i} className="h-32 rounded-3xl" />
           ))}
         </div>
-        <Skeleton className="h-64 rounded-2xl" />
+        <Skeleton className="h-64 rounded-3xl" />
       </div>
     );
   }
@@ -107,36 +108,28 @@ export function FriendStatsSection({
       value: totalDuels.toString(),
       subtext: "Matches played",
       icon: Swords,
-      color: "text-cyan-400",
-      bg: "bg-cyan-500/10",
-      border: "border-cyan-500/20",
+      colorClass: "text-portal-mint bg-portal-mint/15 border-portal-mint/30",
     },
     {
       label: "Duels Won",
       value: wins.toString(),
       subtext: "Victories",
       icon: Trophy,
-      color: "text-emerald-400",
-      bg: "bg-emerald-500/10",
-      border: "border-emerald-500/20",
+      colorClass: "text-portal-mint bg-portal-mint/15 border-portal-mint/30",
     },
     {
       label: "Duels Lost",
       value: losses.toString(),
       subtext: "Defeats",
       icon: XCircle,
-      color: "text-rose-400",
-      bg: "bg-rose-500/10",
-      border: "border-rose-500/20",
+      colorClass: "text-rose-400 bg-rose-500/15 border-rose-500/30",
     },
     {
       label: "Win Rate %",
       value: `${winRate}%`,
-      subtext: "Overall accuracy",
+      subtext: "Head-to-head accuracy",
       icon: TrendingUp,
-      color: "text-violet-400",
-      bg: "bg-violet-500/10",
-      border: "border-violet-500/20",
+      colorClass: "text-portal-mint bg-portal-mint/15 border-portal-mint/30",
     },
   ];
 
@@ -144,45 +137,44 @@ export function FriendStatsSection({
     <div className="space-y-6">
       {/* Friend Duels Statistics Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat, i) => (
-          <div
-            key={i}
-            className={`p-6 rounded-2xl border ${stat.border} bg-card/60 hover:border-border transition-colors duration-200`}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color}`}>
-                <stat.icon className="h-5 w-5" />
+        {statCards.map((stat, i) => {
+          const Icon = stat.icon;
+          return (
+            <div
+              key={i}
+              className="p-5 rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-xl flex flex-col justify-between hover:border-portal-mint/40 transition-all duration-300 group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className={`p-2.5 rounded-2xl border ${stat.colorClass} group-hover:scale-105 transition-transform`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="text-xs font-semibold text-muted-foreground">
+                  {stat.label}
+                </p>
+                <h3 className="font-display text-3xl font-black tracking-tight text-foreground mt-1">
+                  {stat.value}
+                </h3>
               </div>
-              <span className="text-[10px] uppercase font-extrabold text-muted-foreground tracking-wider">
-                Friend Duels
-              </span>
-            </div>
-            <div className="space-y-1">
-              <p className="text-3xl font-black tracking-tight text-white">
-                {stat.value}
-              </p>
-              <p className="text-xs text-muted-foreground font-medium">
-                {stat.label}
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-border/20">
-              <span className={`text-[11px] font-bold ${stat.color}`}>
+
+              <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-muted-foreground font-medium">
                 {stat.subtext}
-              </span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Recent Duels Match History against Friends */}
-      <div className="p-6 rounded-3xl border border-border/40 bg-card/60 backdrop-blur-xl shadow-xl space-y-6">
-        <div className="flex items-center justify-between border-b border-border/40 pb-4">
+      <div className="p-6 rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-xl space-y-6">
+        <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400">
+            <div className="p-2.5 rounded-2xl bg-portal-mint/15 border border-portal-mint/30 text-portal-mint">
               <Swords className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-bold text-foreground">
                 Recent Friend Match History
               </h3>
               <p className="text-xs text-muted-foreground">
@@ -190,15 +182,15 @@ export function FriendStatsSection({
               </p>
             </div>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-secondary/40 border border-border/40 text-muted-foreground">
+          <span className="text-xs font-semibold px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-muted-foreground font-mono">
             {history.length} duels
           </span>
         </div>
 
         {history.length === 0 ? (
-          <div className="p-12 text-center rounded-2xl border border-dashed border-border/60 bg-secondary/5">
+          <div className="p-12 text-center rounded-2xl border border-dashed border-white/10 bg-white/[0.01]">
             <Swords className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-            <h3 className="text-lg font-bold text-white mb-1">
+            <h3 className="text-lg font-bold text-foreground mb-1">
               No Friend Duels Yet
             </h3>
             <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -216,35 +208,27 @@ export function FriendStatsSection({
               return (
                 <div
                   key={match.id}
-                  className="flex items-center justify-between p-4 rounded-2xl border border-border/40 bg-secondary/15 hover:bg-secondary/30 transition-all duration-200"
+                  className="flex items-center justify-between p-4 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-200"
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className={`p-3 rounded-xl bg-gradient-to-br ${game.color} shadow-md`}
+                      className="p-3 rounded-xl bg-portal-mint/15 border border-portal-mint/30 text-portal-mint shadow-md"
                     >
-                      <GameIcon className="h-5 w-5 text-white" />
+                      <GameIcon className="h-5 w-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-white text-sm">
+                        <h4 className="font-bold text-foreground text-sm">
                           {game.name}
                         </h4>
                         <span
-                          className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
+                          className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
                             isWin
-                              ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                              ? "bg-portal-mint/15 text-portal-mint border-portal-mint/30"
                               : "bg-rose-500/15 text-rose-400 border-rose-500/30"
                           }`}
                         >
-                          {isWin ? (
-                            <>
-                              <CheckCircle2 className="h-3 w-3" /> Victory
-                            </>
-                          ) : (
-                            <>
-                              <XCircle className="h-3 w-3" /> Defeat
-                            </>
-                          )}
+                          {isWin ? "Victory" : "Defeat"}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
@@ -260,8 +244,8 @@ export function FriendStatsSection({
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <p className="text-xs font-semibold text-white">
+                  <div className="text-right font-mono">
+                    <p className="text-xs font-semibold text-foreground">
                       {new Date(match.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",

@@ -18,7 +18,7 @@ export function GameHistoryList({ history }: GameHistoryListProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("pl-PL", {
+    return date.toLocaleDateString("en-US", {
       day: "numeric",
       month: "short",
       hour: "2-digit",
@@ -27,48 +27,66 @@ export function GameHistoryList({ history }: GameHistoryListProps) {
   };
 
   return (
-    <div className="p-6 rounded-2xl border border-border/40 bg-card/60">
-      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <Clock className="h-5 w-5 text-violet-500" />
-        Recent Games
-      </h3>
+    <div className="p-6 rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-xl space-y-4">
+      <div className="flex items-center gap-2.5 pb-3 border-b border-white/10">
+        <Clock className="h-5 w-5 text-portal-mint" />
+        <h3 className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
+          Recent Games History
+        </h3>
+      </div>
 
       {history.length === 0 ? (
-        <div className="py-8 text-center text-muted-foreground">
-          <Gamepad2 className="h-8 w-8 mx-auto mb-2 opacity-40" />
-          <p className="text-sm">No games played yet. Start playing to see your history!</p>
+        <div className="py-12 text-center rounded-2xl border border-dashed border-white/10 bg-white/[0.01]">
+          <Gamepad2 className="h-10 w-10 mx-auto mb-2 opacity-30 text-muted-foreground" />
+          <p className="text-xs text-muted-foreground">
+            No practice games played yet. Start playing to see your history!
+          </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {history.map((game) => {
             const gameType = getGameTypeById(game.gameType);
             return (
               <div
                 key={game.id}
-                className="flex items-center justify-between p-4 rounded-xl bg-secondary/20 border border-border/40"
+                className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/10 hover:bg-white/[0.04] transition-all"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3.5">
                   <div
-                    className={`p-2 rounded-lg bg-gradient-to-br ${gameType?.color ?? "from-gray-500 to-gray-600"}`}
+                    className="p-2.5 rounded-xl bg-portal-mint/15 border border-portal-mint/30 text-portal-mint shadow-md"
                   >
-                    {gameType?.icon && <gameType.icon className="h-4 w-4 text-white" />}
+                    {gameType?.icon ? (
+                      <gameType.icon className="h-4 w-4" />
+                    ) : (
+                      <Gamepad2 className="h-4 w-4" />
+                    )}
                   </div>
                   <div>
-                    <p className="font-medium text-sm">{gameType?.name ?? game.gameType}</p>
-                    <p className="text-xs text-muted-foreground">{formatDate(game.createdAt)}</p>
+                    <p className="font-bold text-sm text-foreground">
+                      {gameType?.name ?? game.gameType}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground font-mono">
+                      {formatDate(game.createdAt)}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-6 text-right">
                   <div>
-                    <p className="text-sm font-bold">{game.score.toLocaleString()}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase">Score</p>
+                    <p className="text-sm font-display font-extrabold text-portal-mint">
+                      {game.score.toLocaleString()}
+                    </p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">
+                      Score
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm font-bold">Lvl {game.level}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase">Level</p>
+                    <p className="text-sm font-bold text-foreground">Lvl {game.level}</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold tracking-wider">
+                      Level
+                    </p>
                   </div>
                   <div className="hidden sm:block">
-                    <p className="text-sm font-medium text-muted-foreground">
+                    <p className="text-xs font-mono text-muted-foreground">
                       {formatDuration(game.duration)}
                     </p>
                   </div>

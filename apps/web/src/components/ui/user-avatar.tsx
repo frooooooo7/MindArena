@@ -1,12 +1,4 @@
-/**
- * Reusable avatar placeholder component.
- * Displays first letter of the name in a gradient circle.
- * When `avatarUrl` is provided, it will render an optimized <Image> instead.
- *
- * Usage:
- *   <UserAvatar name="John" />
- *   <UserAvatar name="John" avatarUrl="https://..." size="lg" />
- */
+"use client";
 
 import Image from "next/image";
 
@@ -36,7 +28,7 @@ export function UserAvatar({ name, avatarUrl, size = "md" }: UserAvatarProps) {
   if (avatarUrl && isValidUrl) {
     return (
       <div
-        className={`${classes} rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 p-[2px] shadow-lg shadow-violet-500/15 shrink-0`}
+        className={`${classes} rounded-full bg-gradient-to-br from-portal-mint via-teal-400 to-cyan-500 p-[2px] shadow-[0_0_15px_rgba(112,245,193,0.25)] shrink-0`}
       >
         <Image
           src={avatarUrl}
@@ -51,10 +43,10 @@ export function UserAvatar({ name, avatarUrl, size = "md" }: UserAvatarProps) {
 
   return (
     <div
-      className={`${classes} rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 p-[2px] shadow-lg shadow-violet-500/15 shrink-0`}
+      className={`${classes} rounded-full bg-gradient-to-br from-portal-mint via-teal-400 to-cyan-500 p-[2px] shadow-[0_0_15px_rgba(112,245,193,0.25)] shrink-0`}
     >
-      <div className="h-full w-full rounded-full bg-card flex items-center justify-center">
-        <span className="font-bold bg-gradient-to-br from-violet-400 to-indigo-400 bg-clip-text text-transparent">
+      <div className="h-full w-full rounded-full bg-slate-950 flex items-center justify-center">
+        <span className="font-display font-extrabold text-portal-mint">
           {initial}
         </span>
       </div>

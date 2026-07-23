@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { BackgroundGradients } from "@/components/home";
+import { BackgroundGradients, Footer } from "@/components/home";
 import { Navbar } from "@/components/navbar";
 import { ProfileHeader } from "@/components/account/profile-header";
 import { LocalStatsSection } from "@/components/account/local-stats-section";
@@ -14,7 +14,6 @@ import {
   User,
   Shield,
   BarChart3,
-  Trophy,
   Gamepad2,
   Swords,
   Users,
@@ -37,8 +36,8 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
   const { friends, pendingRequests, sendRequest } = useFriends();
   const { isFriendOnline, setPickerOpen } = useDuel();
 
-  const ownerTabs = ["overview", "stats", "social", "achievements", "security"];
-  const publicTabs = ["overview", "stats", "achievements"];
+  const ownerTabs = ["overview", "stats", "social", "security"];
+  const publicTabs = ["overview", "stats"];
   const allowedTabs = isOwner ? ownerTabs : publicTabs;
 
   const tabFromQuery = searchParams.get("tab");
@@ -77,91 +76,88 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
   };
 
   const handleChallenge = () => {
-    // Open the duel picker modal (from arena) so user can select game type
     setPickerOpen(true, user.id);
   };
 
   const profileIsOnline = isFriendOnline(user.id);
 
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="min-h-dvh bg-background flex flex-col justify-between relative overflow-hidden">
       <BackgroundGradients />
       <Navbar />
 
-      <main className="container relative mx-auto px-4 py-8 md:px-8 max-w-6xl">
+      <main className="container relative z-10 mx-auto px-4 py-8 md:px-8 max-w-6xl flex-1">
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="flex flex-col gap-6">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                {isOwner ? "Account Settings" : "Player Profile"}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                {isOwner
-                  ? "Manage your profile, view your stats and update security settings."
-                  : `Viewing ${user.name}'s profile and performance summary.`}
-              </p>
-            </div>
+          <ProfileHeader
+            user={user}
+            isOwner={isOwner}
+            onAddFriend={handleAddToFriends}
+            isAddingFriend={isSendingFriendRequest}
+            isFriend={isAlreadyFriend}
+            isFriendRequestSent={isFriendRequestSent}
+            hasPendingIncomingRequest={hasPendingIncomingRequest}
+            onChallenge={handleChallenge}
+            isFriendOnline={profileIsOnline}
+          />
 
-            <ProfileHeader
-              user={user}
-              isOwner={isOwner}
-              onAddFriend={handleAddToFriends}
-              isAddingFriend={isSendingFriendRequest}
-              isFriend={isAlreadyFriend}
-              isFriendRequestSent={isFriendRequestSent}
-              hasPendingIncomingRequest={hasPendingIncomingRequest}
-              onChallenge={handleChallenge}
-              isFriendOnline={profileIsOnline}
-            />
-          </div>
-
-          <Tabs key={activeTab} defaultValue={activeTab} className="w-full">
-            <TabsList className="bg-secondary/20 p-1 border border-border/40 mb-6">
-              <TabsTrigger value="overview" className="gap-2">
+          <Tabs key={activeTab} defaultValue={activeTab} className="w-full space-y-6">
+            <TabsList className="bg-white/[0.03] p-1.5 rounded-2xl border border-white/10 backdrop-blur-md inline-flex h-auto max-w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              <TabsTrigger
+                value="overview"
+                className="gap-2 px-4 py-2 rounded-xl text-xs font-bold data-[state=active]:bg-portal-mint data-[state=active]:text-[#07150f] data-[state=active]:shadow-[0_0_15px_rgba(112,245,193,0.3)] transition-all"
+              >
                 <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Overview</span>
+                <span>Overview</span>
               </TabsTrigger>
-              <TabsTrigger value="stats" className="gap-2">
+              <TabsTrigger
+                value="stats"
+                className="gap-2 px-4 py-2 rounded-xl text-xs font-bold data-[state=active]:bg-portal-mint data-[state=active]:text-[#07150f] data-[state=active]:shadow-[0_0_15px_rgba(112,245,193,0.3)] transition-all"
+              >
                 <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Statistics</span>
+                <span>Statistics</span>
               </TabsTrigger>
               {isOwner && (
-                <TabsTrigger value="social" className="gap-2">
+                <TabsTrigger
+                  value="social"
+                  className="gap-2 px-4 py-2 rounded-xl text-xs font-bold data-[state=active]:bg-portal-mint data-[state=active]:text-[#07150f] data-[state=active]:shadow-[0_0_15px_rgba(112,245,193,0.3)] transition-all"
+                >
                   <Users className="h-4 w-4" />
-                  <span className="hidden sm:inline">Social</span>
+                  <span>Social & Friends</span>
                 </TabsTrigger>
               )}
-              <TabsTrigger value="achievements" className="gap-2">
-                <Trophy className="h-4 w-4" />
-                <span className="hidden sm:inline">Achievements</span>
-              </TabsTrigger>
               {isOwner && (
-                <TabsTrigger value="security" className="gap-2">
+                <TabsTrigger
+                  value="security"
+                  className="gap-2 px-4 py-2 rounded-xl text-xs font-bold data-[state=active]:bg-portal-mint data-[state=active]:text-[#07150f] data-[state=active]:shadow-[0_0_15px_rgba(112,245,193,0.3)] transition-all"
+                >
                   <Shield className="h-4 w-4" />
-                  <span className="hidden sm:inline">Security</span>
+                  <span>Security</span>
                 </TabsTrigger>
               )}
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
-              <div className="flex items-center gap-2">
+              {/* Mode Toggle Controls in Logo Mint */}
+              <div className="flex items-center gap-2 bg-white/[0.03] p-1.5 rounded-2xl border border-white/10 w-fit">
                 <button
+                  type="button"
                   onClick={() => setGameMode("local")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                     gameMode === "local"
-                      ? "bg-linear-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/20"
-                      : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50"
+                      ? "bg-portal-mint text-[#07150f] shadow-[0_0_15px_rgba(112,245,193,0.3)]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                   }`}
                 >
                   <Gamepad2 className="h-4 w-4" />
-                  Local
+                  Personal Practice
                 </button>
                 <button
+                  type="button"
                   onClick={() => setGameMode("arena")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                     gameMode === "arena"
-                      ? "bg-linear-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/20"
-                      : "bg-secondary/30 text-muted-foreground hover:bg-secondary/50"
+                      ? "bg-portal-mint text-[#07150f] shadow-[0_0_15px_rgba(112,245,193,0.3)]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                   }`}
                 >
                   <Swords className="h-4 w-4" />
@@ -196,42 +192,43 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
               </TabsContent>
             )}
 
-            <TabsContent value="achievements">
-              <div className="p-12 text-center rounded-2xl border border-dashed border-border/60 bg-secondary/5">
-                <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-                <h3 className="text-xl font-semibold mb-2">
-                  Achievements & Badges
-                </h3>
-                <p className="text-muted-foreground max-w-md mx-auto">
-                  Unlock special badges by completing games and challenges. This
-                  feature will be available in the next update.
-                </p>
-              </div>
-            </TabsContent>
-
             {isOwner && (
               <TabsContent value="security">
-                <div className="max-w-xl p-6 rounded-2xl border border-border/40 bg-card/60">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-violet-500" />
-                    Security Settings
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="p-4 rounded-xl bg-secondary/20 border border-border/40">
-                      <p className="text-sm font-medium">
-                        Two-Factor Authentication
+                <div className="max-w-xl p-6 rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-xl space-y-4">
+                  <div className="flex items-center gap-3 pb-3 border-b border-white/10">
+                    <div className="p-2.5 rounded-2xl bg-portal-mint/15 border border-portal-mint/30 text-portal-mint">
+                      <Shield className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-foreground text-base">
+                        Security & Credentials
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        Manage your authentication and password settings.
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1 mb-3">
-                        Add an extra layer of security to your account.
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-2">
+                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2">
+                      <p className="text-xs font-bold text-foreground">
+                        Two-Factor Authentication (2FA)
                       </p>
-                      <button className="text-xs font-semibold px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors">
+                      <p className="text-xs text-muted-foreground">
+                        Add an extra layer of security to protect your MindArena account.
+                      </p>
+                      <button
+                        type="button"
+                        className="mt-2 text-xs font-extrabold px-4 py-2 bg-portal-mint hover:bg-portal-mint/90 text-[#07150f] rounded-xl transition-all shadow-[0_0_15px_rgba(112,245,193,0.3)]"
+                      >
                         Enable 2FA
                       </button>
                     </div>
-                    <div className="p-4 rounded-xl bg-secondary/20 border border-border/40">
-                      <p className="text-sm font-medium">Browser Sessions</p>
+
+                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+                      <p className="text-xs font-bold text-foreground">Active Device Sessions</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Manage your active sessions on other devices.
+                        Currently logged in on this browser session.
                       </p>
                     </div>
                   </div>
@@ -243,6 +240,7 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
       </main>
 
       <DuelFriendPicker />
+      <Footer />
     </div>
   );
 }
