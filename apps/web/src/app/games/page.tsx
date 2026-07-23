@@ -21,6 +21,8 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/home/footer";
 import { GAME_TYPES } from "@/lib/games/game-types";
 import { cn } from "@/lib/utils";
+import { useDuel } from "@/hooks/use-duel";
+import { DuelFriendPicker } from "@/components/arena/duel-friend-picker";
 
 const CATEGORIES = [
   "All",
@@ -32,6 +34,7 @@ const CATEGORIES = [
 type CategoryFilter = (typeof CATEGORIES)[number];
 
 export default function GamesPage() {
+  const { setPickerOpen } = useDuel();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>("All");
   const [currentPage, setCurrentPage] = useState(1);
@@ -298,14 +301,15 @@ export default function GamesPage() {
                             <span>Play Challenge</span>
                             <ArrowRight className="size-3.5 transition-transform group-hover/btn:translate-x-1" />
                           </Link>
-                          <Link
-                            href="/arena"
-                            aria-label={`1v1 Arena mode for ${game.name}`}
-                            className="inline-flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:border-portal-yellow/40 hover:bg-portal-yellow/10 hover:text-portal-yellow"
-                            title="1v1 Arena Clash"
+                          <button
+                            type="button"
+                            onClick={() => setPickerOpen(true)}
+                            aria-label={`Challenge friend in ${game.name}`}
+                            className="inline-flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-muted-foreground transition-colors hover:border-cyan-400/40 hover:bg-cyan-500/10 hover:text-cyan-400"
+                            title="Challenge Friend"
                           >
                             <Swords className="size-4" />
-                          </Link>
+                          </button>
                         </div>
                       </motion.div>
                     );
@@ -367,6 +371,7 @@ export default function GamesPage() {
         </section>
       </main>
 
+      <DuelFriendPicker />
       <Footer />
     </div>
   );

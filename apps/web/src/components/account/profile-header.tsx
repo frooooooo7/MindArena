@@ -1,22 +1,16 @@
 "use client";
 
-import {
-  User,
-  getRankForPoints,
-  getRankProgress,
-  getNextRankTier,
-  RankName,
-} from "@mindarena/shared";
+import { User } from "@mindarena/shared";
 import {
   Calendar,
   Mail,
-  TrendingUp,
   Edit3,
   UserPlus,
   UserCheck,
   Clock,
   Loader2,
   Swords,
+  Trophy,
 } from "lucide-react";
 import { UserAvatar } from "../../components/ui/user-avatar";
 import { EditProfileDialog } from "./edit-profile-dialog";
@@ -34,44 +28,6 @@ interface ProfileHeaderProps {
   isFriendOnline?: boolean;
 }
 
-/** Color scheme per rank tier */
-function getRankColors(rankName: string) {
-  switch (rankName) {
-    case "Geniusz":
-      return {
-        bg: "from-amber-500/15 to-yellow-500/15",
-        border: "border-amber-500/30",
-        text: "text-amber-400",
-        bar: "from-amber-500 to-yellow-500",
-        glow: "shadow-amber-500/20",
-      };
-    case "Kora":
-      return {
-        bg: "from-cyan-500/15 to-teal-500/15",
-        border: "border-cyan-500/30",
-        text: "text-cyan-400",
-        bar: "from-cyan-500 to-teal-500",
-        glow: "shadow-cyan-500/20",
-      };
-    case "Synapsa":
-      return {
-        bg: "from-violet-500/15 to-purple-500/15",
-        border: "border-violet-500/30",
-        text: "text-violet-400",
-        bar: "from-violet-500 to-purple-500",
-        glow: "shadow-violet-500/20",
-      };
-    default: // Neuron
-      return {
-        bg: "from-slate-500/15 to-zinc-500/15",
-        border: "border-slate-500/30",
-        text: "text-slate-400",
-        bar: "from-slate-500 to-zinc-500",
-        glow: "shadow-slate-500/20",
-      };
-  }
-}
-
 export function ProfileHeader({
   user,
   isOwner = true,
@@ -83,11 +39,6 @@ export function ProfileHeader({
   onChallenge,
   isFriendOnline = false,
 }: ProfileHeaderProps) {
-  const rank = getRankForPoints(user.rankPoints);
-  const progress = getRankProgress(user.rankPoints);
-  const nextRank = getNextRankTier(rank.name as RankName);
-  const colors = getRankColors(rank.name);
-
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   return (
@@ -139,49 +90,17 @@ export function ProfileHeader({
             </div>
           </div>
 
-          {/* Rank Badge + Progress */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
-            {/* Rank Badge */}
-            <div
-              className={`flex items-center gap-2 px-4 py-2 rounded-2xl bg-linear-to-r ${colors.bg} border ${colors.border} ${colors.glow} shadow-lg`}
-            >
-              <span className="text-xl">{rank.icon}</span>
-              <span
-                className={`font-bold text-sm uppercase tracking-wider ${colors.text}`}
-              >
-                {rank.name}
-              </span>
-              <span className="text-xs text-muted-foreground font-semibold tabular-nums">
-                {user.rankPoints} pts
-              </span>
+          {/* Profile Header Badges: Friend Duelist & Personal High Score */}
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-1">
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-linear-to-r from-cyan-500/15 to-blue-500/15 border border-cyan-500/30 text-cyan-400 font-bold text-xs shadow-md shadow-cyan-500/10">
+              <Swords className="h-4 w-4" />
+              <span className="uppercase tracking-wider">Friend Duelist</span>
             </div>
 
-            {/* Progress bar to next rank */}
-            {nextRank && (
-              <div className="flex items-center gap-2 flex-1 max-w-50">
-                <div className="flex-1">
-                  <div className="h-2 rounded-full bg-white/5 overflow-hidden border border-white/10">
-                    <div
-                      className={`h-full rounded-full bg-linear-to-r ${colors.bar} transition-all duration-700`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                  <TrendingUp className="h-3 w-3" />
-                  <span>
-                    {nextRank.icon} {nextRank.minPoints}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Max rank indicator */}
-            {!nextRank && (
-              <span className="text-xs font-semibold text-amber-400/70 uppercase tracking-wider">
-                Max Rank
-              </span>
-            )}
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-linear-to-r from-violet-500/15 to-purple-500/15 border border-violet-500/30 text-violet-300 font-bold text-xs shadow-md shadow-violet-500/10">
+              <Trophy className="h-4 w-4 text-amber-400" />
+              <span>{user.rankPoints ? user.rankPoints.toLocaleString() : 0} Score Pts</span>
+            </div>
           </div>
         </div>
 

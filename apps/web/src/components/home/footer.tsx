@@ -2,8 +2,8 @@ import Link from "next/link";
 
 const footerLinks = [
   { label: "Games", href: "/games" },
-  { label: "Arena", href: "/arena" },
-  { label: "Ranking", href: "/stats" },
+  { label: "Play with Friends", href: "/play-with-friends" },
+  { label: "Stats", href: "/stats" },
 ];
 
 export function Footer() {

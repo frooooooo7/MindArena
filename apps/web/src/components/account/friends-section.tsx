@@ -125,7 +125,7 @@ export function FriendsSection({
               <h3 className="text-lg font-semibold mb-2">No friends yet</h3>
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">
                 Search for players to add them to your friends list and compare
-                your ranks.
+                your high scores.
               </p>
             </div>
           ) : (
@@ -157,7 +157,7 @@ export function FriendsSection({
                         <div className="flex items-center gap-1.5 mt-1 text-sm text-muted-foreground">
                           <Trophy className="h-3.5 w-3.5 text-amber-500" />
                           <span>
-                            {f.friend?.rankName} • {f.friend?.rankPoints} RP
+                            Friend Duelist
                           </span>
                         </div>
                       </div>
@@ -217,7 +217,7 @@ export function FriendsSection({
                           <p className="font-semibold">Unknown player</p>
                         )}
                         <p className="text-xs text-muted-foreground">
-                          {req.friend?.rankName} • {req.friend?.rankPoints} RP
+                          Ready to duel
                         </p>
                       </div>
                     </div>
@@ -353,7 +353,7 @@ export function FriendsSection({
                             {u.name}
                           </Link>
                           <p className="text-xs text-muted-foreground">
-                            {u.rankName} • {u.rankPoints} RP
+                            MindArena Player
                           </p>
                         </div>
                       </div>

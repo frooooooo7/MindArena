@@ -220,13 +220,9 @@ export function CognitiveDomains() {
       <div className="portal-section">
         {/* Section Header */}
         <div className="mb-10 text-center sm:text-left">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-portal-mint/30 bg-portal-mint/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-portal-mint">
-            <Activity className="size-3.5" />
-            <span>Training Disciplines</span>
-          </div>
           <h2
             id="domains-title"
-            className="font-display mt-3 text-3xl font-bold uppercase tracking-tight text-foreground sm:text-5xl"
+            className="font-display text-3xl font-bold uppercase tracking-tight text-foreground sm:text-5xl"
           >
             Train 4 Core <span className="text-portal-mint">Cognitive Domains</span>
           </h2>

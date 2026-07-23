@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/navbar";
 import {
-  ArenaPromo,
+  FriendsDuelPromo,
   CognitiveDomains,
   FeaturesGrid,
   Footer,
@@ -23,7 +23,7 @@ export default function Home() {
           <PlayerProgress />
         </ScrollReveal>
         <ScrollReveal delay={0.04}>
-          <ArenaPromo />
+          <FriendsDuelPromo />
         </ScrollReveal>
       </main>
       <Footer />

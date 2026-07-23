@@ -6,7 +6,7 @@ import { BackgroundGradients } from "@/components/home";
 import { Navbar } from "@/components/navbar";
 import { ProfileHeader } from "@/components/account/profile-header";
 import { LocalStatsSection } from "@/components/account/local-stats-section";
-import { ArenaStatsSection } from "@/components/account/arena-stats-section";
+import { FriendStatsSection } from "@/components/account/friend-stats-section";
 import { GameRecordsSection } from "@/components/account/game-records-section";
 import { FriendsSection } from "@/components/account/friends-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +23,7 @@ import { GameMode, type User as ProfileUser } from "@mindarena/shared";
 import { toast } from "sonner";
 import { useFriends } from "@/hooks/use-friends";
 import { useDuel } from "@/hooks/use-duel";
+import { DuelFriendPicker } from "@/components/arena/duel-friend-picker";
 
 interface AccountPageContentProps {
   user: ProfileUser;
@@ -164,7 +165,7 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
                   }`}
                 >
                   <Swords className="h-4 w-4" />
-                  Arena
+                  Friend Duels
                 </button>
               </div>
 
@@ -174,7 +175,7 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
                   profileName={targetProfileName}
                 />
               ) : (
-                <ArenaStatsSection
+                <FriendStatsSection
                   isAuthenticated
                   profileName={targetProfileName}
                 />
@@ -240,6 +241,8 @@ export function AccountPageContent({ user, isOwner }: AccountPageContentProps) {
           </Tabs>
         </div>
       </main>
+
+      <DuelFriendPicker />
     </div>
   );
 }

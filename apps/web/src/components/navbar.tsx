@@ -31,8 +31,8 @@ import {
 
 const navItems = [
   { name: "Games", href: "/games", icon: Gamepad2 },
-  { name: "Arena", href: "/arena", icon: Swords },
-  { name: "Ranking", href: "/stats", icon: BarChart3 },
+  { name: "Play with Friends", href: "/play-with-friends", icon: Users },
+  { name: "Stats", href: "/stats", icon: BarChart3 },
 ];
 
 export function Navbar() {

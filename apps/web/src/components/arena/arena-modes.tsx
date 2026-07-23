@@ -39,10 +39,10 @@ export function ArenaModes({
 
   const modes = [
     {
-      title: "Ranked 1v1",
-      subtitle: "Climb the Ladder",
+      title: "1v1 Duel",
+      subtitle: "Head-to-Head Battle",
       description:
-        "Battle against a similarly skilled opponent. Win to earn RP and climb the global tiers.",
+        "Battle against a real-time opponent. Test your cognitive memory and reaction speed.",
       icon: Trophy,
       color: "from-amber-500 to-orange-600",
       status: "Active",

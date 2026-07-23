@@ -6,11 +6,10 @@ import {
   RotateCcw,
   Zap,
   TrendingUp,
-  Trophy,
+  Swords,
   Flame,
   Target,
   Award,
-  Sparkles,
   BarChart3,
   ShieldCheck,
 } from "lucide-react";
@@ -42,15 +41,15 @@ const GUEST_CARDS = [
     pills: ["Precision Rate %", "Reaction Speed", "Streak Rewards"],
   },
   {
-    category: "Global Competition",
-    title: "MindRank Division",
+    category: "Social Competition",
+    title: "1v1 Friend Duels",
     description:
-      "Climb through competitive skill tiers from Initiate to Grandmaster on global leaderboards.",
-    icon: Trophy,
+      "Challenge your friends to instant 1v1 memory duels and compare head-to-head standings.",
+    icon: Swords,
     colorClass: "text-portal-yellow bg-portal-yellow/10 border-portal-yellow/20",
     glowClass: "from-portal-yellow/20 via-portal-yellow/5 to-transparent",
     borderHover: "hover:border-portal-yellow/40",
-    pills: ["Global Ladder", "6 Rank Tiers", "Seasonal Leagues"],
+    pills: ["1v1 Duels", "Head-to-Head", "Friends Lobby"],
   },
 ];
 
@@ -82,7 +81,7 @@ function ProgressSkeleton() {
 }
 
 export function PlayerProgress() {
-  const { isAuthenticated, isHydrated, user } = useAuthStore();
+  const { isAuthenticated, isHydrated } = useAuthStore();
   const { data, isLoading, error, refetch } = useAuthenticatedQuery(
     () => gameResultApi.getStats("local"),
     isAuthenticated,
@@ -117,15 +116,15 @@ export function PlayerProgress() {
           pill: "🎯 Active Streak",
         },
         {
-          category: "Competitive Division",
-          label: "MindRank Standing",
-          value: user?.rankName ?? "Unranked",
-          description: "Your official skill division based on competitive rankings.",
+          category: "Social Duels",
+          label: "1v1 Duels Record",
+          value: "Friend Duelist",
+          description: "Your head-to-head performance record in 1v1 friend duels.",
           icon: Award,
           colorClass: "text-portal-yellow bg-portal-yellow/10 border-portal-yellow/20",
           glowClass: "from-portal-yellow/20 via-portal-yellow/5 to-transparent",
           borderHover: "hover:border-portal-yellow/40",
-          pill: "🏆 Rank Division",
+          pill: "⚔️ Friend Duelist",
         },
       ]
     : [];
@@ -139,17 +138,13 @@ export function PlayerProgress() {
         {/* Section Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-portal-mint/30 bg-portal-mint/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-portal-mint">
-              <Sparkles className="size-3.5" />
-              <span>{isAuthenticated ? "Personal Dashboard" : "Performance Engine"}</span>
-            </div>
-            <h2 id="progress-title" className="font-display mt-2 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+            <h2 id="progress-title" className="font-display text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
               {isAuthenticated ? "Your current form" : "Every run counts"}
             </h2>
             <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted-foreground">
               {isAuthenticated
-                ? "Track your cognitive metrics, total score accumulators, and global MindRank standing in real-time."
-                : "Train your memory, benchmark your cognitive agility, and unlock your true brain potential with instant feedback."}
+                ? "Track your cognitive metrics, total score accumulators, and friend duel standings in real-time."
+                : "Train your memory, benchmark your cognitive agility, and challenge your friends to 1v1 duels with instant feedback."}
             </p>
           </div>
           {!isAuthenticated && isHydrated && (
@@ -289,10 +284,10 @@ export function PlayerProgress() {
                     </div>
                     <div>
                       <h4 className="font-display text-sm font-bold text-foreground">
-                        Unlock Full Performance Analytics & Global Leaderboards
+                        Unlock Full Performance Analytics & 1v1 Friend Duels
                       </h4>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        Sign up for free to save your memory records, earn rank titles, and track long-term cognitive improvement.
+                        Sign up for free to save your memory records, challenge friends to 1v1 duels, and track long-term cognitive improvement.
                       </p>
                     </div>
                   </div>
@@ -314,4 +309,3 @@ export function PlayerProgress() {
     </section>
   );
 }
-

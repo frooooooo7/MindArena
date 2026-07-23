@@ -105,7 +105,7 @@ export function GameRecordsSection({
             }`}
           >
             <Swords className="h-3.5 w-3.5" />
-            Arena
+            Friend Duels
           </button>
         </div>
       </div>
