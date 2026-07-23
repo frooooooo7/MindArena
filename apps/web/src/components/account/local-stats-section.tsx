@@ -3,6 +3,7 @@
 import { GameResult, GameStats, gameResultApi } from "@/lib/game-result-api";
 import { Gamepad2 } from "lucide-react";
 import { StatsOverview } from "./stats-overview";
+import { StatsMetricGridSkeleton } from "./stats-bento";
 import { TopDisciplineCard } from "./top-discipline-card";
 import { GameHistoryList } from "./game-history-list";
 import { AccountPlaceholder } from "./account-placeholder";
@@ -75,15 +76,8 @@ export function LocalStatsSection({
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[...Array(2)].map((_, i) => (
-            <div
-              key={i}
-              className="p-6 rounded-3xl border border-white/10 bg-white/[0.02] h-36"
-            />
-          ))}
-        </div>
+      <div className="space-y-6">
+        <StatsMetricGridSkeleton />
       </div>
     );
   }

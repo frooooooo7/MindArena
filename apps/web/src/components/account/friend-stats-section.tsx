@@ -5,6 +5,7 @@ import { GameResult, GameStats, gameResultApi } from "@/lib/game-result-api";
 import { GAME_TYPES } from "@/lib/games/game-types";
 import { Swords, Trophy, XCircle, TrendingUp, Gamepad2, Clock } from "lucide-react";
 import { AccountPlaceholder } from "./account-placeholder";
+import { StatsMetricGrid, StatsMetricGridSkeleton } from "./stats-bento";
 import { useAuthenticatedQuery } from "@/hooks/use-authenticated-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -92,79 +93,48 @@ export function FriendStatsSection({
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-3xl" />
-          ))}
-        </div>
+        <StatsMetricGridSkeleton />
         <Skeleton className="h-64 rounded-3xl" />
       </div>
     );
   }
 
-  const statCards = [
-    {
-      label: "Total Duels",
-      value: totalDuels.toString(),
-      subtext: "Matches played",
-      icon: Swords,
-      colorClass: "text-portal-mint bg-portal-mint/15 border-portal-mint/30",
-    },
-    {
-      label: "Duels Won",
-      value: wins.toString(),
-      subtext: "Victories",
-      icon: Trophy,
-      colorClass: "text-portal-mint bg-portal-mint/15 border-portal-mint/30",
-    },
-    {
-      label: "Duels Lost",
-      value: losses.toString(),
-      subtext: "Defeats",
-      icon: XCircle,
-      colorClass: "text-rose-400 bg-rose-500/15 border-rose-500/30",
-    },
-    {
-      label: "Win Rate %",
-      value: `${winRate}%`,
-      subtext: "Head-to-head accuracy",
-      icon: TrendingUp,
-      colorClass: "text-portal-mint bg-portal-mint/15 border-portal-mint/30",
-    },
-  ];
-
   return (
     <div className="space-y-6">
-      {/* Friend Duels Statistics Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat, i) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={i}
-              className="p-5 rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-xl flex flex-col justify-between hover:border-portal-mint/40 transition-all duration-300 group"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2.5 rounded-2xl border ${stat.colorClass} group-hover:scale-105 transition-transform`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                </div>
-                <p className="text-xs font-semibold text-muted-foreground">
-                  {stat.label}
-                </p>
-                <h3 className="font-display text-3xl font-black tracking-tight text-foreground mt-1">
-                  {stat.value}
-                </h3>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-muted-foreground font-medium">
-                {stat.subtext}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <StatsMetricGrid
+        metrics={[
+          {
+            label: "Total Duels",
+            value: totalDuels.toString(),
+            numericValue: totalDuels,
+            subtext: "Matches played",
+            icon: Swords,
+          },
+          {
+            label: "Duels Won",
+            value: wins.toString(),
+            numericValue: wins,
+            subtext: "Victories",
+            icon: Trophy,
+          },
+          {
+            label: "Duels Lost",
+            value: losses.toString(),
+            numericValue: losses,
+            subtext: "Defeats",
+            icon: XCircle,
+            tone: "rose",
+          },
+          {
+            label: "Win Rate %",
+            value: `${winRate}%`,
+            numericValue: winRate,
+            valueSuffix: "%",
+            subtext: "Head-to-head accuracy",
+            icon: TrendingUp,
+          },
+        ]}
+      />
 
       {/* Recent Duels Match History against Friends */}
       <div className="p-6 rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-xl space-y-6">
